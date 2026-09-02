@@ -1,0 +1,14 @@
+{
+  "name": "iiit-pune-campus-connect",
+  "version": "1.0.0",
+  "description": "IIIT Pune Campus Connect - Emergency Response Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

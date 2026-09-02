@@ -1,0 +1,459 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ===================================================================
+// CORE USER MODEL (Extended for Smart Campus Platform)
+// ===================================================================
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  passwordHash  String
+  name          String
+  role          String   // STUDENT, FACULTY, FACULTY_ADVISOR, HOSTEL_WARDEN, CLEARANCE_OFFICER, RESPONDER, ADMIN, SECURITY
+  contactNumber String
+  userId        String   @unique // MIS (students) / Employee ID (staff)
+  department    String?  // CSE, ECE, ADMIN, etc.
+  programme     String?  // B.Tech, M.Tech (students)
+  batch         String?  // 2024-2028 (students)
+  section       String?  // Section A, Section B, Section C
+  semester      Int?     // Current semester
+  hostelBlock   String?  // Hostel assignment (students)
+  advisorId     Int?     // Faculty Advisor reference (students)
+  isGraduating  Boolean  @default(false) // Eligible for no-dues
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations: Emergency System
+  requests         EmergencyRequest[]      @relation("ReporterRequests")
+  statusChanges    EmergencyStatusHistory[]
+  responder        Responder?
+
+  // Relations: Attendance System
+  enrollments      CourseEnrollment[]
+  taughtCourses    Course[]                @relation("FacultyCourses")
+  attendanceSessions AttendanceSession[]
+  attendanceRecords AttendanceRecord[]
+  attendanceAlerts AttendanceAlert[]
+
+  // Relations: Semester Registration
+  semesterRegistrations SemesterRegistration[]
+  regVerificationsGiven RegistrationVerification[] @relation("VerifierActions")
+
+  // Relations: No-Dues
+  noDuesApplications NoDuesApplication[]
+  clearanceActions   NoDuesClearance[] @relation("OfficerClearances")
+
+  // Relations: General
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+  uploadedFiles    FileUpload[]
+}
+
+// ===================================================================
+// ATTENDANCE MODULE
+// ===================================================================
+model Course {
+  id           Int      @id @default(autoincrement())
+  code         String   // e.g. "CS301"
+  name         String   // e.g. "Machine Learning"
+  credits      Int      @default(3)
+  semesterId   Int
+  semester     Semester @relation(fields: [semesterId], references: [id])
+  section      String   // "Section A (CSE)", "Section B (CSE)", "Section C (ECE)"
+  facultyId    Int
+  faculty      User     @relation("FacultyCourses", fields: [facultyId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  enrollments  CourseEnrollment[]
+  sessions     AttendanceSession[]
+  records      AttendanceRecord[]
+  alerts       AttendanceAlert[]
+
+  @@unique([code, section, semesterId])
+}
+
+model Semester {
+  id           Int      @id @default(autoincrement())
+  name         String   // "Odd Semester 2026-27", "Even Semester 2026-27"
+  year         Int      // 2026
+  term         String   // "ODD", "EVEN"
+  startDate    String   // "2026-07-15"
+  endDate      String   // "2026-12-15"
+  isActive     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  courses      Course[]
+  registrations SemesterRegistration[]
+}
+
+model CourseEnrollment {
+  id         Int      @id @default(autoincrement())
+  courseId   Int
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  studentId  Int
+  student    User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  enrolledAt DateTime @default(now())
+
+  @@unique([courseId, studentId])
+}
+
+model AttendanceSession {
+  id         Int      @id @default(autoincrement())
+  courseId   Int
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  date       String   // "YYYY-MM-DD"
+  topic      String?  // Optional lecture topic
+  conductedById Int
+  conductedBy  User   @relation(fields: [conductedById], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  records    AttendanceRecord[]
+
+  @@unique([courseId, date])
+}
+
+model AttendanceRecord {
+  id          Int               @id @default(autoincrement())
+  sessionId   Int
+  session     AttendanceSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  courseId    Int
+  course     Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  studentId   Int
+  student     User              @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status      String            // "PRESENT", "ABSENT", "LATE"
+  markedAt    DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([sessionId, studentId])
+}
+
+model AttendanceAlert {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  courseId    Int
+  course     Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  percentage  Float    // Current attendance percentage at time of alert
+  alertType   String   // "WARNING" (<75%), "CRITICAL" (<65%)
+  message     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+// ===================================================================
+// SEMESTER REGISTRATION MODULE
+// ===================================================================
+model SemesterRegistration {
+  id            Int      @id @default(autoincrement())
+  studentId     Int
+  student       User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  semesterId    Int
+  semester      Semester @relation(fields: [semesterId], references: [id])
+  status        String   @default("PENDING") // PENDING, WARDEN_REVIEW, WARDEN_APPROVED, ADVISOR_REVIEW, APPROVED, REJECTED
+  wardenRemarks String?
+  advisorRemarks String?
+  submittedAt   DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  documents     RegistrationDocument[]
+  verifications RegistrationVerification[]
+  statusHistory RegistrationStatusHistory[]
+
+  @@unique([studentId, semesterId])
+}
+
+model RegistrationDocument {
+  id              Int                  @id @default(autoincrement())
+  registrationId  Int
+  registration    SemesterRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  documentType    String               // "ERP_PROOF", "FEE_RECEIPT", "OTHER"
+  documentName    String
+  filePath        String
+  fileType        String               // "pdf", "jpg", "png"
+  fileSize        Int                  // bytes
+  version         Int                  @default(1) // For resubmissions
+  status          String               @default("PENDING") // PENDING, VERIFIED, REJECTED, RESUBMISSION_REQUIRED
+  reviewerRemarks String?
+  uploadedAt      DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model RegistrationVerification {
+  id              Int                  @id @default(autoincrement())
+  registrationId  Int
+  registration    SemesterRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  verifierId      Int
+  verifier        User                 @relation("VerifierActions", fields: [verifierId], references: [id])
+  verifierRole    String               // "HOSTEL_WARDEN", "FACULTY_ADVISOR", "ADMIN"
+  action          String               // "APPROVED", "REJECTED", "RESUBMISSION_REQUIRED"
+  remarks         String?
+  timestamp       DateTime             @default(now())
+}
+
+model RegistrationStatusHistory {
+  id              Int                  @id @default(autoincrement())
+  registrationId  Int
+  registration    SemesterRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  fromStatus      String
+  toStatus        String
+  changedBy       String               // Name or role of who changed it
+  remarks         String?
+  timestamp       DateTime             @default(now())
+}
+
+// ===================================================================
+// NO-DUES CLEARANCE MODULE
+// ===================================================================
+model NoDuesApplication {
+  id            Int      @id @default(autoincrement())
+  studentId     Int
+  student       User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  batch         String   // "2020-2024"
+  programme     String   // "B.Tech CSE"
+  status        String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, REJECTED
+  submittedAt   DateTime @default(now())
+  completedAt   DateTime?
+  updatedAt     DateTime @updatedAt
+
+  clearances    NoDuesClearance[]
+  documents     NoDuesDocument[]
+  certificate   NoDuesCertificate?
+  statusHistory NoDuesStatusHistory[]
+
+  @@unique([studentId])
+}
+
+model NoDuesDepartment {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique // "Library / Information Service", "Hostel", etc.
+  displayOrder    Int      @default(0)
+  officerId       Int?     // Assigned clearance officer
+  requiredDocs    String?  // JSON array of required document types
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  clearances      NoDuesClearance[]
+}
+
+model NoDuesClearance {
+  id              Int               @id @default(autoincrement())
+  applicationId   Int
+  application     NoDuesApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  departmentId    Int
+  department      NoDuesDepartment  @relation(fields: [departmentId], references: [id])
+  officerId       Int?
+  officer         User?             @relation("OfficerClearances", fields: [officerId], references: [id])
+  status          String            @default("PENDING") // PENDING, APPROVED, REJECTED, CLARIFICATION_REQUIRED
+  amountDue       Float             @default(0) // Amount to be recovered in INR
+  remarks         String?
+  actionAt        DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([applicationId, departmentId])
+}
+
+model NoDuesDocument {
+  id              Int               @id @default(autoincrement())
+  applicationId   Int
+  application     NoDuesApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  documentName    String
+  filePath        String
+  fileType        String
+  fileSize        Int
+  category        String            // "LIBRARY", "HOSTEL", "ACCOUNTS", "GENERAL"
+  uploadedAt      DateTime          @default(now())
+}
+
+model NoDuesCertificate {
+  id              Int               @id @default(autoincrement())
+  applicationId   Int               @unique
+  application     NoDuesApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  certificateId   String            @unique // Unique ID like "IIITP-ND-2024-0001"
+  studentName     String
+  studentMIS      String
+  programme       String
+  batch           String
+  issuedAt        DateTime          @default(now())
+  pdfPath         String?
+  qrVerificationUrl String?
+  isValid         Boolean           @default(true)
+}
+
+model NoDuesStatusHistory {
+  id              Int               @id @default(autoincrement())
+  applicationId   Int
+  application     NoDuesApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  fromStatus      String
+  toStatus        String
+  changedBy       String
+  department      String?
+  remarks         String?
+  timestamp       DateTime          @default(now())
+}
+
+// ===================================================================
+// FILE UPLOAD SYSTEM
+// ===================================================================
+model FileUpload {
+  id              Int      @id @default(autoincrement())
+  originalName    String
+  storedName      String   // UUID-based filename for security
+  filePath        String
+  fileType        String   // "pdf", "jpg", "jpeg", "png"
+  fileSize        Int      // bytes
+  category        String   // "ERP_PROOF", "FEE_RECEIPT", "NO_DUES_DOC", "ADMIN_DOC"
+  uploadedById    Int
+  uploadedBy      User     @relation(fields: [uploadedById], references: [id])
+  relatedId       Int?     // Related application/registration ID
+  relatedType     String?  // "SEMESTER_REGISTRATION", "NO_DUES_APPLICATION"
+  uploadedAt      DateTime @default(now())
+}
+
+// ===================================================================
+// EMERGENCY SYSTEM (Existing — Preserved)
+// ===================================================================
+model Responder {
+  id                 Int                   @id @default(autoincrement())
+  userId             Int                   @unique
+  user               User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role               String                // "Campus Security", "Medical Team", etc.
+  latitude           Float
+  longitude          Float
+  availabilityStatus String                // AVAILABLE, BUSY, OFFLINE
+  currentWorkload    Int                   @default(0)
+  rating             Float                 @default(5.0)
+  responseTimeSum    Int                   @default(0)
+  resolvedCount      Int                   @default(0)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  skills             ResponderSkill[]
+  assignments        EmergencyAssignment[]
+}
+
+model ResponderSkill {
+  id          Int       @id @default(autoincrement())
+  responderId Int
+  responder   Responder @relation(fields: [responderId], references: [id], onDelete: Cascade)
+  skill       String
+  createdAt   DateTime  @default(now())
+}
+
+model EmergencyRequest {
+  id              String                   @id
+  reporterId      Int
+  reporter        User                     @relation("ReporterRequests", fields: [reporterId], references: [id])
+  reporterName    String
+  reporterContact String
+  type            String
+  severity        String
+  latitude        Float
+  longitude       Float
+  manualLocation  String?
+  description     String?
+  status          String
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  escalatedAt     DateTime?
+  escalationLevel Int                      @default(0)
+  resolvedAt      DateTime?
+  notes           String?
+  assignments     EmergencyAssignment[]
+  statusHistory   EmergencyStatusHistory[]
+  locationHistory EmergencyLocationHistory[]
+}
+
+model EmergencyAssignment {
+  id          Int              @id @default(autoincrement())
+  requestId   String
+  request     EmergencyRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  responderId Int
+  responder   Responder        @relation(fields: [responderId], references: [id], onDelete: Cascade)
+  status      String
+  assignedAt  DateTime         @default(now())
+  respondedAt DateTime?
+  createdAt   DateTime         @default(now())
+}
+
+model EmergencyLocationHistory {
+  id          Int              @id @default(autoincrement())
+  requestId   String
+  request     EmergencyRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  latitude    Float
+  longitude   Float
+  timestamp   DateTime         @default(now())
+}
+
+model EmergencyStatusHistory {
+  id          Int              @id @default(autoincrement())
+  requestId   String
+  request     EmergencyRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  status      String
+  changedById Int
+  changedBy   User             @relation(fields: [changedById], references: [id])
+  timestamp   DateTime         @default(now())
+  note        String?
+}
+
+// ===================================================================
+// SHARED PLATFORM MODELS
+// ===================================================================
+model Notification {
+  id          Int      @id @default(autoincrement())
+  recipientId Int
+  recipient   User     @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  title       String
+  message     String
+  type        String   // INFO, ALERT, CRITICAL, ATTENDANCE, REGISTRATION, NO_DUES
+  category    String   @default("GENERAL") // EMERGENCY, ATTENDANCE, REGISTRATION, NO_DUES, SYSTEM
+  actionUrl   String?  // Deep link to relevant module
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model EmergencyContact {
+  id         Int      @id @default(autoincrement())
+  name       String
+  number     String
+  department String
+  createdAt  DateTime @default(now())
+}
+
+model CampusLocation {
+  id        Int      @id @default(autoincrement())
+  name      String
+  latitude  Float
+  longitude Float
+  type      String
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  action    String   // "ATTENDANCE_MARKED", "REGISTRATION_APPROVED", "CLEARANCE_GRANTED", etc.
+  module    String   @default("GENERAL") // "ATTENDANCE", "REGISTRATION", "NO_DUES", "EMERGENCY", "SYSTEM"
+  details   String
+  ipAddress String?
+  timestamp DateTime @default(now())
+}
+
+// ===================================================================
+// SYSTEM CONFIGURATION
+// ===================================================================
+model SystemConfig {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique // "ATTENDANCE_WARNING_THRESHOLD", "ATTENDANCE_CRITICAL_THRESHOLD", etc.
+  value     String   // "75", "65", etc.
+  module    String   // "ATTENDANCE", "REGISTRATION", "NO_DUES", "SYSTEM"
+  updatedAt DateTime @updatedAt
+}
