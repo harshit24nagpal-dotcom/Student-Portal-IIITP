@@ -6,9 +6,11 @@ import L from 'leaflet';
 import { 
   Heart, Flame, ShieldAlert, Activity, AlertCircle, HelpCircle, 
   MapPin, Phone, User, Clock, AlertTriangle, Shield, CheckCircle,
-  BookOpen, Building, Calendar, GraduationCap, Sparkles, Send, Award, CheckCircle2, ChevronRight
+  BookOpen, Building, Calendar, GraduationCap, Sparkles, Send, Award, CheckCircle2, ChevronRight, FileCheck, CheckSquare, AlertOctagon
 } from 'lucide-react';
 import SOSModal from '../components/SOSModal';
+import SemesterRegistrationTab from '../components/SemesterRegistrationTab';
+import NoDuesClearanceTab from '../components/NoDuesClearanceTab';
 
 // Helper to create custom Leaflet marker icons with CSS and emojis
 const createMarkerIcon = (color, emoji) => {
@@ -265,84 +267,207 @@ export default function StudentDashboard() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-100">
-      {/* Top Banner: Student Institutional Header */}
-      <div className="glass-card p-6 rounded-2xl border border-iiitp-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-900">
+      {/* Header Greeting Banner */}
+      <div className="glass-card p-6 rounded-2xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm bg-white">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-iiitp-gold/15 border border-iiitp-gold/30 text-iiitp-gold text-[10px] font-black uppercase rounded tracking-wider">
+            <span className="px-2.5 py-0.5 bg-blue-50 border border-blue-200 text-blue-800 text-[10px] font-black uppercase rounded tracking-wider">
               OFFICIAL STUDENT PORTAL
             </span>
-            <span className="text-xxs text-slate-400 font-mono">
+            <span className="text-xxs text-slate-500 font-mono font-bold">
               MIS: {user?.userId || '112415079'}
             </span>
           </div>
-          <h2 className="text-2xl font-black text-white mt-1">Welcome back, {user?.name}!</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Indian Institute of Information Technology, Pune • Academic Session 2024-2028
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight">
+            Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name || 'Student'}!
+          </h2>
+          <p className="text-xs text-slate-500 mt-0.5 font-medium">
+            Here's what's happening with your campus life at IIIT Pune.
           </p>
         </div>
 
-        {/* Portal Module Tab Selector */}
-        <div className="flex flex-wrap gap-1.5 p-1.5 bg-slate-950 border border-slate-800 rounded-xl">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsSosOpen(true)}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-xl tracking-wider shadow-md flex items-center gap-2 transition-all cursor-pointer animate-pulse"
+          >
+            <ShieldAlert className="w-4 h-4" />
+            <span>Emergency SOS</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Top 4 Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Attendance Summary */}
+        <div 
+          onClick={() => setPortalTab('attendance')}
+          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
+            portalTab === 'attendance'
+              ? 'bg-white border-emerald-500 shadow-md ring-2 ring-emerald-500/20'
+              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">Overall Attendance</span>
+            <CheckSquare className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <h3 className="text-2xl font-black text-slate-900">82%</h3>
+            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black uppercase rounded">
+              Good Standing
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2 font-medium">Target threshold 75% • All courses safe</p>
+        </div>
+
+        {/* Semester Registration Summary */}
+        <div 
+          onClick={() => setPortalTab('registration')}
+          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
+            portalTab === 'registration'
+              ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-500/20'
+              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">Semester Registration</span>
+            <FileCheck className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <h3 className="text-xl font-black text-slate-900">Verified</h3>
+            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-black uppercase rounded">
+              Approved
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2 font-medium">Warden & Advisor approvals complete</p>
+        </div>
+
+        {/* No-Dues Clearance Summary */}
+        <div 
+          onClick={() => setPortalTab('nodues')}
+          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
+            portalTab === 'nodues'
+              ? 'bg-white border-amber-500 shadow-md ring-2 ring-amber-500/20'
+              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">No-Dues Clearance</span>
+            <GraduationCap className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <h3 className="text-xl font-black text-slate-900">15 / 15</h3>
+            <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-black uppercase rounded">
+              Cleared
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2 font-medium">Ready to download certificate</p>
+        </div>
+
+        {/* Emergency Alert Summary */}
+        <div 
+          onClick={() => setPortalTab('sos')}
+          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
+            activeEmergency 
+              ? 'bg-red-50 border-red-300 shadow-md animate-pulse'
+              : portalTab === 'sos'
+              ? 'bg-white border-red-500 shadow-md ring-2 ring-red-500/20'
+              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">Emergency Status</span>
+            <ShieldAlert className={`w-4 h-4 ${activeEmergency ? 'text-red-600 animate-bounce' : 'text-slate-400'}`} />
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <h3 className="text-base font-black text-slate-900 truncate">
+              {activeEmergency ? 'ACTIVE ALERT' : 'No Active Alerts'}
+            </h3>
+            <span className={`px-2 py-0.5 border text-[10px] font-black uppercase rounded ${
+              activeEmergency ? 'bg-red-100 text-red-700 border-red-300' : 'bg-slate-100 text-slate-600 border-slate-200'
+            }`}>
+              {activeEmergency ? activeEmergency.status : 'Normal'}
+            </span>
+          </div>
+          <p className="text-[10px] text-slate-500 mt-2 font-medium">Campus Security & Response Active</p>
+        </div>
+      </div>
+
+      {/* Quick Action Navigation Tabs */}
+      <div className="flex items-center justify-between border-b border-slate-200 pb-2 overflow-x-auto">
+        <div className="flex gap-2">
           <button
             onClick={() => setPortalTab('sos')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'sos'
-                ? 'bg-iiitp-danger text-white shadow-glow-danger'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-red-600 text-white shadow-md'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
             }`}
           >
-            <ShieldAlert className="w-3.5 h-3.5" />
+            <ShieldAlert className="w-4 h-4" />
             <span>Emergency SOS</span>
           </button>
 
           <button
             onClick={() => setPortalTab('attendance')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'attendance'
-                ? 'bg-iiitp-success text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-emerald-600 text-white shadow-lg'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
-            <CheckSquare className="w-3.5 h-3.5" />
-            <span>Attendance Portal</span>
+            <CheckSquare className="w-4 h-4" />
+            <span>Attendance</span>
+          </button>
+
+          <button
+            onClick={() => setPortalTab('registration')}
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+              portalTab === 'registration'
+                ? 'bg-blue-600 text-white shadow-lg'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <FileCheck className="w-4 h-4" />
+            <span>Semester Registration</span>
+          </button>
+
+          <button
+            onClick={() => setPortalTab('nodues')}
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+              portalTab === 'nodues'
+                ? 'bg-amber-600 text-white shadow-lg'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4" />
+            <span>No-Dues Clearance</span>
           </button>
 
           <button
             onClick={() => setPortalTab('academics')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'academics'
-                ? 'bg-iiitp-gold text-slate-950 font-extrabold shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-indigo-600 text-white shadow-lg'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5" />
-            <span>Academics</span>
+            <BookOpen className="w-4 h-4" />
+            <span>Academics & Documents</span>
           </button>
 
           <button
             onClick={() => setPortalTab('facilities')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'facilities'
-                ? 'bg-iiitp-info text-white shadow'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-teal-600 text-white shadow-lg'
+                : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800'
             }`}
           >
-            <Building className="w-3.5 h-3.5" />
+            <Building className="w-4 h-4" />
             <span>Facilities</span>
-          </button>
-
-          <button
-            onClick={() => setPortalTab('clubs')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 transition-all ${
-              portalTab === 'clubs'
-                ? 'bg-purple-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Clubs & Fests</span>
           </button>
 
           <button
@@ -580,6 +705,8 @@ export default function StudentDashboard() {
               </div>
             </div>
           )}
+        </>
+      )}
 
       {/* VIEW 2: SUBJECT ATTENDANCE TRACKER */}
       {portalTab === 'attendance' && (
@@ -1042,6 +1169,12 @@ export default function StudentDashboard() {
           </div>
         </div>
       )}
+
+      {/* VIEW: SEMESTER REGISTRATION */}
+      {portalTab === 'registration' && <SemesterRegistrationTab />}
+
+      {/* VIEW: NO-DUES CLEARANCE */}
+      {portalTab === 'nodues' && <NoDuesClearanceTab />}
 
       {/* VIEW 5: STUDENT IDENTITY & PROFILE */}
       {portalTab === 'profile' && (

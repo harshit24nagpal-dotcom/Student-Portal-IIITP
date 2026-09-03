@@ -8,18 +8,20 @@ export default {
     extend: {
       colors: {
         iiitp: {
-          navy: '#0B1B3D',       // Premium Academic Navy
-          burgundy: '#7A1C1C',   // Rich Academic Red
-          gold: '#C5A880',       // Accent Gold
-          cream: '#F4F2EE',      // Warm off-white
-          dark: '#030712',       // Sleek Dark Background
-          card: '#0f172a',       // Slate Card
-          border: '#334155',     // Slate Border
-          lightBorder: '#e2e8f0',// Light Mode Border
-          danger: '#dc2626',     // SOS Red
-          success: '#16a34a',    // Resolved Green
-          warning: '#ea580c',    // Escalation Orange
-          info: '#2563eb',       // Inbound Blue
+          officialNavy: '#0B1D48', // Official IIIT Pune website header blue
+          officialRed: '#D9232D',  // Official IIIT Pune website button red
+          navy: '#0B1B3D',         // Premium Academic Navy
+          burgundy: '#7A1C1C',     // Rich Academic Red
+          gold: '#C5A880',         // Accent Gold
+          cream: '#F4F2EE',        // Warm off-white
+          dark: '#030712',         // Sleek Dark Background
+          card: '#0f172a',         // Slate Card
+          border: '#334155',       // Slate Border
+          lightBorder: '#e2e8f0',  // Light Mode Border
+          danger: '#dc2626',       // SOS Red
+          success: '#16a34a',      // Resolved Green
+          warning: '#ea580c',      // Escalation Orange
+          info: '#2563eb',         // Inbound Blue
         }
       },
       fontFamily: {

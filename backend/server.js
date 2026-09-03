@@ -3,6 +3,8 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Import routers
 import authRouter from './routes/auth.js';
@@ -12,11 +14,18 @@ import locationsRouter from './routes/locations.js';
 import contactsRouter from './routes/contacts.js';
 import analyticsRouter from './routes/analytics.js';
 import attendanceRouter from './routes/attendance.js';
+import registrationRouter from './routes/registration.js';
+import noduesRouter from './routes/nodues.js';
+import filesRouter from './routes/files.js';
+import notificationsRouter from './routes/notifications.js';
 
 // Import background services
 import { startEscalationService } from './services/escalation.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
@@ -30,6 +39,9 @@ app.use(
 );
 
 app.use(express.json());
+
+// Serve static uploaded files (PDFs, images)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Set up Socket.IO
 const io = new Server(server, {
@@ -50,10 +62,14 @@ app.use('/api/locations', locationsRouter);
 app.use('/api/contacts', contactsRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/attendance', attendanceRouter);
+app.use('/api/registration', registrationRouter);
+app.use('/api/nodues', noduesRouter);
+app.use('/api/files', filesRouter);
+app.use('/api/notifications', notificationsRouter);
 
 // Basic health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', time: new Date() });
+  res.json({ status: 'ok', platform: 'IIIT Pune Campus Connect', time: new Date() });
 });
 
 // Socket.IO connection handling

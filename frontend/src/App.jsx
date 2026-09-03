@@ -7,6 +7,8 @@ import StudentDashboard from './pages/StudentDashboard';
 import ResponderDashboard from './pages/ResponderDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import FacultyDashboard from './pages/FacultyDashboard';
+import WardenDashboard from './pages/WardenDashboard';
+import ClearanceOfficerDashboard from './pages/ClearanceOfficerDashboard';
 import { Shield } from 'lucide-react';
 import './App.css';
 
@@ -39,7 +41,12 @@ function MainLayout() {
       case 'RESPONDER':
         return <ResponderDashboard />;
       case 'FACULTY':
+      case 'FACULTY_ADVISOR':
         return <FacultyDashboard />;
+      case 'HOSTEL_WARDEN':
+        return <WardenDashboard />;
+      case 'CLEARANCE_OFFICER':
+        return <ClearanceOfficerDashboard />;
       case 'STUDENT':
       default:
         return <StudentDashboard />;

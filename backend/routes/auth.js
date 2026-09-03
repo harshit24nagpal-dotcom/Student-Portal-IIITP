@@ -90,6 +90,20 @@ router.post('/register', async (req, res) => {
       },
     });
 
+    console.log(`[BACKEND LOG] New Student Registered: ${newUser.name} (${newUser.email}) - MIS: ${newUser.userId}`);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('user_created', {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        userId: newUser.userId,
+        createdAt: newUser.createdAt,
+      });
+    }
+
     const token = jwt.sign(
       { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role },
       JWT_SECRET,
@@ -195,6 +209,100 @@ router.post('/quick-login', async (req, res) => {
         contactNumber: user.contactNumber,
         userId: user.userId,
         responder: user.responder,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET list of all registered users (for Admin Directory)
+router.get('/users', authenticateToken, async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        contactNumber: true,
+        userId: true,
+        createdAt: true,
+        department: true,
+        section: true,
+        hostelBlock: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST Admin endpoint to create a user with any role directly
+router.post('/admin-create-user', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Only Administrators can create users via this console.' });
+    }
+
+    const { name, email, password, role, contactNumber, userId, department, section, hostelBlock } = req.body;
+
+    if (!name || !email || !password || !role) {
+      return res.status(400).json({ error: 'Name, email, password, and role are required.' });
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    // Check existing
+    const existing = await prisma.user.findUnique({ where: { email: trimmedEmail } });
+    if (existing) {
+      return res.status(400).json({ error: 'An account with this email address already exists.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const generatedUserId = userId || (Math.floor(100000000 + Math.random() * 900000000)).toString();
+
+    const createdUser = await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: trimmedEmail,
+        passwordHash,
+        role: role.toUpperCase(),
+        contactNumber: contactNumber || '+91 9988776655',
+        userId: generatedUserId,
+        department: department || 'Computer Science & Engineering',
+        section: section || 'Section A (CSE)',
+        hostelBlock: hostelBlock || 'Vindhyachal BH-1',
+      },
+    });
+
+    console.log(`[BACKEND LOG] New User Created via Frontend Console: ${createdUser.name} (${createdUser.email}) - Role: ${createdUser.role}`);
+
+    // Emit Socket.IO event to all connected admin clients
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('user_created', {
+        id: createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+        role: createdUser.role,
+        userId: createdUser.userId,
+        createdAt: createdUser.createdAt,
+      });
+    }
+
+    res.status(201).json({
+      message: 'User account created successfully in database!',
+      user: {
+        id: createdUser.id,
+        name: createdUser.name,
+        email: createdUser.email,
+        role: createdUser.role,
+        userId: createdUser.userId,
+        contactNumber: createdUser.contactNumber,
+        department: createdUser.department,
       },
     });
   } catch (error) {

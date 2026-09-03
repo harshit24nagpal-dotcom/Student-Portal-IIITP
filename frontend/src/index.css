@@ -4,8 +4,8 @@
 
 @layer base {
   body {
-    background-color: #030712;
-    color: #f8fafc;
+    background-color: #f8fafc;
+    color: #0f172a;
     font-family: 'Outfit', 'Inter', sans-serif;
   }
 }
@@ -17,44 +17,43 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.3);
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #cbd5e1;
   border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94a3b8;
 }
 
-/* Custom premium components */
+/* Premium Light Theme Component Utilities */
 .glass {
-  background: rgba(15, 23, 42, 0.75);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #e2e8f0;
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #f1f5f9;
 }
 
 .glass-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.4) 100%);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -2px rgba(15, 23, 42, 0.03);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
   transform: translateY(-2px);
 }
 
@@ -64,7 +63,7 @@
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7), 0 0 0 0 rgba(220, 38, 38, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 20px rgba(220, 38, 38, 0), 0 0 0 40px rgba(220, 38, 38, 0);
+    box-shadow: 0 0 0 16px rgba(220, 38, 38, 0), 0 0 0 32px rgba(220, 38, 38, 0);
   }
   100% {
     box-shadow: 0 0 0 0 rgba(220, 38, 38, 0), 0 0 0 0 rgba(220, 38, 38, 0);
@@ -89,46 +88,41 @@
   animation: signal-flow 1.5s linear infinite;
 }
 
-/* Leaflet map container fix */
+/* Leaflet map container light mode */
 .leaflet-container {
-  background-color: #0d1527 !important;
+  background-color: #e2e8f0 !important;
   font-family: inherit;
 }
 
-/* Dark mode tiles styling on Leaflet */
-.leaflet-tile {
-  filter: brightness(0.6) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) !important;
-}
-
 .leaflet-bar {
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff !important;
   border-radius: 8px !important;
   overflow: hidden;
 }
 
 .leaflet-bar a {
-  background: rgba(15, 23, 42, 0.8) !important;
-  color: #94a3b8 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
 }
 
 .leaflet-bar a:hover {
-  background: #1e293b !important;
-  color: #f8fafc !important;
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: rgba(15, 23, 42, 0.9) !important;
-  color: #f8fafc !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(10px);
-  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
 }
 
 .leaflet-popup-tip {
-  background: rgba(15, 23, 42, 0.9) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
 /* Step timeline lines */
@@ -140,7 +134,7 @@
   transform: translateX(-50%);
   width: 2px;
   height: calc(100% + 1rem);
-  background-color: #334155;
+  background-color: #cbd5e1;
   z-index: -1;
 }
 

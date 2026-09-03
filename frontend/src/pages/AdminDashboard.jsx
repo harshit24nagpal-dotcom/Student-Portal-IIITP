@@ -6,7 +6,7 @@ import L from 'leaflet';
 import { 
   Shield, AlertTriangle, ShieldCheck, MapPin, Phone, 
   Users, Activity, Check, Plus, Trash2, Clock, 
-  Award, TrendingUp, Settings, Radio 
+  Award, TrendingUp, Settings, Radio, UserPlus, CheckCircle2 
 } from 'lucide-react';
 import AnalyticsDashboard from './AnalyticsDashboard';
 
@@ -62,6 +62,17 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
   const [newContactNum, setNewContactNum] = useState('');
   const [newContactDept, setNewContactDept] = useState('');
 
+  // User management state
+  const [usersList, setUsersList] = useState([]);
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserRole, setNewUserRole] = useState('STUDENT');
+  const [newUserContact, setNewUserContact] = useState('');
+  const [newUserMIS, setNewUserMIS] = useState('');
+  const [userSuccessMsg, setUserSuccessMsg] = useState('');
+  const [userErrorMsg, setUserErrorMsg] = useState('');
+
   // Fetch initial data
   useEffect(() => {
     if (token) {
@@ -69,8 +80,60 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
       fetchResponders();
       fetchLocations();
       fetchContacts();
+      fetchUsers();
     }
   }, [token]);
+
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/users', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (Array.isArray(data)) setUsersList(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    setUserSuccessMsg('');
+    setUserErrorMsg('');
+
+    try {
+      const res = await fetch('http://localhost:5000/api/auth/admin-create-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: newUserName,
+          email: newUserEmail,
+          password: newUserPassword,
+          role: newUserRole,
+          contactNumber: newUserContact,
+          userId: newUserMIS,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        setUserSuccessMsg(`User '${data.user.name}' (${data.user.role}) created and synced to backend!`);
+        setNewUserName('');
+        setNewUserEmail('');
+        setNewUserPassword('');
+        setNewUserContact('');
+        setNewUserMIS('');
+        fetchUsers();
+      } else {
+        setUserErrorMsg(data.error || 'Failed to create user');
+      }
+    } catch (err) {
+      setUserErrorMsg('Network error while creating user');
+    }
+  };
 
   const fetchEmergencies = async () => {
     try {
@@ -172,16 +235,22 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
       ));
     };
 
+    const handleUserCreated = () => {
+      fetchUsers();
+    };
+
     socket.on('new_emergency', handleNewEmergency);
     socket.on('emergency_updated', handleEmergencyUpdated);
     socket.on('emergency_escalated', handleEmergencyUpdated);
     socket.on('responder_location_updated', handleResponderLocation);
+    socket.on('user_created', handleUserCreated);
 
     return () => {
       socket.off('new_emergency', handleNewEmergency);
       socket.off('emergency_updated', handleEmergencyUpdated);
       socket.off('emergency_escalated', handleEmergencyUpdated);
       socket.off('responder_location_updated', handleResponderLocation);
+      socket.off('user_created', handleUserCreated);
     };
   }, [socket, selectedEmergency]);
 
@@ -389,6 +458,21 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
             >
               <Phone className="w-4 h-4 text-iiitp-info" />
               <span>Hotline Numbers</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('users')}
+              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+                activeTab === 'users' 
+                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
+                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+              }`}
+            >
+              <UserPlus className="w-4 h-4 text-emerald-400" />
+              <span>User Directory & Accounts</span>
+              <span className="ml-auto bg-slate-800 text-slate-300 text-[9px] font-black px-1.5 py-0.5 rounded-full">
+                {usersList.length}
+              </span>
             </button>
 
             <button
@@ -987,7 +1071,164 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
           </div>
         )}
 
-        {/* Tab 5: Analytics Sub-panel */}
+        {/* Tab 5: User Directory & Accounts */}
+        {activeTab === 'users' && (
+          <div className="space-y-6">
+            <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-emerald-400" />
+              IIIT Pune User Account Manager & Database Directory
+            </h2>
+
+            {userSuccessMsg && (
+              <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs rounded-xl flex items-center gap-2 font-bold animate-pulse">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                {userSuccessMsg}
+              </div>
+            )}
+
+            {userErrorMsg && (
+              <div className="p-4 bg-red-950/40 border border-red-500/40 text-red-300 text-xs rounded-xl flex items-center gap-2 font-bold">
+                <AlertTriangle className="w-4 h-4 text-red-400" />
+                {userErrorMsg}
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Form to create user */}
+              <div className="lg:col-span-1 glass-card p-5 rounded-2xl border border-slate-800 space-y-4 h-fit">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">Create New Institutional Account</h3>
+                <form onSubmit={handleCreateUser} className="space-y-3.5 text-xs">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Full Name</label>
+                    <input
+                      type="text"
+                      required
+                      value={newUserName}
+                      onChange={(e) => setNewUserName(e.target.value)}
+                      placeholder="e.g. Prof. Ramesh Sharma"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Institutional Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={newUserEmail}
+                      onChange={(e) => setNewUserEmail(e.target.value)}
+                      placeholder="e.g. ramesh@iiitp.ac.in"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Account Password</label>
+                    <input
+                      type="password"
+                      required
+                      value={newUserPassword}
+                      onChange={(e) => setNewUserPassword(e.target.value)}
+                      placeholder="Min 6 characters"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">System Role</label>
+                    <select
+                      value={newUserRole}
+                      onChange={(e) => setNewUserRole(e.target.value)}
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs font-bold"
+                    >
+                      <option value="STUDENT">STUDENT</option>
+                      <option value="FACULTY">FACULTY / ADVISOR</option>
+                      <option value="HOSTEL_WARDEN">HOSTEL WARDEN</option>
+                      <option value="CLEARANCE_OFFICER">CLEARANCE OFFICER</option>
+                      <option value="RESPONDER">RESPONDER / SECURITY</option>
+                      <option value="ADMIN">ADMINISTRATOR</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">MIS / Roll No / ID</label>
+                    <input
+                      type="text"
+                      value={newUserMIS}
+                      onChange={(e) => setNewUserMIS(e.target.value)}
+                      placeholder="Optional (e.g. 112415099)"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Contact Number</label>
+                    <input
+                      type="text"
+                      value={newUserContact}
+                      onChange={(e) => setNewUserContact(e.target.value)}
+                      placeholder="+91 9988776655"
+                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none text-xs"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-lg text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4 cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" /> Create & Persist User
+                  </button>
+                </form>
+              </div>
+
+              {/* Table list of database users */}
+              <div className="lg:col-span-2 glass-card p-5 rounded-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[550px]">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex justify-between items-center">
+                  <span>Backend Database User Directory ({usersList.length} Accounts)</span>
+                  <span className="text-xxs text-emerald-400 font-bold uppercase">Real-Time Sync Active ✓</span>
+                </h3>
+                <div className="flex-1 overflow-y-auto pr-1">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+                        <th className="pb-2.5">User Name</th>
+                        <th className="pb-2.5">Email</th>
+                        <th className="pb-2.5">Role</th>
+                        <th className="pb-2.5">MIS / ID</th>
+                        <th className="pb-2.5">Registered</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-850">
+                      {usersList.map((u) => (
+                        <tr key={u.id} className="text-slate-300 hover:text-white">
+                          <td className="py-2.5 font-bold text-white">{u.name}</td>
+                          <td className="py-2.5 font-mono text-slate-300">{u.email}</td>
+                          <td className="py-2.5">
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
+                              u.role === 'ADMIN' ? 'bg-purple-950 text-purple-400 border-purple-500/40' :
+                              u.role === 'STUDENT' ? 'bg-blue-950 text-blue-400 border-blue-500/40' :
+                              u.role === 'FACULTY' ? 'bg-iiitp-gold/20 text-iiitp-gold border-iiitp-gold/40' :
+                              u.role === 'HOSTEL_WARDEN' ? 'bg-amber-950 text-amber-400 border-amber-500/40' :
+                              'bg-emerald-950 text-emerald-400 border-emerald-500/40'
+                            }`}>
+                              {u.role}
+                            </span>
+                          </td>
+                          <td className="py-2.5 font-mono text-iiitp-gold font-bold">{u.userId}</td>
+                          <td className="py-2.5 font-mono text-[10px] text-slate-500">
+                            {new Date(u.createdAt).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 6: Analytics Sub-panel */}
         {activeTab === 'analytics' && (
           <div className="space-y-6 animate-in fade-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">

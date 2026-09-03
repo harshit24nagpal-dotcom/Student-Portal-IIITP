@@ -50,13 +50,16 @@ router.get('/section-students', authenticateToken, async (req, res) => {
         email: true,
         userId: true,
         contactNumber: true,
+        section: true,
+        department: true,
+        batch: true,
       },
       orderBy: { userId: 'asc' },
     });
 
-    // Filter students by section if specified
     if (section) {
       students = students.filter(s => {
+        if (s.section === section) return true;
         const uStr = String(s.userId || s.email || '').split('@')[0];
         const misNum = parseInt(uStr.slice(-3)) || 0;
         if (section.includes('Section A')) {
@@ -88,36 +91,64 @@ router.post('/mark', authenticateToken, async (req, res) => {
     const facultyName = req.user.name || 'Faculty Instructor';
     const facultyId = req.user.id;
 
+    // Find or create active semester and course for relational sync
+    let activeSem = await prisma.semester.findFirst({ where: { isActive: true } });
+    if (!activeSem) {
+      activeSem = await prisma.semester.create({
+        data: { name: 'Odd Semester 2026-27', year: 2026, term: 'ODD', startDate: '2026-07-15', endDate: '2026-12-15', isActive: true }
+      });
+    }
+
+    let course = await prisma.course.findFirst({
+      where: { code: subjectCode, section, semesterId: activeSem.id }
+    });
+    if (!course) {
+      course = await prisma.course.create({
+        data: { code: subjectCode, name: subjectName || subjectCode, section, semesterId: activeSem.id, facultyId }
+      });
+    }
+
+    let session = await prisma.attendanceSession.findFirst({
+      where: { courseId: course.id, date }
+    });
+    if (!session) {
+      session = await prisma.attendanceSession.create({
+        data: { courseId: course.id, date, conductedById: facultyId, topic: `Lecture on ${date}` }
+      });
+    }
+
     const upsertPromises = records.map((rec) =>
       prisma.attendanceRecord.upsert({
         where: {
-          subjectCode_date_studentId: {
-            subjectCode,
-            date,
+          sessionId_studentId: {
+            sessionId: session.id,
             studentId: rec.studentId,
           },
         },
         update: {
           status: rec.status,
-          section,
-          subjectName,
-          facultyId,
-          facultyName,
         },
         create: {
-          subjectCode,
-          subjectName: subjectName || subjectCode,
-          section,
-          date,
+          sessionId: session.id,
+          courseId: course.id,
           studentId: rec.studentId,
-          facultyId,
-          facultyName,
           status: rec.status,
         },
       })
     );
 
     const savedRecords = await Promise.all(upsertPromises);
+
+    // Audit Log
+    await prisma.auditLog.create({
+      data: {
+        userId: facultyId,
+        action: 'ATTENDANCE_MARKED',
+        module: 'ATTENDANCE',
+        details: `Marked attendance for ${subjectCode} (${section}) on ${date} (${savedRecords.length} students)`
+      }
+    });
+
     res.json({ message: `Successfully saved ${savedRecords.length} attendance entries`, count: savedRecords.length });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -132,11 +163,15 @@ router.get('/marked-sheet', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'subjectCode, section, and date are required' });
     }
 
-    const records = await prisma.attendanceRecord.findMany({
-      where: { subjectCode, section, date },
+    const session = await prisma.attendanceSession.findFirst({
+      where: {
+        course: { code: subjectCode, section },
+        date
+      },
+      include: { records: true }
     });
 
-    res.json(records);
+    res.json(session ? session.records : []);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -147,27 +182,28 @@ router.get('/student-summary', authenticateToken, async (req, res) => {
   try {
     const studentId = req.user.id;
 
-    // Get all attendance entries for this student
     const records = await prisma.attendanceRecord.findMany({
       where: { studentId },
-      orderBy: { date: 'desc' },
+      include: {
+        course: true,
+        session: true
+      },
+      orderBy: { session: { date: 'desc' } },
     });
 
-    // Determine student section & relevant subjects
     const isEce = (req.user.email || '').includes('@ece.');
     const userIdStr = String(req.user.userId || req.user.email || '').split('@')[0];
     const misNum = parseInt(userIdStr.slice(-3)) || 0;
-    const studentSection = isEce 
+    const studentSection = req.user.section || (isEce 
       ? 'Section C (ECE)' 
       : misNum <= 82 
       ? 'Section A (CSE)' 
-      : 'Section B (CSE)';
+      : 'Section B (CSE)');
 
     const relevantSubjects = SUBJECT_DIRECTORY.filter(s => s.section === studentSection);
 
-    // Calculate subject-wise metrics
     const summary = relevantSubjects.map((sub) => {
-      const subRecords = records.filter(r => r.subjectCode === sub.code);
+      const subRecords = records.filter(r => r.course && r.course.code === sub.code);
       const totalClasses = subRecords.length;
       const attendedClasses = subRecords.filter(r => r.status === 'PRESENT').length;
       const absentClasses = subRecords.filter(r => r.status === 'ABSENT').length;
@@ -183,14 +219,80 @@ router.get('/student-summary', authenticateToken, async (req, res) => {
         absentClasses,
         percentage,
         isShortage: percentage < 75,
+        isCriticalShortage: percentage < 65,
       };
     });
 
     res.json({
       studentSection,
       summary,
-      detailedHistory: records,
+      detailedHistory: records.map(r => ({
+        id: r.id,
+        subjectCode: r.course?.code,
+        subjectName: r.course?.name,
+        date: r.session?.date,
+        status: r.status
+      })),
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET Faculty Advisor Students & Low Attendance Alerts
+router.get('/advisor-students', authenticateToken, async (req, res) => {
+  try {
+    if (!['FACULTY_ADVISOR', 'FACULTY', 'ADMIN'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Access denied. Faculty Advisor role required.' });
+    }
+
+    // Get all students
+    const students = await prisma.user.findMany({
+      where: { role: 'STUDENT' },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        userId: true,
+        contactNumber: true,
+        section: true,
+        department: true,
+        programme: true,
+        batch: true,
+        attendanceRecords: {
+          include: { course: true }
+        }
+      },
+      orderBy: { userId: 'asc' }
+    });
+
+    // Calculate each student's overall attendance %
+    const studentMetrics = students.map((s) => {
+      const total = s.attendanceRecords.length;
+      const attended = s.attendanceRecords.filter(r => r.status === 'PRESENT').length;
+      const percentage = total > 0 ? Math.round((attended / total) * 100) : 100;
+      let alertLevel = 'NORMAL';
+      if (percentage < 65) alertLevel = 'CRITICAL';
+      else if (percentage < 75) alertLevel = 'WARNING';
+
+      return {
+        id: s.id,
+        name: s.name,
+        email: s.email,
+        userId: s.userId,
+        contactNumber: s.contactNumber,
+        section: s.section,
+        department: s.department,
+        batch: s.batch,
+        totalClasses: total,
+        attendedClasses: attended,
+        absentClasses: total - attended,
+        percentage,
+        alertLevel
+      };
+    });
+
+    res.json(studentMetrics);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

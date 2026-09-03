@@ -97,18 +97,16 @@ npm run dev
 - **Backend API**: http://localhost:5000
 - **Health Check**: http://localhost:5000/health
 
-## 📡 API Endpoints
-
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/auth/register` | Register new user |
 | POST | `/api/auth/login` | User login |
-| GET | `/api/emergencies` | List all emergencies |
-| POST | `/api/emergencies` | Report new emergency |
-| GET | `/api/responders` | List responders |
-| GET | `/api/analytics` | Dashboard analytics |
-| GET | `/api/attendance` | Attendance records |
-| GET | `/api/locations` | Campus locations |
+| GET | `/api/emergencies/active` | Active emergency alerts |
+| POST | `/api/emergencies` | Report new emergency alert |
+| GET/POST | `/api/attendance/*` | Class attendance sheets, section rosters & advisor alerts |
+| GET/POST | `/api/registration/*` | Semester registration submission, Warden & Advisor clearance |
+| GET/POST | `/api/nodues/*` | 15-Department clearance matrix, officer verification & certificate generation |
+| POST | `/api/files/upload` | Document upload for registration proofs |
 
 ## 🤝 Contributing
 
