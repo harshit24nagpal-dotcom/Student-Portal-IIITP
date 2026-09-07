@@ -41,19 +41,19 @@ export default function Navigation({ activeTab, setActiveTab }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2 flex items-center justify-between shadow-xs">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between shadow-xs">
         {/* Left: Brand with Prominent Official IIIT Pune Logo */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3.5">
           <img 
             src="/iiitp_logo.png" 
             alt="IIIT Pune Official Logo" 
-            className="w-11 h-11 sm:w-12 sm:h-12 object-contain drop-shadow-sm transition-transform hover:scale-105" 
+            className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 object-contain drop-shadow-sm transition-transform hover:scale-105" 
           />
           <div className="flex flex-col justify-center">
-            <h1 className="font-black text-sm sm:text-base tracking-tight text-[#0c2340] leading-tight">
+            <h1 className="font-black text-base sm:text-lg tracking-tight text-[#0c2340] leading-tight">
               IIIT PUNE
             </h1>
-            <p className="text-[10px] text-slate-500 tracking-wider font-bold uppercase leading-tight">
+            <p className="text-[10px] sm:text-[11px] text-slate-500 tracking-wider font-bold uppercase leading-tight">
               CAMPUS PORTAL
             </p>
           </div>
