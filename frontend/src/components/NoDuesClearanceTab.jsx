@@ -83,27 +83,27 @@ export default function NoDuesClearanceTab() {
   return (
     <div className="space-y-6">
       {/* Banner */}
-      <div className="glass-card p-6 rounded-2xl border border-iiitp-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-iiitp-gold/20 text-iiitp-gold text-[10px] font-black uppercase rounded tracking-wider border border-iiitp-gold/30">
+            <span className="px-2.5 py-0.5 bg-amber-50 text-amber-800 text-[10px] font-bold uppercase rounded tracking-wider border border-amber-200">
               GRADUATING BATCH CLEARANCE
             </span>
-            <span className="text-xxs text-slate-400 font-mono">
+            <span className="text-xxs text-slate-500 font-mono">
               BATCH: {user?.batch || '2020-2024'}
             </span>
           </div>
-          <h3 className="text-xl font-black text-white mt-1">Graduating Batch No-Dues Clearance System</h3>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h3 className="text-xl font-bold text-slate-900 mt-1">Graduating Batch No-Dues Clearance System</h3>
+          <p className="text-xs text-slate-500 mt-0.5">
             Official 15-Department IIIT Pune No-Dues Certificate Clearance Protocol
           </p>
         </div>
 
         {application && (
           <div className="flex items-center gap-3">
-            <div className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl text-right">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">Clearance Progress</span>
-              <span className="text-xs font-black text-iiitp-gold">
+            <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-right">
+              <span className="text-[10px] text-slate-500 uppercase font-bold block">Clearance Progress</span>
+              <span className="text-xs font-bold text-[#1c398e]">
                 {approvedDepts} / {totalDepts} Approved ({Math.round((approvedDepts / (totalDepts || 1)) * 100)}%)
               </span>
             </div>
@@ -111,7 +111,7 @@ export default function NoDuesClearanceTab() {
             {isComplete && (
               <button
                 onClick={() => setShowCertModal(true)}
-                className="px-4 py-2 bg-iiitp-success text-white font-black text-xs uppercase rounded-xl tracking-wider shadow-glow-success flex items-center gap-2 hover:bg-green-700 transition-colors"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase rounded-xl tracking-wider shadow-sm flex items-center gap-2 transition-colors cursor-pointer"
               >
                 <GraduationCap className="w-4 h-4" />
                 View & Download Certificate
@@ -123,31 +123,31 @@ export default function NoDuesClearanceTab() {
 
       {/* Notifications */}
       {message && (
-        <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs rounded-xl flex items-center gap-2 font-bold animate-pulse">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold animate-pulse">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-950/40 border border-red-500/40 text-red-300 text-xs rounded-xl flex items-center gap-2 font-bold">
-          <AlertCircle className="w-4 h-4 text-red-400" />
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+          <AlertCircle className="w-4 h-4 text-red-600" />
           {error}
         </div>
       )}
 
       {/* Start Application prompt if not applied */}
       {!application && (
-        <div className="glass-card p-8 rounded-2xl border border-iiitp-border text-center max-w-xl mx-auto space-y-4">
-          <GraduationCap className="w-16 h-16 text-iiitp-gold mx-auto" />
-          <h4 className="text-lg font-black text-white">Graduation Clearance Protocol Ready</h4>
-          <p className="text-xs text-slate-400 leading-relaxed">
+        <div className="glass-card p-8 rounded-2xl border border-slate-200 bg-white text-center max-w-xl mx-auto space-y-4 shadow-sm">
+          <GraduationCap className="w-16 h-16 text-[#5367c8] mx-auto" />
+          <h4 className="text-lg font-bold text-slate-900">Graduation Clearance Protocol Ready</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">
             As a graduating batch candidate ({user?.programme || 'B.Tech CSE'}, Batch {user?.batch || '2020-2024'}), you are eligible to initiate digital No-Dues clearance across all 15 Institute departments.
           </p>
           <button
             onClick={handleApplyNoDues}
             disabled={applying}
-            className="px-6 py-3 bg-gradient-to-r from-iiitp-gold to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider shadow-glow-gold transition-all"
+            className="px-6 py-2.5 sm:py-3 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer"
           >
             {applying ? 'Initiating Application...' : 'Initiate 15-Department No-Dues Clearance'}
           </button>
@@ -158,12 +158,12 @@ export default function NoDuesClearanceTab() {
       {application && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-iiitp-gold" />
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#5367c8]" />
               15 Department Clearances Approval Matrix
             </h4>
             {totalAmountDue > 0 && (
-              <span className="px-3 py-1 bg-red-950/60 border border-red-500/40 text-red-400 text-xs font-black rounded-lg">
+              <span className="px-3 py-1 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-lg">
                 Total Outstanding Dues: ₹{totalAmountDue.toLocaleString('en-IN')}
               </span>
             )}
@@ -178,47 +178,47 @@ export default function NoDuesClearanceTab() {
               return (
                 <div 
                   key={c.id} 
-                  className={`p-4 rounded-xl border transition-all ${
+                  className={`p-4 rounded-xl border transition-all bg-white shadow-xs ${
                     isApp 
-                      ? 'bg-slate-900/60 border-emerald-500/30' 
+                      ? 'border-emerald-200' 
                       : isRej 
-                      ? 'bg-red-950/20 border-red-500/40' 
+                      ? 'border-red-200' 
                       : isClar
-                      ? 'bg-amber-950/20 border-amber-500/40'
-                      : 'bg-slate-900/40 border-slate-850'
+                      ? 'border-amber-200' 
+                      : 'border-slate-200'
                   }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="space-y-1">
-                      <span className="text-[9px] font-black text-slate-500 font-mono">DEPT {idx + 1}</span>
-                      <h5 className="text-xs font-extrabold text-white">{c.department?.name}</h5>
+                      <span className="text-[9px] font-bold text-slate-400 font-mono">DEPT {idx + 1}</span>
+                      <h5 className="text-xs font-bold text-slate-900">{c.department?.name}</h5>
                     </div>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
+                    <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded border ${
                       isApp 
-                        ? 'bg-iiitp-success/20 text-green-400 border-green-500/30' 
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                         : isRej 
-                        ? 'bg-iiitp-danger/20 text-red-400 border-red-500/30'
+                        ? 'bg-red-50 text-red-700 border-red-200' 
                         : isClar
-                        ? 'bg-amber-950 text-amber-400 border-amber-500/40'
-                        : 'bg-slate-800 text-slate-400 border-slate-700'
+                        ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                        : 'bg-slate-50 text-slate-600 border-slate-200'
                     }`}>
                       {c.status.replace(/_/g, ' ')}
                     </span>
                   </div>
 
-                  <div className="mt-3 pt-3 border-t border-slate-850 text-xxs space-y-1 text-slate-400">
+                  <div className="mt-3 pt-3 border-t border-slate-100 text-xxs space-y-1 text-slate-500">
                     <div className="flex justify-between">
                       <span>Clearance Officer:</span>
-                      <span className="font-bold text-slate-200">{c.officer?.name || 'Assigned Officer'}</span>
+                      <span className="font-semibold text-slate-800">{c.officer?.name || 'Assigned Officer'}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Dues / Recovery:</span>
-                      <span className={`font-mono font-bold ${c.amountDue > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                      <span className={`font-mono font-bold ${c.amountDue > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                         ₹{c.amountDue}
                       </span>
                     </div>
                     {c.remarks && (
-                      <p className="text-[10px] text-slate-300 italic bg-slate-950 p-2 rounded border border-slate-900 mt-1">
+                      <p className="text-[10px] text-slate-600 italic bg-slate-50 p-2 rounded border border-slate-200 mt-1">
                         "{c.remarks}"
                       </p>
                     )}

@@ -10,7 +10,7 @@ import {
 const COLORS = ['#ef4444', '#f97316', '#a855f7', '#f59e0b', '#ec4899', '#64748b'];
 
 export default function AnalyticsDashboard() {
-  const { token } = { token: localStorage.getItem('token') }; // Quick fetch
+  const { token } = { token: localStorage.getItem('token') };
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,8 +38,8 @@ export default function AnalyticsDashboard() {
   if (loading || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">
-        <Clock className="w-10 h-10 text-iiitp-gold animate-spin" />
-        <p className="text-sm text-slate-400">Aggregating Campus Incident Records...</p>
+        <Clock className="w-8 h-8 text-[#0c2340] animate-spin" />
+        <p className="text-sm text-slate-500 font-medium">Aggregating Campus Incident Records...</p>
       </div>
     );
   }
@@ -47,50 +47,49 @@ export default function AnalyticsDashboard() {
   const { summary, categoryDistribution, statusDistribution, hotspots, hourlyDistribution, leaderboard } = data;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 font-sans text-slate-800">
       
       {/* 1. Aggregation Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Emergencies */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-800 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-slate-900/40 rounded-full blur-xl"></div>
+        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">TOTAL SOS ALERTS</p>
           <div className="flex items-baseline gap-2 mt-2">
-            <h4 className="text-3xl font-black text-white">{summary.totalRequests}</h4>
-            <span className="text-[10px] text-slate-400 font-semibold">reported</span>
+            <h4 className="text-3xl font-black text-slate-900">{summary.totalRequests}</h4>
+            <span className="text-[10px] text-slate-500 font-semibold">reported</span>
           </div>
         </div>
 
         {/* Avg Response Time */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-800">
+        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AVG RESPONSE TIME</p>
           <div className="flex items-baseline gap-2 mt-2">
-            <h4 className="text-3xl font-black text-iiitp-success">
+            <h4 className="text-3xl font-black text-emerald-700">
               {summary.avgResponseTimeMinutes}
             </h4>
-            <span className="text-[10px] text-slate-400 font-semibold">minutes</span>
+            <span className="text-[10px] text-slate-500 font-semibold">minutes</span>
           </div>
         </div>
 
         {/* Escalated Count */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-800">
+        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">ESCALATED INCIDENTS</p>
           <div className="flex items-baseline gap-2 mt-2">
-            <h4 className="text-3xl font-black text-iiitp-warning">{summary.escalatedRequests}</h4>
-            <span className="text-[10px] text-slate-400 font-semibold">needed admin</span>
+            <h4 className="text-3xl font-black text-amber-600">{summary.escalatedRequests}</h4>
+            <span className="text-[10px] text-slate-500 font-semibold">needed admin</span>
           </div>
         </div>
 
         {/* Efficiency index */}
-        <div className="glass-card p-5 rounded-2xl border border-slate-800">
+        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">RESOLVED RATIO</p>
           <div className="flex items-baseline gap-2 mt-2">
-            <h4 className="text-3xl font-black text-iiitp-info">
+            <h4 className="text-3xl font-black text-[#0c2340]">
               {summary.totalRequests > 0 
                 ? `${Math.round((summary.resolvedRequests / summary.totalRequests) * 100)}%` 
                 : '100%'}
             </h4>
-            <span className="text-[10px] text-slate-400 font-semibold">resolution rate</span>
+            <span className="text-[10px] text-slate-500 font-semibold">resolution rate</span>
           </div>
         </div>
       </div>
@@ -99,9 +98,9 @@ export default function AnalyticsDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Category Breakdown (Pie) */}
-        <div className="lg:col-span-1 glass-card p-5 rounded-2xl border border-slate-800 flex flex-col h-[350px]">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-1.5">
-            <ShieldAlert className="w-4 h-4 text-iiitp-danger" />
+        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[350px]">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
+            <ShieldAlert className="w-4 h-4 text-red-600" />
             SOS INCIDENT BY CATEGORY
           </h3>
           <div className="flex-1 min-h-0">
@@ -121,8 +120,8 @@ export default function AnalyticsDashboard() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
-                  itemStyle={{ color: '#f8fafc', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  itemStyle={{ color: '#0f172a', fontSize: '12px' }}
                 />
                 <Legend 
                   layout="horizontal" 
@@ -130,7 +129,7 @@ export default function AnalyticsDashboard() {
                   align="center"
                   iconSize={8}
                   iconType="circle"
-                  wrapperStyle={{ fontSize: '10px', color: '#94a3b8' }}
+                  wrapperStyle={{ fontSize: '10px', color: '#64748b' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -138,21 +137,21 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Peak reporting hours (Bar) */}
-        <div className="lg:col-span-2 glass-card p-5 rounded-2xl border border-slate-800 flex flex-col h-[350px]">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-1.5">
-            <TrendingUp className="w-4 h-4 text-iiitp-info" />
+        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[350px]">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
+            <TrendingUp className="w-4 h-4 text-blue-600" />
             PEAK ALERTS BY HOUR OF DAY
           </h3>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={hourlyDistribution} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="hour" stroke="#64748b" fontSize={10} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="hour" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
-                  itemStyle={{ color: '#f8fafc', fontSize: '12px' }}
-                  labelStyle={{ fontSize: '11px', color: '#94a3b8' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  itemStyle={{ color: '#0f172a', fontSize: '12px' }}
+                  labelStyle={{ fontSize: '11px', color: '#64748b' }}
                 />
                 <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -161,9 +160,9 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Hotspots Section (horizontal bar) */}
-        <div className="lg:col-span-1 glass-card p-5 rounded-2xl border border-slate-800 flex flex-col h-[320px]">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-1.5">
-            <MapPin className="w-4 h-4 text-iiitp-gold" />
+        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[320px]">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
+            <MapPin className="w-4 h-4 text-amber-600" />
             CAMPUS EMERGENCY HOTSPOTS
           </h3>
           <div className="flex-1 min-h-0">
@@ -174,18 +173,18 @@ export default function AnalyticsDashboard() {
                   layout="vertical"
                   margin={{ top: 10, right: 10, left: 30, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                  <XAxis type="number" stroke="#64748b" fontSize={10} />
-                  <YAxis type="category" dataKey="location" stroke="#94a3b8" fontSize={9} width={80} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis type="number" stroke="#94a3b8" fontSize={10} />
+                  <YAxis type="category" dataKey="location" stroke="#64748b" fontSize={9} width={80} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
-                    itemStyle={{ color: '#f8fafc', fontSize: '12px' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                    itemStyle={{ color: '#0f172a', fontSize: '12px' }}
                   />
                   <Bar dataKey="count" fill="#ec4899" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-full text-slate-500 text-xs">
+              <div className="flex items-center justify-center h-full text-slate-400 text-xs">
                 No hot spots registered.
               </div>
             )}
@@ -193,15 +192,15 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Responder performance (Leaderboard Table) */}
-        <div className="lg:col-span-2 glass-card p-5 rounded-2xl border border-slate-800 flex flex-col h-[320px] overflow-hidden">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex items-center gap-1.5">
-            <Award className="w-4 h-4 text-iiitp-success" />
+        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[320px] overflow-hidden">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
+            <Award className="w-4 h-4 text-emerald-600" />
             RESPONDER PERFORMANCE BOARD
           </h3>
           <div className="flex-1 overflow-y-auto pr-1">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+                <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                   <th className="pb-2.5">Name</th>
                   <th className="pb-2.5">Specialization</th>
                   <th className="pb-2.5 text-center">Resolved</th>
@@ -209,19 +208,19 @@ export default function AnalyticsDashboard() {
                   <th className="pb-2.5 text-right">Rating</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800">
+              <tbody className="divide-y divide-slate-100">
                 {leaderboard.map((resp, i) => (
-                  <tr key={resp.id} className="text-slate-300 hover:text-white">
-                    <td className="py-2.5 font-semibold text-slate-100 flex items-center gap-2">
-                      <span className="text-[10px] text-slate-500">{i + 1}.</span>
+                  <tr key={resp.id} className="text-slate-700 hover:bg-slate-50">
+                    <td className="py-2.5 font-bold text-slate-900 flex items-center gap-2">
+                      <span className="text-[10px] text-slate-400">{i + 1}.</span>
                       {resp.name}
                     </td>
-                    <td className="py-2.5 text-slate-400">{resp.role}</td>
-                    <td className="py-2.5 text-center font-bold text-slate-200">{resp.resolvedCount}</td>
-                    <td className="py-2.5 text-center text-slate-300 font-medium">
+                    <td className="py-2.5 text-slate-500">{resp.role}</td>
+                    <td className="py-2.5 text-center font-bold text-slate-800">{resp.resolvedCount}</td>
+                    <td className="py-2.5 text-center text-slate-600 font-medium">
                       {resp.avgResponseMinutes} mins
                     </td>
-                    <td className="py-2.5 text-right font-black text-iiitp-gold">
+                    <td className="py-2.5 text-right font-black text-amber-600">
                       ★ {resp.rating}
                     </td>
                   </tr>

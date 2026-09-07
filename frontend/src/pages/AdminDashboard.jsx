@@ -12,7 +12,7 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 
 const createMarkerIcon = (color, emoji) => {
   return L.divIcon({
-    html: `<div style="background-color: ${color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 15px; cursor: pointer;">${emoji}</div>`,
+    html: `<div style="background-color: ${color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 15px; cursor: pointer;">${emoji}</div>`,
     className: 'custom-marker-icon',
     iconSize: [32, 32],
     iconAnchor: [16, 16],
@@ -21,11 +21,11 @@ const createMarkerIcon = (color, emoji) => {
 
 const CATEGORIES_COLOR = {
   MEDICAL: '#dc2626',
-  FIRE: '#f97316',
-  SECURITY: '#a855f7',
-  ACCIDENT: '#f59e0b',
-  HARASSMENT: '#ec4899',
-  OTHER: '#64748b',
+  FIRE: '#ea580c',
+  SECURITY: '#7c3aed',
+  ACCIDENT: '#d97706',
+  HARASSMENT: '#db2777',
+  OTHER: '#475569',
 };
 
 const CATEGORIES_EMOJI = {
@@ -120,7 +120,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
       const data = await res.json();
       if (res.ok) {
-        setUserSuccessMsg(`User '${data.user.name}' (${data.user.role}) created and synced to backend!`);
+        setUserSuccessMsg(`User '${data.user.name}' (${data.user.role}) created successfully!`);
         setNewUserName('');
         setNewUserEmail('');
         setNewUserPassword('');
@@ -155,7 +155,6 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
           setRecommendations([]);
         }
       } else if (list.length > 0) {
-        // Auto-select first active emergency if none selected
         setSelectedEmergency(list[0]);
         fetchEmergencyRecommendations(list[0].id);
       }
@@ -227,7 +226,6 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
     };
 
     const handleResponderLocation = (data) => {
-      // Update local responder pin in state
       setResponders(prev => prev.map(r => 
         r.id === data.responderId 
           ? { ...r, latitude: data.latitude, longitude: data.longitude }
@@ -357,7 +355,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
   // Resolve Incident directly from admin console
   const handleAdminResolve = async (id) => {
     const notes = prompt('Enter resolution notes:');
-    if (notes === null) return; // cancelled
+    if (notes === null) return;
     try {
       const res = await fetch(`http://localhost:5000/api/emergencies/${id}/resolve`, {
         method: 'POST',
@@ -385,7 +383,6 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const activeAssignedResponder = getAssignedResponder(selectedEmergency);
 
-  // Time elapsed helper
   const getElapsedSeconds = (createdAt) => {
     const diff = Date.now() - new Date(createdAt).getTime();
     return Math.max(0, Math.floor(diff / 1000));
@@ -398,27 +395,27 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-73px)] font-sans text-slate-100 bg-iiitp-dark">
+    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-65px)] font-sans text-slate-800 bg-slate-50">
       {/* Sidebar Navigation */}
-      <nav className="w-full lg:w-60 bg-slate-950 border-r border-slate-900 flex flex-col justify-between py-6 shrink-0">
+      <nav className="w-full lg:w-60 bg-white border-r border-slate-200 flex flex-col justify-between py-6 shrink-0 shadow-xs">
         <div className="space-y-6">
-          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider px-6">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider px-6">
             COMMAND PORTALS
           </p>
 
           <div className="flex flex-col px-3 gap-1">
             <button
               onClick={() => setActiveTab('live')}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeTab === 'live' 
-                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  ? 'bg-red-50 text-red-700 border border-red-200' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <Activity className="w-4 h-4 text-iiitp-danger" />
-              <span>Live Emergency Console</span>
+              <Activity className="w-4 h-4 text-red-600" />
+              <span>Live Emergency</span>
               {emergencies.length > 0 && (
-                <span className="ml-auto bg-iiitp-danger text-white text-[9px] font-black px-1.5 py-0.5 rounded-full animate-pulse">
+                <span className="ml-auto bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full animate-pulse">
                   {emergencies.length}
                 </span>
               )}
@@ -426,72 +423,72 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
             <button
               onClick={() => setActiveTab('responders')}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeTab === 'responders' 
-                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <Users className="w-4 h-4 text-iiitp-success" />
+              <Users className="w-4 h-4 text-emerald-600" />
               <span>Responder Crew</span>
             </button>
 
             <button
               onClick={() => setActiveTab('locations')}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeTab === 'locations' 
-                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-200' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <MapPin className="w-4 h-4 text-iiitp-gold" />
-              <span>Landmarks Coordinators</span>
+              <MapPin className="w-4 h-4 text-amber-600" />
+              <span>Campus Locations</span>
             </button>
 
             <button
               onClick={() => setActiveTab('contacts')}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeTab === 'contacts' 
-                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <Phone className="w-4 h-4 text-iiitp-info" />
+              <Phone className="w-4 h-4 text-[#0c2340]" />
               <span>Hotline Numbers</span>
             </button>
 
             <button
               onClick={() => setActiveTab('users')}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeTab === 'users' 
-                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  ? 'bg-purple-50 text-purple-700 border border-purple-200' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <UserPlus className="w-4 h-4 text-emerald-400" />
-              <span>User Directory & Accounts</span>
-              <span className="ml-auto bg-slate-800 text-slate-300 text-[9px] font-black px-1.5 py-0.5 rounded-full">
+              <UserPlus className="w-4 h-4 text-purple-600" />
+              <span>User Directory</span>
+              <span className="ml-auto bg-slate-100 text-slate-600 text-[9px] font-bold px-1.5 py-0.5 rounded-full">
                 {usersList.length}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`w-full text-left px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2.5 transition-colors ${
+              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
                 activeTab === 'analytics' 
-                  ? 'bg-iiitp-burgundy text-white border-l-4 border-red-500' 
-                  : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                  ? 'bg-[#0c2340] text-white' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <TrendingUp className="w-4 h-4 text-purple-400" />
-              <span>Analytics & Metrics</span>
+              <TrendingUp className="w-4 h-4 text-blue-600" />
+              <span>System Analytics</span>
             </button>
           </div>
         </div>
 
-        <div className="px-6 text-xxs text-slate-600 font-semibold space-y-1">
-          <p>Portal: v1.0.4 - Seeding Active</p>
-          <p>DB Host: SQLite Local Fallback</p>
+        <div className="px-6 text-xxs text-slate-400 font-medium space-y-0.5">
+          <p>Portal: v1.0.4 - Localhost</p>
+          <p>Engine: Express • SQLite</p>
         </div>
       </nav>
 
@@ -501,9 +498,9 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
         {/* Tab 1: Live Incident Command Center */}
         {activeTab === 'live' && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 flex items-center gap-2">
-                <Radio className="w-5 h-5 text-iiitp-danger animate-pulse" />
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <Radio className="w-5 h-5 text-red-600 animate-pulse" />
                 Live Incident Dispatch Panel
               </h2>
               <span className="text-xxs text-slate-500 font-bold uppercase">
@@ -526,13 +523,13 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                         onClick={() => selectIncident(req)}
                         className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 relative overflow-hidden ${
                           isSelected 
-                            ? 'bg-slate-900 border-red-500/40 shadow-md ring-1 ring-red-500/20' 
-                            : 'bg-slate-900/40 border-slate-850 hover:bg-slate-900/60 hover:border-slate-800'
+                            ? 'bg-white border-red-500 shadow-md ring-2 ring-red-500/20' 
+                            : 'bg-white border-slate-200 hover:border-slate-300 shadow-xs'
                         }`}
                       >
                         {/* Escalated warning banner */}
                         {req.escalationLevel > 0 && (
-                          <div className="absolute top-0 left-0 right-0 bg-amber-500/20 border-b border-amber-500/30 py-0.5 text-[8px] font-black text-amber-400 text-center uppercase tracking-widest">
+                          <div className="absolute top-0 left-0 right-0 bg-amber-50 border-b border-amber-200 py-0.5 text-[8px] font-black text-amber-800 text-center uppercase tracking-widest">
                             ESCALATED (LEVEL {req.escalationLevel})
                           </div>
                         )}
@@ -542,26 +539,26 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                             <span className="text-[10px] font-black text-slate-400 tracking-wider">
                               {req.id}
                             </span>
-                            <h4 className="text-xs font-black text-white flex items-center gap-1.5">
+                            <h4 className="text-xs font-black text-slate-900 flex items-center gap-1.5">
                               <span>{rTypeEmoji}</span>
-                              <span className="uppercase text-slate-100">{req.type}</span>
+                              <span className="uppercase text-slate-900">{req.type}</span>
                             </h4>
                           </div>
-                          <span className="text-[10px] text-slate-400 font-bold flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5 text-iiitp-gold shrink-0" />
+                          <span className="text-[10px] text-slate-500 font-bold flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                             {elapsed}
                           </span>
                         </div>
 
-                        <p className="text-[10px] text-slate-400 font-semibold mt-2.5">
-                          Reporter: <span className="text-white">{req.reporterName}</span> • Loc: <span className="text-iiitp-gold font-bold">{req.manualLocation}</span>
+                        <p className="text-[10px] text-slate-600 font-semibold mt-2.5">
+                          Reporter: <span className="text-slate-900">{req.reporterName}</span> • Loc: <span className="text-[#0c2340] font-bold">{req.manualLocation}</span>
                         </p>
 
-                        <div className="flex items-center justify-between mt-3.5 pt-3.5 border-t border-slate-900">
-                          <span className="text-[9px] font-black uppercase text-iiitp-danger bg-iiitp-danger/10 border border-iiitp-danger/35 px-1.5 py-0.5 rounded">
+                        <div className="flex items-center justify-between mt-3.5 pt-3.5 border-t border-slate-100">
+                          <span className="text-[9px] font-black uppercase text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">
                             {req.severity}
                           </span>
-                          <span className="text-[9.5px] font-black uppercase tracking-wider text-slate-300">
+                          <span className="text-[9.5px] font-black uppercase tracking-wider text-slate-600">
                             {req.status.replace(/_/g, ' ')}
                           </span>
                         </div>
@@ -576,77 +573,74 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                     {/* Left: Metadata, Escalations & Scoring Override */}
                     <div className="space-y-4">
                       {/* Incident Details Card */}
-                      <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
-                        <div className="flex items-start justify-between border-b border-slate-800 pb-3">
+                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+                        <div className="flex items-start justify-between border-b border-slate-100 pb-3">
                           <div>
-                            <span className="text-[10px] text-slate-500 font-bold uppercase">INCIDENT FILE</span>
-                            <h3 className="text-lg font-black text-white">{selectedEmergency.id}</h3>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase">INCIDENT FILE</span>
+                            <h3 className="text-lg font-black text-slate-900">{selectedEmergency.id}</h3>
                           </div>
                           <button
                             onClick={() => handleAdminResolve(selectedEmergency.id)}
-                            className="px-2.5 py-1 bg-iiitp-success hover:bg-green-700 text-white text-[10px] font-extrabold uppercase rounded-lg tracking-wider transition-colors shadow"
+                            className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-extrabold uppercase rounded-lg tracking-wider transition-colors shadow-xs cursor-pointer"
                           >
                             Resolve Alert
                           </button>
                         </div>
 
                         <div className="space-y-2 text-xs">
-                          <div className="flex justify-between border-b border-slate-900 pb-1.5 text-slate-400">
+                          <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-500">
                             <span>Incident Status:</span>
-                            <span className="font-black text-slate-200 uppercase">{selectedEmergency.status.replace(/_/g, ' ')}</span>
+                            <span className="font-black text-slate-900 uppercase">{selectedEmergency.status.replace(/_/g, ' ')}</span>
                           </div>
-                          <div className="flex justify-between border-b border-slate-900 pb-1.5 text-slate-400">
+                          <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-500">
                             <span>Reporter:</span>
-                            <span className="font-semibold text-slate-200">{selectedEmergency.reporterName} ({selectedEmergency.reporter?.email})</span>
+                            <span className="font-semibold text-slate-900">{selectedEmergency.reporterName} ({selectedEmergency.reporter?.email})</span>
                           </div>
-                          <div className="flex justify-between border-b border-slate-900 pb-1.5 text-slate-400">
+                          <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-500">
                             <span>Reporter Contact:</span>
-                            <a href={`tel:${selectedEmergency.reporterContact}`} className="font-bold text-iiitp-gold hover:underline flex items-center gap-1">
+                            <a href={`tel:${selectedEmergency.reporterContact}`} className="font-bold text-[#0c2340] hover:underline flex items-center gap-1">
                               <Phone className="w-3.5 h-3.5" /> {selectedEmergency.reporterContact}
                             </a>
                           </div>
-                          <div className="flex justify-between border-b border-slate-900 pb-1.5 text-slate-400">
-                            <span>Seeded Campus Block:</span>
-                            <span className="font-bold text-iiitp-gold">{selectedEmergency.manualLocation}</span>
+                          <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-500">
+                            <span>Campus Block:</span>
+                            <span className="font-bold text-[#0c2340]">{selectedEmergency.manualLocation}</span>
                           </div>
                           {selectedEmergency.description && (
-                            <div className="bg-slate-900/60 p-2.5 rounded border border-slate-800 mt-2">
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 mt-2">
                               <p className="text-[10px] text-slate-500 font-bold uppercase">Incident Notes</p>
-                              <p className="text-[11px] text-slate-300 italic mt-0.5">"{selectedEmergency.description}"</p>
+                              <p className="text-[11px] text-slate-700 italic mt-0.5">"{selectedEmergency.description}"</p>
                             </div>
                           )}
                         </div>
 
                         {/* Automated Escalation Watcher */}
-                        {selectedEmergency.status !== 'RESOLVED' && (
-                          <div className={`p-3 rounded-lg border text-xxs flex items-center gap-2.5 ${
-                            selectedEmergency.escalationLevel > 0 
-                              ? 'bg-amber-950/40 border-amber-500/30 text-amber-300'
-                              : 'bg-slate-900 border-slate-800 text-slate-400'
-                          }`}>
-                            <AlertTriangle className={`w-4 h-4 shrink-0 ${selectedEmergency.escalationLevel > 0 ? 'text-amber-400 animate-bounce' : 'text-slate-500'}`} />
-                            <div>
-                              <p className="font-bold uppercase tracking-wider">
-                                {selectedEmergency.escalationLevel > 0 
-                                  ? `System Escalated (Level ${selectedEmergency.escalationLevel})`
-                                  : 'Escalation Watcher Standing By'}
-                              </p>
-                              <p className="text-[10px] text-slate-500 mt-0.5">
-                                {selectedEmergency.escalationLevel === 0 && 'Escalating to Security in 20s if unresolved.'}
-                                {selectedEmergency.escalationLevel === 1 && 'Escalated to Head Security. Next tier: Faculty Coordinator.'}
-                                {selectedEmergency.escalationLevel === 2 && 'Escalated to Coordinator. Next tier: System Admin.'}
-                                {selectedEmergency.escalationLevel >= 3 && 'Critical Escalation. System administrator notified.'}
-                              </p>
-                            </div>
+                        <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                          <div className="flex justify-between text-xxs font-bold text-slate-600">
+                            <span>Auto Escalation Watcher</span>
+                            <span className="text-amber-700">Threshold: {escalationLimit}s</span>
                           </div>
-                        )}
+                          <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div 
+                              className={`h-full transition-all duration-300 ${
+                                getElapsedSeconds(selectedEmergency.createdAt) > escalationLimit
+                                  ? 'bg-red-600'
+                                  : 'bg-amber-500'
+                              }`}
+                              style={{ width: `${Math.min((getElapsedSeconds(selectedEmergency.createdAt) / escalationLimit) * 100, 100)}%` }}
+                            ></div>
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Responder Scoring override list */}
-                      <div className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">
-                          RESPONDER SCORING & RECOMMENDATION ENGINE
-                        </span>
+                      {/* AI Distance & ERT Recommender List */}
+                      <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-3">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                          <span className="text-xs font-black uppercase tracking-wider text-slate-900">
+                            Dispatch Recommendation Engine
+                          </span>
+                          <span className="text-[9px] text-slate-500 font-bold">Closest ERT Scored</span>
+                        </div>
                         
                         <div className="space-y-2 max-h-[170px] overflow-y-auto pr-1">
                           {recommendations.map((rec) => {
@@ -657,31 +651,31 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                             return (
                               <div 
                                 key={rec.id} 
-                                className={`p-3 bg-slate-900/60 border rounded-xl flex items-center justify-between text-xs transition-colors ${
+                                className={`p-3 border rounded-xl flex items-center justify-between text-xs transition-colors ${
                                   isCurrentlyAssigned 
-                                    ? 'border-iiitp-success/40 bg-iiitp-success/5' 
-                                    : 'border-slate-850'
+                                    ? 'border-emerald-500/40 bg-emerald-50/50' 
+                                    : 'bg-slate-50 border-slate-200'
                                 }`}
                               >
                                 <div>
                                   <div className="flex items-center gap-1.5">
-                                    <h4 className="font-extrabold text-white">{rec.user?.name}</h4>
+                                    <h4 className="font-extrabold text-slate-900">{rec.user?.name}</h4>
                                     <span className="text-[9px] text-slate-500 uppercase">{rec.role.split(' ')[0]}</span>
                                   </div>
-                                  <p className="text-[10px] text-slate-400 mt-0.5">
-                                    Score: <span className="font-black text-iiitp-gold">{rec.score}</span> • Dist: {Math.round(rec.distance)}m • ERT: {rec.ERT}m
+                                  <p className="text-[10px] text-slate-500 mt-0.5">
+                                    Score: <span className="font-black text-[#0c2340]">{rec.score}</span> • Dist: {Math.round(rec.distance)}m • ERT: {rec.ERT}m
                                   </p>
                                 </div>
 
                                 <button
                                   onClick={() => handleAssignResponder(rec.id)}
                                   disabled={isCurrentlyAssigned || rec.availabilityStatus === 'OFFLINE'}
-                                  className={`px-2 py-1 rounded text-[10px] font-black uppercase transition-colors ${
+                                  className={`px-2 py-1 rounded text-[10px] font-black uppercase transition-colors cursor-pointer ${
                                     isCurrentlyAssigned 
-                                      ? 'bg-iiitp-success/20 text-iiitp-success' 
+                                      ? 'bg-emerald-100 text-emerald-800' 
                                       : rec.availabilityStatus === 'OFFLINE'
-                                      ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                                      : 'bg-iiitp-burgundy hover:bg-red-700 text-white'
+                                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                                      : 'bg-[#0c2340] hover:bg-[#1a365d] text-white'
                                   }`}
                                 >
                                   {isCurrentlyAssigned ? 'Assigned' : 'Assign'}
@@ -694,13 +688,13 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                     </div>
 
                     {/* Right: Dispatch map panel */}
-                    <div className="glass-card p-4 rounded-2xl border border-slate-800 h-[450px] md:h-auto flex flex-col">
-                      <div className="flex items-center justify-between text-xxs pb-2 border-b border-slate-900 mb-3 text-slate-400 uppercase font-semibold">
+                    <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm h-[450px] md:h-auto flex flex-col">
+                      <div className="flex items-center justify-between text-xxs pb-2 border-b border-slate-100 mb-3 text-slate-500 uppercase font-semibold">
                         <span>Incident Dispatch Grid Map</span>
                         <span>Seeded landmarks</span>
                       </div>
 
-                      <div className="flex-1 rounded-xl overflow-hidden">
+                      <div className="flex-1 rounded-xl overflow-hidden border border-slate-200">
                         <MapContainer 
                           center={[selectedEmergency.latitude, selectedEmergency.longitude]} 
                           zoom={17} 
@@ -709,7 +703,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                         >
                           <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            attribution='&copy; OpenStreetMap'
                           />
 
                           {/* Selected Emergency Marker */}
@@ -718,8 +712,8 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                             icon={createMarkerIcon(CATEGORIES_COLOR[selectedEmergency.type] || '#dc2626', CATEGORIES_EMOJI[selectedEmergency.type] || '🚨')}
                           >
                             <Popup>
-                              <div className="text-slate-100 text-xs font-semibold">
-                                <p className="font-black text-red-500 uppercase">{selectedEmergency.type} ALERTS</p>
+                              <div className="text-slate-800 text-xs font-semibold">
+                                <p className="font-black text-red-600 uppercase">{selectedEmergency.type} ALERTS</p>
                                 <p className="mt-1">Block: {selectedEmergency.manualLocation}</p>
                               </div>
                             </Popup>
@@ -732,12 +726,12 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                             const isBusy = resp.availabilityStatus === 'BUSY';
                             
                             const pinColor = isAssignedToThis 
-                              ? '#10b981' // Green
+                              ? '#16a34a' 
                               : isBusy 
-                              ? '#f59e0b' // Yellow
+                              ? '#f59e0b' 
                               : isOffline 
-                              ? '#64748b' // Slate/Grey
-                              : '#3b82f6'; // Available Blue
+                              ? '#64748b' 
+                              : '#2563eb';
 
                             return (
                               <Marker 
@@ -746,17 +740,17 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                                 icon={createMarkerIcon(pinColor, '💂')}
                               >
                                 <Popup>
-                                  <div className="text-slate-100 text-xs font-semibold">
-                                    <p className="font-bold text-white">{resp.user?.name}</p>
-                                    <p className="text-[10px] text-slate-400 mt-0.5">{resp.role}</p>
-                                    <p className="text-[9px] text-slate-500 mt-1 uppercase">Status: {resp.availabilityStatus}</p>
+                                  <div className="text-slate-800 text-xs font-semibold">
+                                    <p className="font-bold text-slate-900">{resp.user?.name}</p>
+                                    <p className="text-[10px] text-slate-500">{resp.role}</p>
+                                    <p className="text-[10px] font-black uppercase text-emerald-700">{resp.availabilityStatus}</p>
                                   </div>
                                 </Popup>
                               </Marker>
                             );
                           })}
 
-                          {/* Draw polyline route if responder assigned */}
+                          {/* Connect line from assigned responder to selected emergency */}
                           {activeAssignedResponder && (
                             <Polyline 
                               positions={[
@@ -764,10 +758,8 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                                 [selectedEmergency.latitude, selectedEmergency.longitude]
                               ]} 
                               color="#f59e0b"
-                              weight={4.5}
-                              opacity={0.8}
+                              weight={4}
                               dashArray="8, 6"
-                              className="map-route-line"
                             />
                           )}
                         </MapContainer>
@@ -775,20 +767,20 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                     </div>
                   </div>
                 ) : (
-                  <div className="xl:col-span-2 glass-card p-12 rounded-2xl border border-slate-800 text-center flex flex-col justify-center items-center">
-                    <ShieldCheck className="w-16 h-16 text-slate-600 mb-4" />
-                    <h3 className="text-lg font-bold text-white">No active incidents.</h3>
-                    <p className="text-slate-400 text-xs mt-2 max-w-sm">
+                  <div className="xl:col-span-2 p-12 rounded-2xl border border-slate-200 bg-white shadow-sm text-center flex flex-col justify-center items-center">
+                    <ShieldCheck className="w-16 h-16 text-emerald-600 mb-4" />
+                    <h3 className="text-lg font-bold text-slate-900">No active incidents.</h3>
+                    <p className="text-slate-500 text-xs mt-2 max-w-sm">
                       All campus emergencies resolved successfully. The dispatch system is on standby.
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="glass-card p-12 rounded-2xl border border-slate-800 text-center flex flex-col justify-center items-center">
-                <ShieldCheck className="w-16 h-16 text-iiitp-success mb-4" />
-                <h3 className="text-lg font-black text-white">System Clear</h3>
-                <p className="text-slate-400 text-xs mt-2 max-w-sm leading-relaxed">
+              <div className="p-12 rounded-2xl border border-slate-200 bg-white shadow-sm text-center flex flex-col justify-center items-center">
+                <ShieldCheck className="w-16 h-16 text-emerald-600 mb-4" />
+                <h3 className="text-lg font-black text-slate-900">System Clear</h3>
+                <p className="text-slate-500 text-xs mt-2 max-w-sm leading-relaxed">
                   There are no active emergency alerts reported across IIIT Pune campus. The system is scanning for incoming signals.
                 </p>
               </div>
@@ -799,8 +791,8 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
         {/* Tab 2: Responders Crew Management */}
         {activeTab === 'responders' && (
           <div className="space-y-6">
-            <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <Users className="w-5 h-5 text-iiitp-success" />
+            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
+              <Users className="w-5 h-5 text-emerald-600" />
               Responder Crew Directory
             </h2>
 
@@ -811,48 +803,48 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                   : 0;
                 
                 return (
-                  <div key={resp.id} className="glass-card p-5 rounded-2xl border border-slate-800 space-y-4">
+                  <div key={resp.id} className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-lg">
+                      <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-lg shadow-xs">
                         💂
                       </div>
                       <div>
-                        <h4 className="text-xs font-black text-white">{resp.user?.name}</h4>
-                        <span className="inline-block text-[9px] text-slate-400 font-semibold">{resp.role}</span>
+                        <h4 className="text-xs font-black text-slate-900">{resp.user?.name}</h4>
+                        <span className="inline-block text-[9px] text-slate-500 font-semibold">{resp.role}</span>
                       </div>
                     </div>
 
-                    <div className="border-t border-slate-850 pt-3 grid grid-cols-3 gap-2 text-center text-xxs font-semibold text-slate-400">
+                    <div className="border-t border-slate-100 pt-3 grid grid-cols-3 gap-2 text-center text-xxs font-semibold text-slate-500">
                       <div>
                         <p>Availability</p>
                         <span className={`inline-block mt-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider ${
                           resp.availabilityStatus === 'AVAILABLE' 
-                            ? 'bg-iiitp-success/15 border border-iiitp-success/40 text-iiitp-success'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-700'
                             : resp.availabilityStatus === 'BUSY'
-                            ? 'bg-iiitp-warning/15 border border-iiitp-warning/40 text-iiitp-warning'
-                            : 'bg-slate-800 border border-slate-700 text-slate-500'
+                            ? 'bg-amber-50 border border-amber-200 text-amber-700'
+                            : 'bg-slate-100 border border-slate-200 text-slate-500'
                         }`}>
                           {resp.availabilityStatus}
                         </span>
                       </div>
                       <div>
                         <p>Resolved</p>
-                        <p className="text-slate-100 font-bold mt-1.5">{resp.resolvedCount}</p>
+                        <p className="text-slate-900 font-bold mt-1.5">{resp.resolvedCount}</p>
                       </div>
                       <div>
                         <p>Avg Time</p>
-                        <p className="text-slate-100 font-bold mt-1.5">
+                        <p className="text-slate-900 font-bold mt-1.5">
                           {Math.round(avgResponseTimeSec / 60)}m
                         </p>
                       </div>
                     </div>
 
                     {/* Skill Badges */}
-                    <div className="border-t border-slate-850 pt-3">
+                    <div className="border-t border-slate-100 pt-3">
                       <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-1.5">Registered Specializations</p>
                       <div className="flex flex-wrap gap-1">
                         {resp.skills?.map((sk) => (
-                          <span key={sk.id} className="text-[8.5px] font-bold uppercase bg-slate-900 border border-slate-800 text-slate-400 px-1.5 py-0.5 rounded">
+                          <span key={sk.id} className="text-[8.5px] font-bold uppercase bg-slate-50 border border-slate-200 text-slate-600 px-1.5 py-0.5 rounded">
                             {sk.skill}
                           </span>
                         ))}
@@ -868,60 +860,60 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
         {/* Tab 3: Campus Landmark Coordinates Manager */}
         {activeTab === 'locations' && (
           <div className="space-y-6">
-            <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-iiitp-gold" />
+            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
+              <MapPin className="w-5 h-5 text-amber-600" />
               Campus Landmarks Coordinator Manager
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Landmark Add Form */}
-              <div className="lg:col-span-1 glass-card p-5 rounded-2xl border border-slate-800 space-y-4 h-fit">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">Add Predefined Landmark</h3>
+              <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4 h-fit">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Add Predefined Landmark</h3>
                 
                 <form onSubmit={handleAddLocation} className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Landmark Block Name</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Landmark Block Name</label>
                     <input
                       type="text"
                       required
                       value={newLocName}
                       onChange={(e) => setNewLocName(e.target.value)}
                       placeholder="e.g. Sports Playground Complex"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 text-xs"
                     />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Latitude</label>
+                      <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Latitude</label>
                       <input
                         type="text"
                         required
                         value={newLocLat}
                         onChange={(e) => setNewLocLat(e.target.value)}
                         placeholder="18.487700"
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Longitude</label>
+                      <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Longitude</label>
                       <input
                         type="text"
                         required
                         value={newLocLng}
                         onChange={(e) => setNewLocLng(e.target.value)}
                         placeholder="73.815600"
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none text-xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Location Type</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Location Type</label>
                     <select
                       value={newLocType}
                       onChange={(e) => setNewLocType(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none text-xs"
                     >
                       <option value="ACADEMIC">ACADEMIC</option>
                       <option value="HOSTEL">HOSTEL</option>
@@ -934,7 +926,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
                   <button
                     type="submit"
-                    className="w-full py-2 bg-iiitp-burgundy hover:bg-red-700 text-white font-extrabold rounded-lg text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4"
+                    className="w-full py-2 bg-[#0c2340] hover:bg-[#1a365d] text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4 cursor-pointer"
                   >
                     <Plus className="w-4 h-4" /> Save Coordinates
                   </button>
@@ -942,29 +934,29 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               </div>
 
               {/* Landmark Table */}
-              <div className="lg:col-span-2 glass-card p-5 rounded-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[480px]">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4">Active Campus Landmark Indexes</h3>
+              <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col max-h-[480px]">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4">Active Campus Landmark Indexes</h3>
                 <div className="flex-1 overflow-y-auto pr-1">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+                      <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                         <th className="pb-2.5">Landmark Block</th>
                         <th className="pb-2.5">Category</th>
                         <th className="pb-2.5">Latitude</th>
                         <th className="pb-2.5">Longitude</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-850">
+                    <tbody className="divide-y divide-slate-100">
                       {campusLocations.map((loc) => (
-                        <tr key={loc.id} className="text-slate-300 hover:text-white">
-                          <td className="py-2.5 font-semibold text-slate-100">{loc.name}</td>
+                        <tr key={loc.id} className="text-slate-700 hover:bg-slate-50">
+                          <td className="py-2.5 font-semibold text-slate-900">{loc.name}</td>
                           <td className="py-2.5">
-                            <span className="text-[9px] font-black uppercase bg-slate-900 border border-slate-800 text-slate-400 px-2 py-0.5 rounded">
+                            <span className="text-[9px] font-black uppercase bg-slate-50 border border-slate-200 text-slate-700 px-2 py-0.5 rounded">
                               {loc.type}
                             </span>
                           </td>
-                          <td className="py-2.5 font-mono text-slate-400">{loc.latitude.toFixed(6)}</td>
-                          <td className="py-2.5 font-mono text-slate-400">{loc.longitude.toFixed(6)}</td>
+                          <td className="py-2.5 font-mono text-slate-500">{loc.latitude.toFixed(6)}</td>
+                          <td className="py-2.5 font-mono text-slate-500">{loc.longitude.toFixed(6)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -978,52 +970,52 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
         {/* Tab 4: Hotline Numbers Manager */}
         {activeTab === 'contacts' && (
           <div className="space-y-6">
-            <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <Phone className="w-5 h-5 text-iiitp-info" />
+            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
+              <Phone className="w-5 h-5 text-blue-600" />
               Emergency Hotline Numbers Manager
             </h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Form to add */}
-              <div className="lg:col-span-1 glass-card p-5 rounded-2xl border border-slate-800 space-y-4 h-fit">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">Add Hotline Line</h3>
+              <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4 h-fit">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Add Hotline Line</h3>
                 <form onSubmit={handleAddContact} className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Contact / Line Name</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Contact / Line Name</label>
                     <input
                       type="text"
                       required
                       value={newContactName}
                       onChange={(e) => setNewContactName(e.target.value)}
                       placeholder="e.g. Anti-Ragging Cell"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Hotline Number</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Hotline Number</label>
                     <input
                       type="text"
                       required
                       value={newContactNum}
                       onChange={(e) => setNewContactNum(e.target.value)}
                       placeholder="e.g. +91 98888 77777 / 100"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 text-xs"
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Department / Section</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Department / Section</label>
                     <input
                       type="text"
                       required
                       value={newContactDept}
                       onChange={(e) => setNewContactDept(e.target.value)}
                       placeholder="e.g. Security Center"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 text-xs"
                     />
                   </div>
                   <button
                     type="submit"
-                    className="w-full py-2 bg-iiitp-burgundy hover:bg-red-700 text-white font-extrabold rounded-lg text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4"
+                    className="w-full py-2 bg-[#0c2340] hover:bg-[#1a365d] text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4 cursor-pointer"
                   >
                     <Plus className="w-4 h-4" /> Save Contact
                   </button>
@@ -1031,31 +1023,31 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               </div>
 
               {/* Table list */}
-              <div className="lg:col-span-2 glass-card p-5 rounded-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[480px]">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex justify-between items-center">
+              <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col max-h-[480px]">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex justify-between items-center">
                   <span>Emergency Line Index</span>
                   <span className="text-xxs text-slate-500 font-bold uppercase">Contacts display on student dashboard</span>
                 </h3>
                 <div className="flex-1 overflow-y-auto pr-1">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+                      <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                         <th className="pb-2.5">Name</th>
                         <th className="pb-2.5">Line Number</th>
                         <th className="pb-2.5">Department</th>
                         <th className="pb-2.5 text-right">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-850">
+                    <tbody className="divide-y divide-slate-100">
                       {contacts.map((contact) => (
-                        <tr key={contact.id} className="text-slate-300 hover:text-white">
-                          <td className="py-2.5 font-semibold text-slate-100">{contact.name}</td>
-                          <td className="py-2.5 font-bold text-iiitp-gold">{contact.number}</td>
-                          <td className="py-2.5">{contact.department}</td>
+                        <tr key={contact.id} className="text-slate-700 hover:bg-slate-50">
+                          <td className="py-2.5 font-semibold text-slate-900">{contact.name}</td>
+                          <td className="py-2.5 font-bold text-[#0c2340]">{contact.number}</td>
+                          <td className="py-2.5 text-slate-600">{contact.department}</td>
                           <td className="py-2.5 text-right">
                             <button
                               onClick={() => handleDeleteContact(contact.id)}
-                              className="p-1 hover:bg-slate-900 rounded text-slate-500 hover:text-red-500 transition-colors"
+                              className="p-1.5 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
                               title="Delete Contact"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1074,72 +1066,72 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
         {/* Tab 5: User Directory & Accounts */}
         {activeTab === 'users' && (
           <div className="space-y-6">
-            <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 border-b border-slate-800 pb-3 flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-3 flex items-center gap-2">
+              <UserPlus className="w-5 h-5 text-emerald-600" />
               IIIT Pune User Account Manager & Database Directory
             </h2>
 
             {userSuccessMsg && (
-              <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs rounded-xl flex items-center gap-2 font-bold animate-pulse">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-bold animate-pulse">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 {userSuccessMsg}
               </div>
             )}
 
             {userErrorMsg && (
-              <div className="p-4 bg-red-950/40 border border-red-500/40 text-red-300 text-xs rounded-xl flex items-center gap-2 font-bold">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2 font-bold">
+                <AlertTriangle className="w-4 h-4 text-red-600" />
                 {userErrorMsg}
               </div>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Form to create user */}
-              <div className="lg:col-span-1 glass-card p-5 rounded-2xl border border-slate-800 space-y-4 h-fit">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300">Create New Institutional Account</h3>
+              <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4 h-fit">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900">Create New Institutional Account</h3>
                 <form onSubmit={handleCreateUser} className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Full Name</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Full Name</label>
                     <input
                       type="text"
                       required
                       value={newUserName}
                       onChange={(e) => setNewUserName(e.target.value)}
                       placeholder="e.g. Prof. Ramesh Sharma"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Institutional Email</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Institutional Email</label>
                     <input
                       type="email"
                       required
                       value={newUserEmail}
                       onChange={(e) => setNewUserEmail(e.target.value)}
                       placeholder="e.g. ramesh@iiitp.ac.in"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-gold text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Account Password</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Account Password</label>
                     <input
                       type="password"
                       required
                       value={newUserPassword}
                       onChange={(e) => setNewUserPassword(e.target.value)}
                       placeholder="Min 6 characters"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">System Role</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">System Role</label>
                     <select
                       value={newUserRole}
                       onChange={(e) => setNewUserRole(e.target.value)}
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 focus:outline-none text-xs font-bold"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none text-xs font-bold"
                     >
                       <option value="STUDENT">STUDENT</option>
                       <option value="FACULTY">FACULTY / ADVISOR</option>
@@ -1151,30 +1143,30 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">MIS / Roll No / ID</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">MIS / Roll No / ID</label>
                     <input
                       type="text"
                       value={newUserMIS}
                       onChange={(e) => setNewUserMIS(e.target.value)}
                       placeholder="Optional (e.g. 112415099)"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Contact Number</label>
+                    <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">Contact Number</label>
                     <input
                       type="text"
                       value={newUserContact}
                       onChange={(e) => setNewUserContact(e.target.value)}
                       placeholder="+91 9988776655"
-                      className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-lg text-slate-100 placeholder-slate-600 focus:outline-none text-xs"
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none text-xs"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black rounded-lg text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4 cursor-pointer"
+                    className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1a365d] text-white font-black rounded-xl text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 mt-4 cursor-pointer"
                   >
                     <Plus className="w-4 h-4" /> Create & Persist User
                   </button>
@@ -1182,15 +1174,15 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               </div>
 
               {/* Table list of database users */}
-              <div className="lg:col-span-2 glass-card p-5 rounded-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[550px]">
-                <h3 className="text-xs font-black uppercase tracking-wider text-slate-300 mb-4 flex justify-between items-center">
+              <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden flex flex-col max-h-[550px]">
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex justify-between items-center">
                   <span>Backend Database User Directory ({usersList.length} Accounts)</span>
-                  <span className="text-xxs text-emerald-400 font-bold uppercase">Real-Time Sync Active ✓</span>
+                  <span className="text-xxs text-emerald-700 font-bold uppercase">Real-Time Sync Active ✓</span>
                 </h3>
                 <div className="flex-1 overflow-y-auto pr-1">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-slate-500 font-bold uppercase tracking-wider">
+                      <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
                         <th className="pb-2.5">User Name</th>
                         <th className="pb-2.5">Email</th>
                         <th className="pb-2.5">Role</th>
@@ -1198,24 +1190,24 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                         <th className="pb-2.5">Registered</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-850">
+                    <tbody className="divide-y divide-slate-100">
                       {usersList.map((u) => (
-                        <tr key={u.id} className="text-slate-300 hover:text-white">
-                          <td className="py-2.5 font-bold text-white">{u.name}</td>
-                          <td className="py-2.5 font-mono text-slate-300">{u.email}</td>
+                        <tr key={u.id} className="text-slate-700 hover:bg-slate-50">
+                          <td className="py-2.5 font-bold text-slate-900">{u.name}</td>
+                          <td className="py-2.5 font-mono text-slate-600">{u.email}</td>
                           <td className="py-2.5">
                             <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${
-                              u.role === 'ADMIN' ? 'bg-purple-950 text-purple-400 border-purple-500/40' :
-                              u.role === 'STUDENT' ? 'bg-blue-950 text-blue-400 border-blue-500/40' :
-                              u.role === 'FACULTY' ? 'bg-iiitp-gold/20 text-iiitp-gold border-iiitp-gold/40' :
-                              u.role === 'HOSTEL_WARDEN' ? 'bg-amber-950 text-amber-400 border-amber-500/40' :
-                              'bg-emerald-950 text-emerald-400 border-emerald-500/40'
+                              u.role === 'ADMIN' ? 'bg-red-50 text-red-700 border-red-200' :
+                              u.role === 'STUDENT' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                              u.role === 'FACULTY' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                              u.role === 'HOSTEL_WARDEN' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                              'bg-emerald-50 text-emerald-700 border-emerald-200'
                             }`}>
                               {u.role}
                             </span>
                           </td>
-                          <td className="py-2.5 font-mono text-iiitp-gold font-bold">{u.userId}</td>
-                          <td className="py-2.5 font-mono text-[10px] text-slate-500">
+                          <td className="py-2.5 font-mono text-[#0c2340] font-bold">{u.userId}</td>
+                          <td className="py-2.5 font-mono text-[10px] text-slate-400">
                             {new Date(u.createdAt).toLocaleDateString()}
                           </td>
                         </tr>
@@ -1231,14 +1223,14 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
         {/* Tab 6: Analytics Sub-panel */}
         {activeTab === 'analytics' && (
           <div className="space-y-6 animate-in fade-in duration-200">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h2 className="text-lg font-black uppercase tracking-wider text-slate-100 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-purple-400" />
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
                 IIIT Pune Campus Incident Safety Analytics
               </h2>
               <button 
-                onClick={fetchEmergencies} // Triggers full data refresh indirectly
-                className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-[10px] font-extrabold uppercase rounded-lg tracking-wider text-slate-300 hover:border-slate-700 transition-colors"
+                onClick={fetchEmergencies}
+                className="px-2.5 py-1 bg-white border border-slate-200 text-[10px] font-extrabold uppercase rounded-lg tracking-wider text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer shadow-xs"
               >
                 Refresh Board
               </button>

@@ -18,12 +18,12 @@ function MainLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-iiitp-dark font-sans text-slate-100 gap-3.5">
-        <div className="p-3 bg-iiitp-burgundy/10 border border-iiitp-burgundy/30 rounded-2xl animate-pulse text-iiitp-danger">
-          <Shield className="w-8 h-8 animate-spin" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 font-sans text-slate-800 gap-3.5">
+        <div className="p-3.5 bg-white border border-slate-200 rounded-2xl shadow-sm animate-pulse text-[#1c398e]">
+          <Shield className="w-8 h-8 animate-spin text-[#5367c8]" />
         </div>
-        <p className="text-xs uppercase font-black tracking-widest text-iiitp-gold">
-          Calibrating Security Console...
+        <p className="text-xs uppercase font-semibold tracking-wider text-slate-500">
+          Loading Campus Portal...
         </p>
       </div>
     );
@@ -54,9 +54,9 @@ function MainLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-iiitp-dark font-sans text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800 flex flex-col">
       <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="flex-1 w-full bg-iiitp-dark">
+      <main className="flex-1 w-full bg-slate-50">
         {renderDashboard()}
       </main>
     </div>

@@ -213,30 +213,30 @@ export default function FacultyDashboard() {
   const absentCount = Object.values(attendanceState).filter(s => s === 'ABSENT').length;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-100">
+    <div className="p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-800">
       {/* Header */}
-      <div className="glass-card p-6 rounded-2xl border border-iiitp-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-iiitp-gold/20 text-iiitp-gold text-[10px] font-black uppercase rounded tracking-wider border border-iiitp-gold/30">
+            <span className="px-2.5 py-0.5 bg-blue-50 text-[#1c398e] text-[10px] font-bold uppercase rounded tracking-wider border border-blue-200">
               FACULTY & ADVISOR PORTAL
             </span>
-            <span className="text-xxs text-slate-400 font-mono">
+            <span className="text-xxs text-slate-500 font-mono">
               INSTRUCTOR: {user?.name}
             </span>
           </div>
-          <h2 className="text-2xl font-black text-white mt-1">Faculty Academic Console</h2>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <h2 className="text-2xl font-bold text-slate-900 mt-1">Faculty Academic Console</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
             Attendance Management • Semester Registration Approvals • Advisee Shortage Monitoring
           </p>
         </div>
 
         {/* Tab Controls */}
-        <div className="flex flex-wrap gap-1.5 p-1.5 bg-slate-950 border border-slate-800 rounded-xl">
+        <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-xl">
           <button
             onClick={() => setActiveTab('attendance')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'attendance' ? 'bg-iiitp-gold text-slate-950 font-extrabold' : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'attendance' ? 'bg-[#1c398e] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5" />
@@ -245,8 +245,8 @@ export default function FacultyDashboard() {
 
           <button
             onClick={() => setActiveTab('advisor_registration')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'advisor_registration' ? 'bg-blue-600 text-white font-extrabold' : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'advisor_registration' ? 'bg-[#5367c8] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <FileCheck className="w-3.5 h-3.5" />
@@ -255,8 +255,8 @@ export default function FacultyDashboard() {
 
           <button
             onClick={() => setActiveTab('advisor_alerts')}
-            className={`px-3 py-2 rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${
-              activeTab === 'advisor_alerts' ? 'bg-amber-600 text-white font-extrabold' : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'advisor_alerts' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <AlertTriangle className="w-3.5 h-3.5" />
@@ -267,15 +267,15 @@ export default function FacultyDashboard() {
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs rounded-xl flex items-center gap-2 font-bold animate-pulse">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold animate-pulse">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           {successMessage}
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 bg-red-950/40 border border-red-500/40 text-red-300 text-xs rounded-xl flex items-center gap-2 font-bold">
-          <AlertCircle className="w-4 h-4 text-red-400" />
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+          <AlertCircle className="w-4 h-4 text-red-600" />
           {errorMessage}
         </div>
       )}
@@ -284,13 +284,13 @@ export default function FacultyDashboard() {
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="glass-card p-5 rounded-2xl border border-iiitp-border grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="glass-card p-5 rounded-2xl border border-slate-200 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 shadow-sm">
             <div>
-              <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Select Section</label>
+              <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Select Section</label>
               <select
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-iiitp-gold"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
               >
                 <option value="Section A (CSE)">Section A (CSE - MIS 001 to 082)</option>
                 <option value="Section B (CSE)">Section B (CSE - MIS 083 to 150)</option>
@@ -299,11 +299,11 @@ export default function FacultyDashboard() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Select Subject</label>
+              <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Select Subject</label>
               <select
                 value={selectedSubjectCode}
                 onChange={(e) => setSelectedSubjectCode(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-bold text-white focus:outline-none focus:border-iiitp-gold"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
               >
                 {subjectsList.filter(s => s.section === selectedSection).map(s => (
                   <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
@@ -312,57 +312,57 @@ export default function FacultyDashboard() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-black uppercase text-slate-400 mb-1">Lecture Date</label>
+              <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Lecture Date</label>
               <input
                 type="date"
                 value={attendanceDate}
                 onChange={(e) => setAttendanceDate(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono font-bold text-white focus:outline-none focus:border-iiitp-gold"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
               />
             </div>
           </div>
 
           {/* Student Roster Table */}
-          <div className="glass-card p-6 rounded-2xl border border-iiitp-border space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
-                <h3 className="text-sm font-black text-white">{currentSubjectObj?.name} ({selectedSubjectCode})</h3>
-                <p className="text-xs text-slate-400">Class Roll Call • {students.length} Enrolled Students</p>
+                <h3 className="text-sm font-bold text-slate-900">{currentSubjectObj?.name} ({selectedSubjectCode})</h3>
+                <p className="text-xs text-slate-500">Class Roll Call • {students.length} Enrolled Students</p>
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => setAllStatus('PRESENT')} className="px-3 py-1.5 bg-emerald-950 border border-emerald-500/40 text-emerald-400 text-xs font-bold rounded-lg hover:bg-emerald-900">Mark All Present</button>
-                <button onClick={() => setAllStatus('ABSENT')} className="px-3 py-1.5 bg-red-950 border border-red-500/40 text-red-400 text-xs font-bold rounded-lg hover:bg-red-900">Mark All Absent</button>
+                <button onClick={() => setAllStatus('PRESENT')} className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg hover:bg-emerald-100 cursor-pointer">Mark All Present</button>
+                <button onClick={() => setAllStatus('ABSENT')} className="px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-lg hover:bg-red-100 cursor-pointer">Mark All Absent</button>
               </div>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800">
+                <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
                   <tr>
-                    <th className="py-3 px-4">#</th>
-                    <th className="py-3 px-4">MIS / Roll No</th>
-                    <th className="py-3 px-4">Student Name</th>
-                    <th className="py-3 px-4">Branch</th>
-                    <th className="py-3 px-4 text-center">Attendance Status</th>
+                    <th className="py-2.5 px-4">#</th>
+                    <th className="py-2.5 px-4">MIS / Roll No</th>
+                    <th className="py-2.5 px-4">Student Name</th>
+                    <th className="py-2.5 px-4">Branch</th>
+                    <th className="py-2.5 px-4 text-center">Attendance Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-850">
+                <tbody className="divide-y divide-slate-100">
                   {students.map((s, idx) => {
                     const st = attendanceState[s.id] || 'PRESENT';
                     return (
-                      <tr key={s.id} className="hover:bg-slate-900/50 transition-colors">
-                        <td className="py-2.5 px-4 font-mono font-bold text-slate-500">{idx + 1}</td>
-                        <td className="py-2.5 px-4 font-mono font-bold text-iiitp-gold">{s.userId}</td>
-                        <td className="py-2.5 px-4 font-bold text-white">{s.name}</td>
-                        <td className="py-2.5 px-4 text-slate-400">{s.department}</td>
+                      <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
+                        <td className="py-2.5 px-4 font-mono font-medium text-slate-400">{idx + 1}</td>
+                        <td className="py-2.5 px-4 font-mono font-bold text-[#1c398e]">{s.userId}</td>
+                        <td className="py-2.5 px-4 font-semibold text-slate-900">{s.name}</td>
+                        <td className="py-2.5 px-4 text-slate-500">{s.department}</td>
                         <td className="py-2.5 px-4 text-center">
                           <button
                             onClick={() => toggleStatus(s.id)}
-                            className={`px-4 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                            className={`px-3.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                               st === 'PRESENT'
-                                ? 'bg-iiitp-success text-white shadow'
-                                : 'bg-iiitp-danger text-white shadow-glow-danger'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                                : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
                             }`}
                           >
                             {st}
@@ -375,11 +375,11 @@ export default function FacultyDashboard() {
               </table>
             </div>
 
-            <div className="pt-4 border-t border-slate-800 flex justify-end">
+            <div className="pt-4 border-t border-slate-100 flex justify-end">
               <button
                 onClick={handleSaveAttendance}
                 disabled={saving}
-                className="px-6 py-3 bg-gradient-to-r from-iiitp-gold to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 text-slate-950 font-black rounded-xl text-xs uppercase tracking-wider shadow-glow-gold flex items-center gap-2 cursor-pointer transition-all"
+                className="px-5 py-2.5 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all"
               >
                 <Save className="w-4 h-4" />
                 {saving ? 'Saving Sheet...' : 'Submit & Save Attendance Sheet'}
@@ -393,7 +393,7 @@ export default function FacultyDashboard() {
       {activeTab === 'advisor_registration' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 px-1">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">
               Hostel Verified Registrations ({pendingAdvisorRegs.length})
             </h3>
 
@@ -405,41 +405,41 @@ export default function FacultyDashboard() {
                     onClick={() => setSelectedReg(reg)}
                     className={`p-4 rounded-xl border cursor-pointer transition-all ${
                       selectedReg?.id === reg.id
-                        ? 'bg-slate-900 border-iiitp-gold/50 ring-1 ring-iiitp-gold/20'
-                        : 'bg-slate-900/40 border-slate-850 hover:bg-slate-900/60'
+                        ? 'bg-blue-50/80 border-[#1c398e] ring-1 ring-[#1c398e]'
+                        : 'bg-white border-slate-200 hover:bg-slate-50'
                     }`}
                   >
-                    <h4 className="text-xs font-black text-white">{reg.student?.name}</h4>
-                    <p className="text-[10px] text-iiitp-gold font-mono font-bold mt-0.5">MIS: {reg.student?.userId}</p>
-                    <span className="text-[9px] font-black uppercase text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded mt-2 inline-block">
+                    <h4 className="text-xs font-bold text-slate-900">{reg.student?.name}</h4>
+                    <p className="text-[10px] text-[#1c398e] font-mono font-semibold mt-0.5">MIS: {reg.student?.userId}</p>
+                    <span className="text-[9px] font-bold uppercase text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded mt-2 inline-block">
                       WARDEN APPROVED
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center bg-slate-900/20 border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
+              <div className="p-8 text-center bg-white border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs">
                 No registrations currently pending Faculty Advisor approval.
               </div>
             )}
           </div>
 
           {selectedReg ? (
-            <div className="lg:col-span-2 glass-card p-6 rounded-2xl border border-iiitp-border space-y-5">
-              <div className="border-b border-slate-800 pb-3">
-                <span className="text-[10px] text-slate-500 font-bold uppercase">ADVISOR REVIEW</span>
-                <h3 className="text-base font-black text-white">{selectedReg.student?.name}</h3>
-                <p className="text-xs text-slate-400 font-mono">MIS: {selectedReg.student?.userId} • {selectedReg.student?.section}</p>
+            <div className="lg:col-span-2 glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-5 shadow-sm">
+              <div className="border-b border-slate-100 pb-3">
+                <span className="text-[10px] text-slate-400 font-bold uppercase">ADVISOR REVIEW</span>
+                <h3 className="text-base font-bold text-slate-900">{selectedReg.student?.name}</h3>
+                <p className="text-xs text-slate-500 font-mono">MIS: {selectedReg.student?.userId} • {selectedReg.student?.section}</p>
               </div>
 
               <div className="space-y-3">
-                <h4 className="text-xs font-black uppercase tracking-wider text-slate-300">Student Uploaded Proofs</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Student Uploaded Proofs</h4>
                 <div className="grid grid-cols-2 gap-3">
                   {selectedReg.documents?.map(doc => (
-                    <div key={doc.id} className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs">
-                      <p className="font-bold text-iiitp-gold text-[10px]">{doc.documentType}</p>
-                      <p className="text-white font-extrabold truncate mt-0.5">{doc.documentName}</p>
-                      <a href={`http://localhost:5000${doc.filePath}`} target="_blank" rel="noreferrer" className="mt-2 block text-center py-1 bg-slate-900 text-slate-200 rounded text-[10px] font-bold uppercase">
+                    <div key={doc.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                      <p className="font-bold text-[#1c398e] text-[10px]">{doc.documentType}</p>
+                      <p className="text-slate-800 font-semibold truncate mt-0.5">{doc.documentName}</p>
+                      <a href={`http://localhost:5000${doc.filePath}`} target="_blank" rel="noreferrer" className="mt-2 block text-center py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded text-[10px] font-semibold uppercase">
                         Download Doc
                       </a>
                     </div>
@@ -447,27 +447,27 @@ export default function FacultyDashboard() {
                 </div>
               </div>
 
-              <div className="space-y-3 pt-3 border-t border-slate-800">
-                <label className="block text-[10px] font-black uppercase text-slate-400">Advisor Remarks</label>
+              <div className="space-y-3 pt-3 border-t border-slate-100">
+                <label className="block text-[10px] font-bold uppercase text-slate-500">Advisor Remarks</label>
                 <textarea
                   value={advisorRemarks}
                   onChange={(e) => setAdvisorRemarks(e.target.value)}
                   placeholder="Enter remarks or approval notes..."
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white h-20"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 h-20 focus:outline-none focus:border-[#5367c8]"
                 />
 
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleAdvisorAction('APPROVED')}
                     disabled={advisorLoading}
-                    className="flex-1 py-3 bg-emerald-950 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer"
+                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer"
                   >
                     Grant Final Approval
                   </button>
                   <button
                     onClick={() => handleAdvisorAction('RESUBMISSION_REQUIRED')}
                     disabled={advisorLoading}
-                    className="flex-1 py-3 bg-amber-950 text-amber-400 border border-amber-500/40 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer"
+                    className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer"
                   >
                     Request Resubmission
                   </button>
@@ -475,9 +475,9 @@ export default function FacultyDashboard() {
               </div>
             </div>
           ) : (
-            <div className="lg:col-span-2 glass-card p-12 rounded-2xl border border-slate-800 text-center flex flex-col justify-center items-center">
-              <FileCheck className="w-16 h-16 text-slate-600 mb-4" />
-              <h3 className="text-lg font-bold text-white">Select a registration from queue</h3>
+            <div className="lg:col-span-2 glass-card p-12 rounded-2xl border border-slate-200 bg-white text-center flex flex-col justify-center items-center shadow-sm">
+              <FileCheck className="w-16 h-16 text-slate-300 mb-4" />
+              <h3 className="text-lg font-bold text-slate-700">Select a registration from queue</h3>
             </div>
           )}
         </div>
@@ -485,43 +485,43 @@ export default function FacultyDashboard() {
 
       {/* TAB 3: ADVISEE ATTENDANCE SHORTAGE MONITORING */}
       {activeTab === 'advisor_alerts' && (
-        <div className="glass-card p-6 rounded-2xl border border-iiitp-border space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="text-sm font-black text-white">Advisee Attendance Shortage Monitor</h3>
-              <p className="text-xs text-slate-400">Real-time attendance warnings for Faculty Advisees (&lt;75% warning, &lt;65% critical)</p>
+              <h3 className="text-sm font-bold text-slate-900">Advisee Attendance Shortage Monitor</h3>
+              <p className="text-xs text-slate-500">Real-time attendance warnings for Faculty Advisees (&lt;75% warning, &lt;65% critical)</p>
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950 text-[10px] uppercase font-bold text-slate-400 border-b border-slate-800">
+              <thead className="bg-slate-50 text-[10px] uppercase font-bold text-slate-500 border-b border-slate-200">
                 <tr>
-                  <th className="py-3 px-4">MIS / Roll No</th>
-                  <th className="py-3 px-4">Student Name</th>
-                  <th className="py-3 px-4">Section & Branch</th>
-                  <th className="py-3 px-4">Total Classes</th>
-                  <th className="py-3 px-4">Attended</th>
-                  <th className="py-3 px-4">Attendance %</th>
-                  <th className="py-3 px-4">Shortage Level</th>
+                  <th className="py-2.5 px-4">MIS / Roll No</th>
+                  <th className="py-2.5 px-4">Student Name</th>
+                  <th className="py-2.5 px-4">Section & Branch</th>
+                  <th className="py-2.5 px-4">Total Classes</th>
+                  <th className="py-2.5 px-4">Attended</th>
+                  <th className="py-2.5 px-4">Attendance %</th>
+                  <th className="py-2.5 px-4">Shortage Level</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-850">
+              <tbody className="divide-y divide-slate-100">
                 {adviseeMetrics.map((s) => (
-                  <tr key={s.id} className="hover:bg-slate-900/50 transition-colors">
-                    <td className="py-2.5 px-4 font-mono font-bold text-iiitp-gold">{s.userId}</td>
-                    <td className="py-2.5 px-4 font-bold text-white">{s.name}</td>
-                    <td className="py-2.5 px-4 text-slate-400">{s.section}</td>
+                  <tr key={s.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="py-2.5 px-4 font-mono font-bold text-[#1c398e]">{s.userId}</td>
+                    <td className="py-2.5 px-4 font-semibold text-slate-900">{s.name}</td>
+                    <td className="py-2.5 px-4 text-slate-500">{s.section}</td>
                     <td className="py-2.5 px-4 font-mono">{s.totalClasses}</td>
-                    <td className="py-2.5 px-4 font-mono text-emerald-400 font-bold">{s.attendedClasses}</td>
-                    <td className="py-2.5 px-4 font-mono font-black text-base">{s.percentage}%</td>
+                    <td className="py-2.5 px-4 font-mono text-emerald-600 font-bold">{s.attendedClasses}</td>
+                    <td className="py-2.5 px-4 font-mono font-bold text-base text-slate-900">{s.percentage}%</td>
                     <td className="py-2.5 px-4">
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${
                         s.alertLevel === 'CRITICAL'
-                          ? 'bg-red-950 text-red-400 border-red-500/40 animate-pulse'
+                          ? 'bg-red-50 text-red-700 border-red-200 animate-pulse'
                           : s.alertLevel === 'WARNING'
-                          ? 'bg-amber-950 text-amber-400 border-amber-500/40'
-                          : 'bg-emerald-950 text-emerald-400 border-emerald-500/40'
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                       }`}>
                         {s.alertLevel}
                       </span>

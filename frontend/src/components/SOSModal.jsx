@@ -166,17 +166,17 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-      <div className="w-full max-w-xl bg-slate-900 border border-red-500/30 rounded-2xl overflow-hidden shadow-2xl sos-pulse-effect">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div className="w-full max-w-xl bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-slate-800 bg-slate-900/60">
-          <div className="flex items-center gap-2.5 text-iiitp-danger">
-            <AlertOctagon className="w-6 h-6 animate-pulse" />
-            <h4 className="font-extrabold text-lg uppercase tracking-wider text-white">CAMPUS SOS CONSOLE</h4>
+        <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-red-50/70">
+          <div className="flex items-center gap-2.5 text-red-600">
+            <AlertOctagon className="w-5 h-5 animate-pulse" />
+            <h4 className="font-bold text-base sm:text-lg uppercase tracking-wider text-slate-900">CAMPUS SOS CONSOLE</h4>
           </div>
           <button 
             onClick={() => { onClose(); resetForm(); }}
-            className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -185,20 +185,20 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
         {/* Step 1: Category Selection */}
         {step === 1 && (
           <div className="p-6">
-            <p className="text-slate-400 text-sm text-center mb-6">
+            <p className="text-slate-500 text-xs sm:text-sm text-center mb-5">
               Select the category that matches your emergency. This immediately alerts campus security responders.
             </p>
-            <div className="grid grid-cols-2 gap-3.5">
+            <div className="grid grid-cols-2 gap-3">
               {CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
                 return (
                   <button
                     key={cat.value}
                     onClick={() => handleSelectCategory(cat)}
-                    className={`flex flex-col items-center justify-center p-5 rounded-xl border bg-slate-800/40 hover:scale-[1.02] text-center transition-all duration-200 ${cat.color}`}
+                    className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-[#5367c8] hover:shadow-sm text-center transition-all cursor-pointer group"
                   >
-                    <Icon className="w-10 h-10 mb-3" />
-                    <span className="text-xs font-extrabold uppercase tracking-wide">{cat.name}</span>
+                    <Icon className="w-8 h-8 mb-2 text-slate-700 group-hover:scale-105 transition-transform" />
+                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">{cat.name}</span>
                   </button>
                 );
               })}
@@ -208,47 +208,47 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
 
         {/* Step 2: Confirmation / Details Countdown */}
         {step === 2 && (
-          <div className="p-6">
+          <div className="p-6 space-y-4">
             {/* Top timer banner */}
-            <div className="bg-red-950/40 border border-red-500/20 rounded-xl p-5 text-center mb-6">
-              <span className="text-xxs font-bold text-red-500 uppercase tracking-widest block mb-1">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+              <span className="text-[10px] font-bold text-red-600 uppercase tracking-widest block mb-1">
                 TRASH ALARM PREVENTION WINDOW
               </span>
-              <h5 className="text-xl font-black text-white">
-                SOS triggering in <span className="text-red-500 text-3xl font-extrabold px-1 animate-ping-slow inline-block">{countdown}</span> seconds
+              <h5 className="text-base sm:text-lg font-bold text-slate-900">
+                SOS triggering in <span className="text-red-600 text-2xl font-black px-1 inline-block">{countdown}</span> seconds
               </h5>
               <button
                 onClick={cancelSOS}
-                className="mt-3.5 px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-lg uppercase tracking-wider transition-colors border border-slate-700"
+                className="mt-2.5 px-4 py-1.5 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-lg uppercase tracking-wider transition-colors border border-slate-200 cursor-pointer"
               >
-                CANCEL EMERGENCY REQUEST
+                Cancel Emergency Request
               </button>
             </div>
 
             {/* Reporter metadata pre-filled */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="flex items-center gap-2 p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg text-slate-300">
-                  <User className="w-4 h-4 text-iiitp-gold" />
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700">
+                  <User className="w-4 h-4 text-[#1c398e]" />
                   <div>
-                    <p className="text-[10px] text-slate-500 uppercase font-semibold">REPORTER</p>
-                    <p className="font-semibold text-white truncate">{user?.name}</p>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold">REPORTER</p>
+                    <p className="font-semibold text-slate-800 truncate">{user?.name}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 p-3 bg-slate-800/40 border border-slate-700/50 rounded-lg text-slate-300">
-                  <Phone className="w-4 h-4 text-iiitp-gold" />
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-700">
+                  <Phone className="w-4 h-4 text-[#1c398e]" />
                   <div>
-                    <p className="text-[10px] text-slate-500 uppercase font-semibold">CONTACT</p>
-                    <p className="font-semibold text-white truncate">{user?.contactNumber}</p>
+                    <p className="text-[10px] text-slate-400 uppercase font-bold">CONTACT</p>
+                    <p className="font-semibold text-slate-800 truncate">{user?.contactNumber}</p>
                   </div>
                 </div>
               </div>
 
               {/* Location Selectors */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5 flex items-center justify-between">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1 flex items-center justify-between">
                   <span>Manual Location (Fallback)</span>
-                  <span className="text-xxs text-iiitp-gold flex items-center gap-1">
+                  <span className="text-[10px] text-[#1c398e] font-semibold flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
                     {gpsLocation ? 'GPS Calibrated' : 'GPS Fetching...'}
                   </span>
@@ -256,7 +256,7 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
                 <select
                   value={manualLocation}
                   onChange={(e) => setManualLocation(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:border-red-500 text-sm"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-[#5367c8] text-xs font-medium"
                 >
                   {campusLocations.map((loc) => (
                     <option key={loc.id} value={loc.name}>
@@ -265,13 +265,13 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
                   ))}
                 </select>
                 {gpsError && (
-                  <p className="text-[10px] text-amber-500 mt-1">{gpsError}</p>
+                  <p className="text-[10px] text-amber-600 mt-1">{gpsError}</p>
                 )}
               </div>
 
               {/* Description field */}
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
                   Describe Emergency Incident (Optional)
                 </label>
                 <textarea
@@ -279,18 +279,18 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. Broken ankle near sports area / breathing difficulties..."
                   rows={2}
-                  className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 text-sm resize-none"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#5367c8] text-xs"
                 />
               </div>
 
-              {/* Trigger Now Button */}
+              {/* Trigger Button */}
               <button
                 onClick={triggerEmergency}
                 disabled={loading}
-                className="w-full py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-extrabold rounded-xl uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 hover:shadow-red-500/20 text-sm transition-all duration-200"
+                className="w-full py-2.5 sm:py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <AlertIcon className="w-4 h-4 animate-bounce" />
-                {loading ? 'INITIATING EMERGENCY SEQUENCE...' : 'TRIGGER SOS IMMEDIATE'}
+                <AlertOctagon className="w-4 h-4" />
+                {loading ? 'Transmitting Emergency...' : 'Trigger Immediate SOS Broadcast'}
               </button>
             </div>
           </div>
