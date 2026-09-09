@@ -100,6 +100,20 @@ io.on('connection', (socket) => {
 // Start Background Services
 startEscalationService(io);
 
+// Serve static frontend in production
+const frontendDist = path.join(__dirname, '../frontend/dist');
+if (process.env.NODE_ENV === 'production' || process.env.SERVE_STATIC === 'true') {
+  app.use(express.static(frontendDist));
+
+  // SPA Catch-all: serve index.html for non-API/non-upload GET requests
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/health')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDist, 'index.html'));
+  });
+}
+
 // Start listening
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

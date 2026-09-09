@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, getFileUrl } from '../config/api';
 import { 
   FileText, Upload, CheckCircle2, Clock, XCircle, AlertTriangle, 
   Building, UserCheck, ShieldCheck, Download, RefreshCw, FileCheck
@@ -20,7 +21,7 @@ export default function SemesterRegistrationTab() {
   const fetchStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/registration/my-status', {
+      const res = await fetch(`${API_URL}/registration/my-status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const resData = await res.json();
@@ -45,7 +46,7 @@ export default function SemesterRegistrationTab() {
     formData.append('file', file);
     formData.append('category', category);
 
-    const res = await fetch('http://localhost:5000/api/files/upload', {
+    const res = await fetch(`${API_URL}/files/upload`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: formData
@@ -58,33 +59,25 @@ export default function SemesterRegistrationTab() {
 
   const handleSubmitRegistration = async (e) => {
     e.preventDefault();
-    if (!erpFile && !feeFile && !data?.registration) {
-      setError('Please select both ERP Registration Proof and Fee Receipt documents.');
-      return;
-    }
-
     setUploading(true);
     setMessage('');
     setError('');
 
     try {
-      const uploadedDocs = [];
-
-      if (erpFile) {
-        const fileObj = await handleFileUpload(erpFile, 'ERP_PROOF');
-        uploadedDocs.push({
-          documentType: 'ERP_PROOF',
-          documentName: fileObj.originalName,
-          filePath: fileObj.filePath,
-          fileType: fileObj.fileType,
-          fileSize: fileObj.fileSize
-        });
+      if (!erpFile || !feeFile) {
+        throw new Error('Please upload both the ERP Registration slip and the Fee Receipt.');
       }
 
-      if (feeFile) {
-        const fileObj = await handleFileUpload(feeFile, 'FEE_RECEIPT');
+      // Step 1: Upload ERP Document
+      const erpUploaded = await handleFileUpload(erpFile, 'ERP_REGISTRATION_SLIP');
+      
+      // Step 2: Upload Fee Receipt
+      const feeUploaded = await handleFileUpload(feeFile, 'FEE_RECEIPT');
+
+      const uploadedDocs = [];
+      for (const fileObj of [erpUploaded, feeUploaded]) {
         uploadedDocs.push({
-          documentType: 'FEE_RECEIPT',
+          documentType: fileObj.category,
           documentName: fileObj.originalName,
           filePath: fileObj.filePath,
           fileType: fileObj.fileType,
@@ -93,7 +86,7 @@ export default function SemesterRegistrationTab() {
       }
 
       // Submit registration API call
-      const res = await fetch('http://localhost:5000/api/registration/submit', {
+      const res = await fetch(`${API_URL}/registration/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -322,7 +315,7 @@ export default function SemesterRegistrationTab() {
                   </div>
 
                   <a 
-                    href={`http://localhost:5000${doc.filePath}`} 
+                    href={getFileUrl(doc.filePath)} 
                     target="_blank" 
                     rel="noreferrer"
                     className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold uppercase flex items-center gap-1 transition-colors"

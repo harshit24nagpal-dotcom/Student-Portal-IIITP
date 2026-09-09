@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, getFileUrl } from '../config/api';
 import { 
   Building, CheckCircle2, XCircle, Clock, AlertTriangle, 
   FileText, Download, User, RefreshCw, CheckSquare, XSquare
@@ -18,7 +19,7 @@ export default function WardenDashboard() {
   const fetchPending = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/registration/warden/pending', {
+      const res = await fetch(`${API_URL}/registration/warden/pending`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -46,7 +47,7 @@ export default function WardenDashboard() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/registration/warden/verify', {
+      const res = await fetch(`${API_URL}/registration/warden/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -197,7 +198,7 @@ export default function WardenDashboard() {
                     <p className="text-slate-800 font-semibold truncate">{doc.documentName}</p>
                     
                     <a
-                      href={`http://localhost:5000${doc.filePath}`}
+                      href={getFileUrl(doc.filePath)}
                       target="_blank"
                       rel="noreferrer"
                       className="w-full py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-semibold uppercase flex items-center justify-center gap-1.5 transition-colors"

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: iiit-pune-campus-connect
+    env: node
+    plan: free
+    buildCommand: npm run build:deploy
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: JWT_SECRET
+        generateValue: true

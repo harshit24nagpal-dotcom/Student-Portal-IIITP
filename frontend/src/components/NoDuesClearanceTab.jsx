@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config/api';
 import { 
   GraduationCap, CheckCircle2, Clock, XCircle, AlertCircle, 
   Download, QrCode, ShieldCheck, Printer, RefreshCw, FileText
@@ -17,7 +18,7 @@ export default function NoDuesClearanceTab() {
   const fetchStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/nodues/my-status', {
+      const res = await fetch(`${API_URL}/nodues/my-status`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const resData = await res.json();
@@ -42,7 +43,7 @@ export default function NoDuesClearanceTab() {
     setMessage('');
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/nodues/apply', {
+      const res = await fetch(`${API_URL}/nodues/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

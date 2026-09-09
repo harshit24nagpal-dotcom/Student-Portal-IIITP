@@ -108,6 +108,32 @@ npm run dev
 | GET/POST | `/api/nodues/*` | 15-Department clearance matrix, officer verification & certificate generation |
 | POST | `/api/files/upload` | Document upload for registration proofs |
 
+## 🌐 Cloud Deployment (Render / Railway)
+
+This repository is pre-configured for 1-click full-stack deployment on **Render** or **Railway**:
+
+### Option 1: Deploy on Render (Recommended)
+1. Push this repository to your GitHub account (already synced).
+2. Log into [Render Dashboard](https://dashboard.render.com).
+3. Click **New +** → **Blueprint** (or **Web Service**).
+4. Connect this repository (`Student-Portal-IIITP`).
+   - If using **Blueprint**, Render will automatically detect [`render.yaml`](file:///c:/Users/user/Desktop/PROJECTS/IIIT%20PUNE/render.yaml) and configure everything.
+   - If creating a manual **Web Service**:
+     - **Environment**: `Node`
+     - **Build Command**: `npm run build:deploy`
+     - **Start Command**: `npm start`
+     - **Environment Variables**:
+       - `NODE_ENV`: `production`
+       - `DATABASE_URL`: `file:./dev.db`
+       - `JWT_SECRET`: `<any-secure-random-string>`
+5. Click **Deploy**. The platform will build the React frontend, generate the Prisma client, seed the SQLite database, and launch the service with full WebSocket support.
+
+### Option 2: Deploy on Railway
+1. Go to [Railway.app](https://railway.app) and create a new project.
+2. Select **Deploy from GitHub repo** and pick `Student-Portal-IIITP`.
+3. Set environment variable `NODE_ENV=production` and `JWT_SECRET=<secret>`.
+4. Railway will use the root `package.json` / `Procfile` / `Dockerfile` to automatically build and launch the application.
+
 ## 🤝 Contributing
 
 1. Fork the repository

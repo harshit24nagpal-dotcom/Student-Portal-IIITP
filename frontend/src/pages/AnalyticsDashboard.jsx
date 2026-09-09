@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config/api';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, Legend, LineChart, Line 
@@ -23,7 +24,7 @@ export default function AnalyticsDashboard() {
   const fetchAnalytics = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/analytics', {
+      const res = await fetch(`${API_URL}/analytics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const d = await res.json();

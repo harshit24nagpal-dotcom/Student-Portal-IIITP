@@ -11,6 +11,7 @@ import {
 import SOSModal from '../components/SOSModal';
 import SemesterRegistrationTab from '../components/SemesterRegistrationTab';
 import NoDuesClearanceTab from '../components/NoDuesClearanceTab';
+import { API_URL } from '../config/api';
 
 export default function StudentDashboard() {
   const { user, token } = useAuth();
@@ -38,7 +39,7 @@ export default function StudentDashboard() {
   const fetchAttendance = () => {
     if (!token) return;
     setLoadingAttendance(true);
-    fetch('http://localhost:5000/api/attendance/student/attendance', {
+    fetch(`${API_URL}/attendance/student/attendance`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -57,7 +58,7 @@ export default function StudentDashboard() {
 
   const fetchContacts = async () => {
     try {
-      const contactsRes = await fetch('http://localhost:5000/api/contacts', {
+      const contactsRes = await fetch(`${API_URL}/contacts`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const contactsData = await contactsRes.json();

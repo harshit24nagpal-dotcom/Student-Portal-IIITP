@@ -7,6 +7,7 @@ import {
   Shield, Check, X, ShieldAlert, Award, Clock, 
   MapPin, Phone, User, Play, Edit, CheckCircle, Navigation as NavIcon 
 } from 'lucide-react';
+import { API_URL } from '../config/api';
 
 const createMarkerIcon = (color, emoji) => {
   return L.divIcon({
@@ -40,7 +41,7 @@ export default function ResponderDashboard() {
   const fetchDashboardData = async () => {
     try {
       // 1. Fetch active emergencies assigned to me
-      const activeRes = await fetch('http://localhost:5000/api/emergencies/active', {
+      const activeRes = await fetch(`${API_URL}/emergencies/active`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const activeData = await activeRes.json();
@@ -55,7 +56,7 @@ export default function ResponderDashboard() {
 
       // 2. Fetch Performance
       if (user?.responder) {
-        const perfRes = await fetch(`http://localhost:5000/api/responders/${user.responder.id}/performance`, {
+        const perfRes = await fetch(`${API_URL}/responders/${user.responder.id}/performance`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (perfRes.ok) {
@@ -66,7 +67,7 @@ export default function ResponderDashboard() {
       }
 
       // 3. Fetch history
-      const historyRes = await fetch('http://localhost:5000/api/emergencies/history', {
+      const historyRes = await fetch(`${API_URL}/emergencies/history`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const historyData = await historyRes.json();
@@ -106,7 +107,7 @@ export default function ResponderDashboard() {
   // Update Duty Status
   const handleAvailabilityChange = async (newStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/responders/${user.responder.id}/status`, {
+      const res = await fetch(`${API_URL}/responders/${user.responder.id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +135,7 @@ export default function ResponderDashboard() {
     if (!activeJob) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${activeJob.id}/accept`, {
+      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/accept`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -159,7 +160,7 @@ export default function ResponderDashboard() {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${activeJob.id}/decline`, {
+      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/decline`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -179,7 +180,7 @@ export default function ResponderDashboard() {
     if (!activeJob) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${activeJob.id}/arrive`, {
+      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/arrive`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -198,7 +199,7 @@ export default function ResponderDashboard() {
     if (!activeJob) return;
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${activeJob.id}/resolve`, {
+      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -238,7 +239,7 @@ export default function ResponderDashboard() {
 
       // Update location on backend
       try {
-        const res = await fetch(`http://localhost:5000/api/responders/${user.responder.id}/location`, {
+        const res = await fetch(`${API_URL}/responders/${user.responder.id}/location`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
