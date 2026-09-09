@@ -239,6 +239,68 @@ router.get('/student-summary', authenticateToken, async (req, res) => {
   }
 });
 
+// Alias for student attendance endpoint
+router.get('/student/attendance', authenticateToken, async (req, res) => {
+  try {
+    const studentId = req.user.id;
+
+    const records = await prisma.attendanceRecord.findMany({
+      where: { studentId },
+      include: {
+        course: true,
+        session: true
+      },
+      orderBy: { session: { date: 'desc' } },
+    });
+
+    const isEce = (req.user.email || '').includes('@ece.');
+    const userIdStr = String(req.user.userId || req.user.email || '').split('@')[0];
+    const misNum = parseInt(userIdStr.slice(-3)) || 0;
+    const studentSection = req.user.section || (isEce 
+      ? 'Section C (ECE)' 
+      : misNum <= 82 
+      ? 'Section A (CSE)' 
+      : 'Section B (CSE)');
+
+    const relevantSubjects = SUBJECT_DIRECTORY.filter(s => s.section === studentSection);
+
+    const summary = relevantSubjects.map((sub) => {
+      const subRecords = records.filter(r => r.course && r.course.code === sub.code);
+      const totalClasses = subRecords.length;
+      const attendedClasses = subRecords.filter(r => r.status === 'PRESENT').length;
+      const absentClasses = subRecords.filter(r => r.status === 'ABSENT').length;
+      const percentage = totalClasses > 0 ? Math.round((attendedClasses / totalClasses) * 100) : 100;
+
+      return {
+        subjectCode: sub.code,
+        subjectName: sub.name,
+        facultyName: sub.facultyName,
+        section: sub.section,
+        totalClasses,
+        attendedClasses,
+        absentClasses,
+        percentage,
+        isShortage: percentage < 75,
+        isCriticalShortage: percentage < 65,
+      };
+    });
+
+    res.json({
+      studentSection,
+      summary,
+      detailedHistory: records.map(r => ({
+        id: r.id,
+        subjectCode: r.course?.code,
+        subjectName: r.course?.name,
+        date: r.session?.date,
+        status: r.status
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // GET Faculty Advisor Students & Low Attendance Alerts
 router.get('/advisor-students', authenticateToken, async (req, res) => {
   try {

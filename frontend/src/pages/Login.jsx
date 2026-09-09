@@ -100,7 +100,7 @@ export default function Login() {
         {/* Welcome Section */}
         <div className="mb-3.5">
           <h2 className="text-xl font-black text-slate-900 leading-snug">
-            {isRegistering ? 'Student Registration' : 'Welcome Back'}
+            {isRegistering ? 'Student Registration' : 'Welcome'}
           </h2>
           <p className="text-xs text-slate-500 mt-0.5 font-medium">
             {isRegistering 

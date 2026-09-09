@@ -1,253 +1,132 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import L from 'leaflet';
 import { 
   Heart, Flame, ShieldAlert, Activity, AlertCircle, HelpCircle, 
   MapPin, Phone, User, Clock, AlertTriangle, Shield, CheckCircle,
-  BookOpen, Building, Calendar, GraduationCap, Sparkles, Send, Award, CheckCircle2, ChevronRight, FileCheck, CheckSquare, AlertOctagon
+  BookOpen, Building, Calendar, GraduationCap, Sparkles, Send, Award, 
+  CheckCircle2, ChevronRight, FileCheck, CheckSquare, AlertOctagon,
+  ChevronLeft, ChevronRight as ChevronRightIcon, ExternalLink, Mail, Hash, BookMarked
 } from 'lucide-react';
 import SOSModal from '../components/SOSModal';
 import SemesterRegistrationTab from '../components/SemesterRegistrationTab';
 import NoDuesClearanceTab from '../components/NoDuesClearanceTab';
 
-// Helper to create custom Leaflet marker icons with CSS and emojis
-const createMarkerIcon = (color, emoji) => {
-  return L.divIcon({
-    html: `<div style="background-color: ${color}; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2.5px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.25); font-size: 18px; cursor: pointer;">${emoji}</div>`,
-    className: 'custom-marker-icon',
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-  });
-};
-
-const EMERGENCY_EMOJIS = {
-  MEDICAL: '❤️',
-  FIRE: '🔥',
-  SECURITY: '🛡️',
-  ACCIDENT: '🩹',
-  HARASSMENT: '⚠️',
-  OTHER: '❓',
-};
-
-const EMERGENCY_COLORS = {
-  MEDICAL: '#dc2626',
-  FIRE: '#ea580c',
-  SECURITY: '#7c3aed',
-  ACCIDENT: '#d97706',
-  HARASSMENT: '#db2777',
-  OTHER: '#475569',
-};
-
 export default function StudentDashboard() {
   const { user, token } = useAuth();
   const { socket } = useSocket();
-  const [portalTab, setPortalTab] = useState('sos'); // 'sos' | 'attendance' | 'registration' | 'nodues' | 'academics' | 'facilities' | 'clubs' | 'profile'
+  
+  // Default landing tab is Profile / Student Identity Overview
+  const [portalTab, setPortalTab] = useState('profile'); // 'profile' | 'attendance' | 'registration' | 'nodues' | 'academics' | 'contacts' | 'facilities'
   const [activeEmergency, setActiveEmergency] = useState(null);
-  const [history, setHistory] = useState([]);
   const [contacts, setContacts] = useState([]);
   const [isSosOpen, setIsSosOpen] = useState(false);
-  const [assignedResponder, setAssignedResponder] = useState(null);
-  const [cancelLoading, setCancelLoading] = useState(false);
 
-  // Attendance state
+  // Attendance & Calendar State
   const [attendanceData, setAttendanceData] = useState({ summary: [], detailedHistory: [], studentSection: '' });
   const [loadingAttendance, setLoadingAttendance] = useState(false);
+  const [currentCalendarMonth, setCurrentCalendarMonth] = useState(new Date(2026, 8, 1)); // Sept 2026
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState('2026-09-08');
 
-  // Booking form state
+  // Booking state
   const [selectedFacility, setSelectedFacility] = useState('AI/ML Computing Lab');
   const [bookingDate, setBookingDate] = useState('');
   const [bookingTime, setBookingTime] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
 
-  // Registered events state
-  const [registeredEvents, setRegisteredEvents] = useState([]);
-
   // Fetch student live attendance data from backend
-  useEffect(() => {
-    if (token && portalTab === 'attendance') {
-      setLoadingAttendance(true);
-      fetch('http://localhost:5000/api/academics/student/attendance', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data && Array.isArray(data.summary)) {
-            setAttendanceData(data);
-          }
-        })
-        .catch(err => console.error('Attendance fetch error:', err))
-        .finally(() => setLoadingAttendance(false));
-    }
-  }, [token, portalTab]);
-
-  const fetchData = async () => {
-    try {
-      // 1. Fetch active emergencies
-      const activeRes = await fetch('http://localhost:5000/api/emergencies/active', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const activeData = await activeRes.json();
-      const activeList = Array.isArray(activeData) ? activeData : [];
-      
-      // Find if this student has an active request
-      const studentActive = user ? activeList.find(req => req.reporterId === user.id) : null;
-      setActiveEmergency(studentActive || null);
-
-      if (studentActive) {
-        // Extract assigned responder if status is RESPONDER_ASSIGNED or further
-        const activeAssignment = Array.isArray(studentActive.assignments)
-          ? studentActive.assignments.find(a => a.status === 'ACCEPTED' || a.status === 'PENDING')
-          : null;
-        if (activeAssignment) {
-          setAssignedResponder(activeAssignment.responder);
-        } else {
-          setAssignedResponder(null);
+  const fetchAttendance = () => {
+    if (!token) return;
+    setLoadingAttendance(true);
+    fetch('http://localhost:5000/api/attendance/student/attendance', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.summary)) {
+          setAttendanceData(data);
         }
-      }
+      })
+      .catch(err => console.error('Attendance fetch error:', err))
+      .finally(() => setLoadingAttendance(false));
+  };
 
-      // 2. Fetch history
-      const historyRes = await fetch('http://localhost:5000/api/emergencies/history', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const historyData = await historyRes.json();
-      const historyList = Array.isArray(historyData) ? historyData : [];
-      const studentHistory = user ? historyList.filter(req => req.reporterId === user.id) : [];
-      setHistory(studentHistory);
+  useEffect(() => {
+    fetchAttendance();
+  }, [token]);
 
-      // 3. Fetch contacts
+  const fetchContacts = async () => {
+    try {
       const contactsRes = await fetch('http://localhost:5000/api/contacts', {
         headers: { Authorization: `Bearer ${token}` }
       });
       const contactsData = await contactsRes.json();
-      setContacts(Array.isArray(contactsData) ? contactsData : []);
-
+      if (Array.isArray(contactsData) && contactsData.length > 0) {
+        setContacts(contactsData);
+      } else {
+        // Fallback default official directory
+        setContacts([
+          { id: 1, name: 'Campus Emergency Ambulance', number: '+91 9826381867', department: 'Emergency Health & Ambulance Services' },
+          { id: 2, name: 'Harneshwar Multispeciality Hospital (Tie-up)', number: '+91 20 2742 2222 / +91 98220 12345', department: 'Empanelled Hospital (https://www.harneshwarhospital.com/)' },
+          { id: 3, name: 'Chief Hostel Warden (Residence)', number: '+91 98230 12345', department: 'Hostel Affairs & Student Residence' },
+          { id: 4, name: 'Student Grievance Cell', number: '+91 20 2345 6711', department: 'Student Affairs & Grievance Redressal' },
+          { id: 5, name: 'Campus Security Landline', number: '020-23456789 / +91 9123456780', department: 'Main Gate & Central Control Room' },
+          { id: 6, name: 'Anti-Ragging Squad Hotline', number: '1800-180-5522 / +91 20 2345 6710', department: 'Disciplinary & Anti-Ragging Committee' },
+        ]);
+      }
     } catch (err) {
-      console.error('Error fetching student dashboard data:', err);
+      console.error(err);
     }
   };
 
-  // Listen for WebSocket updates to the student's active request
   useEffect(() => {
-    if (!socket) return;
-
-    const handleEmergencyUpdated = (data) => {
-      if (activeEmergency && data.requestId === activeEmergency.id) {
-        fetchData();
-      } else if (data.request && data.request.reporterId === user?.id) {
-        fetchData();
-      }
-    };
-
-    const handleResponderLocation = (data) => {
-      if (activeEmergency && assignedResponder && data.responderId === assignedResponder.id) {
-        setAssignedResponder(prev => ({
-          ...prev,
-          latitude: data.latitude,
-          longitude: data.longitude,
-        }));
-      }
-    };
-
-    socket.on('emergency_updated', handleEmergencyUpdated);
-    socket.on('emergency_escalated', handleEmergencyUpdated);
-    socket.on('responder_location_updated', handleResponderLocation);
-
-    socket.on('new_emergency', (data) => {
-      if (data.emergency.reporterId === user?.id) {
-        fetchData();
-      }
-    });
-
-    return () => {
-      socket.off('emergency_updated', handleEmergencyUpdated);
-      socket.off('emergency_escalated', handleEmergencyUpdated);
-      socket.off('responder_location_updated', handleResponderLocation);
-    };
-  }, [socket, activeEmergency, assignedResponder, user]);
-
-  const handleCancelRequest = async () => {
-    if (!activeEmergency) return;
-    setCancelLoading(true);
-    try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${activeEmergency.id}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: 'RESOLVED', notes: 'Cancelled by student (False alarm)' }),
-      });
-
-      if (!res.ok) throw new Error('Failed to cancel request');
-      await fetchData();
-    } catch (err) {
-      alert(err.message || 'Could not cancel request');
-    } finally {
-      setCancelLoading(false);
+    if (token) {
+      fetchContacts();
     }
-  };
+  }, [token]);
 
-  // Status mapping for incident stepper
-  const statusSteps = [
-    { key: 'PENDING', label: 'Broadcast Sent', desc: 'Alert queued on campus network' },
-    { key: 'RESPONDER_ASSIGNED', label: 'Responder Dispatched', desc: 'Security officer moving to location' },
-    { key: 'ON_SCENE', label: 'Unit On Scene', desc: 'Responder present at coordinates' },
-    { key: 'RESOLVED', label: 'Incident Resolved', desc: 'Assistance completed safely' },
+  // Overall Attendance calculation
+  const totalAttended = attendanceData.summary.reduce((acc, curr) => acc + curr.attendedClasses, 0);
+  const totalClasses = attendanceData.summary.reduce((acc, curr) => acc + curr.totalClasses, 0);
+  const overallPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 88;
+  const hasShortage = attendanceData.summary.some(s => s.isShortage);
+
+  // Calendar Helpers
+  const year = currentCalendarMonth.getFullYear();
+  const month = currentCalendarMonth.getMonth();
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
   ];
+  
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const currentStatusIndex = activeEmergency 
-    ? statusSteps.findIndex(s => s.key === activeEmergency.status) 
-    : 0;
-
-  // Calculate straight-line distance in meters to active responder
-  const getDistanceText = () => {
-    if (!activeEmergency || !assignedResponder) return null;
-    const lat1 = activeEmergency.latitude;
-    const lon1 = activeEmergency.longitude;
-    const lat2 = assignedResponder.latitude;
-    const lon2 = assignedResponder.longitude;
-
-    const R = 6371e3;
-    const phi1 = lat1 * Math.PI/180;
-    const phi2 = lat2 * Math.PI/180;
-    const deltaPhi = (lat2-lat1) * Math.PI/180;
-    const deltaLambda = (lon2-lon1) * Math.PI/180;
-    const a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
-              Math.cos(phi1) * Math.cos(phi2) *
-              Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const dist = R * c;
-
-    if (dist < 10) return 'Arrived';
-    return `${Math.round(dist)} meters away`;
+  const handlePrevMonth = () => {
+    setCurrentCalendarMonth(new Date(year, month - 1, 1));
   };
 
-  const getERTMinutes = () => {
-    if (!activeEmergency || !assignedResponder) return null;
-    const lat1 = activeEmergency.latitude;
-    const lon1 = activeEmergency.longitude;
-    const lat2 = assignedResponder.latitude;
-    const lon2 = assignedResponder.longitude;
-
-    const R = 6371e3;
-    const phi1 = lat1 * Math.PI/180;
-    const phi2 = lat2 * Math.PI/180;
-    const deltaPhi = (lat2-lat1) * Math.PI/180;
-    const deltaLambda = (lon2-lon1) * Math.PI/180;
-    const a = Math.sin(deltaPhi/2) * Math.sin(deltaPhi/2) +
-              Math.cos(phi1) * Math.cos(phi2) *
-              Math.sin(deltaLambda/2) * Math.sin(deltaLambda/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const dist = R * c;
-
-    return Math.ceil(dist / 2 / 60) + 1;
+  const handleNextMonth = () => {
+    setCurrentCalendarMonth(new Date(year, month + 1, 1));
   };
+
+  // Group detailed history by date string (YYYY-MM-DD)
+  const historyByDate = {};
+  (attendanceData.detailedHistory || []).forEach(record => {
+    if (!record.date) return;
+    if (!historyByDate[record.date]) {
+      historyByDate[record.date] = [];
+    }
+    historyByDate[record.date].push(record);
+  });
+
+  // Selected date lectures
+  const selectedDateLectures = historyByDate[selectedCalendarDate] || [];
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-800 bg-slate-50 min-h-screen">
-      {/* Header Greeting Banner */}
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-800 bg-slate-50 min-h-[calc(100vh-65px)]">
+      
+      {/* Top Greeting Header */}
       <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
@@ -262,129 +141,35 @@ export default function StudentDashboard() {
             Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name || 'Student'}!
           </h2>
           <p className="text-xs text-slate-500 mt-0.5 font-medium">
-            Here's what's happening with your campus life at IIIT Pune.
+            Indian Institute of Information Technology Pune • Academic Year 2026-27
           </p>
         </div>
 
+        {/* Quick Overall Metrics Tag */}
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsSosOpen(true)}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-xl tracking-wider shadow-md flex items-center gap-2 transition-all cursor-pointer animate-pulse"
-          >
-            <ShieldAlert className="w-4 h-4" />
-            <span>Emergency SOS</span>
-          </button>
+          <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-right">
+            <span className="text-[10px] text-slate-500 font-bold uppercase block">Current Attendance</span>
+            <span className={`text-lg font-black font-mono ${overallPct >= 75 ? 'text-emerald-700' : 'text-red-600'}`}>
+              {overallPct}% {overallPct >= 75 ? '✓' : '⚠️'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Top 4 Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Attendance Summary */}
-        <div 
-          onClick={() => setPortalTab('attendance')}
-          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-            portalTab === 'attendance'
-              ? 'bg-white border-emerald-500 shadow-md ring-2 ring-emerald-500/20'
-              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">Overall Attendance</span>
-            <CheckSquare className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <h3 className="text-2xl font-black text-slate-900">82%</h3>
-            <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black uppercase rounded">
-              Good Standing
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-500 mt-2 font-medium">Target threshold 75% • All courses safe</p>
-        </div>
-
-        {/* Semester Registration Summary */}
-        <div 
-          onClick={() => setPortalTab('registration')}
-          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-            portalTab === 'registration'
-              ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-500/20'
-              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">Semester Registration</span>
-            <FileCheck className="w-4 h-4 text-blue-600" />
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <h3 className="text-xl font-black text-slate-900">Verified</h3>
-            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-black uppercase rounded">
-              Approved
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-500 mt-2 font-medium">Warden & Advisor approvals complete</p>
-        </div>
-
-        {/* No-Dues Clearance Summary */}
-        <div 
-          onClick={() => setPortalTab('nodues')}
-          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-            portalTab === 'nodues'
-              ? 'bg-white border-amber-500 shadow-md ring-2 ring-amber-500/20'
-              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">No-Dues Clearance</span>
-            <GraduationCap className="w-4 h-4 text-amber-600" />
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <h3 className="text-2xl font-black text-slate-900">15 / 15</h3>
-            <span className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-black uppercase rounded">
-              Cleared
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-500 mt-2 font-medium">Ready to download certificate</p>
-        </div>
-
-        {/* Emergency SOS Summary */}
-        <div 
-          onClick={() => setPortalTab('sos')}
-          className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-            portalTab === 'sos'
-              ? 'bg-white border-red-500 shadow-md ring-2 ring-red-500/20'
-              : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
-          }`}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-xxs font-extrabold uppercase text-slate-500 tracking-wider">Emergency Status</span>
-            <ShieldAlert className={`w-4 h-4 ${activeEmergency ? 'text-red-600 animate-bounce' : 'text-slate-400'}`} />
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <h3 className="text-base font-black text-slate-900 truncate">
-              {activeEmergency ? 'ACTIVE ALERT' : 'No Active Alerts'}
-            </h3>
-            <span className={`px-2 py-0.5 border text-[10px] font-black uppercase rounded ${
-              activeEmergency ? 'bg-red-50 text-red-700 border-red-200' : 'bg-slate-100 text-slate-600 border-slate-200'
-            }`}>
-              {activeEmergency ? activeEmergency.status : 'Normal'}
-            </span>
-          </div>
-          <p className="text-[10px] text-slate-500 mt-2 font-medium">Campus Security & Response Active</p>
-        </div>
-      </div>
-
-      {/* Quick Action Navigation Tabs */}
+      {/* Navigation Tabs Bar */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-2 overflow-x-auto">
         <div className="flex gap-2">
+          
           <button
-            onClick={() => setPortalTab('sos')}
+            onClick={() => setPortalTab('profile')}
             className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'sos'
-                ? 'bg-red-600 text-white shadow-md'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-100'
+              portalTab === 'profile'
+                ? 'bg-[#0c2340] text-white shadow-sm'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <ShieldAlert className="w-4 h-4" />
-            <span>Emergency SOS</span>
+            <User className="w-4 h-4" />
+            <span>Student Profile</span>
           </button>
 
           <button
@@ -395,8 +180,8 @@ export default function StudentDashboard() {
                 : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
             }`}
           >
-            <CheckSquare className="w-4 h-4" />
-            <span>Attendance</span>
+            <Calendar className="w-4 h-4" />
+            <span>Attendance & Calendar</span>
           </button>
 
           <button
@@ -436,6 +221,18 @@ export default function StudentDashboard() {
           </button>
 
           <button
+            onClick={() => setPortalTab('contacts')}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+              portalTab === 'contacts'
+                ? 'bg-red-600 text-white shadow-sm'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <Phone className="w-4 h-4" />
+            <span>Emergency Contacts</span>
+          </button>
+
+          <button
             onClick={() => setPortalTab('facilities')}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
               portalTab === 'facilities'
@@ -447,302 +244,380 @@ export default function StudentDashboard() {
             <span>Facilities</span>
           </button>
 
-          <button
-            onClick={() => setPortalTab('profile')}
-            className={`px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
-              portalTab === 'profile'
-                ? 'bg-[#0c2340] text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <GraduationCap className="w-3.5 h-3.5" />
-            <span>Student ID</span>
-          </button>
         </div>
       </div>
 
-      {/* VIEW 1: EMERGENCY SOS SYSTEM */}
-      {portalTab === 'sos' && (
-        <>
-          {activeEmergency ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Tracking Card Details */}
-              <div className="lg:col-span-1 flex flex-col gap-6">
-                <div className="p-6 rounded-2xl border border-red-200 bg-white shadow-md relative overflow-hidden">
-                  <div className="flex items-center gap-3">
-                    <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-ping"></span>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-red-600">CRITICAL INCIDENT LIVE</span>
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 mt-2">{activeEmergency.id}</h3>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Type: <span className="font-bold text-red-600 uppercase">{activeEmergency.type}</span>
+      {/* ========================================================================= */}
+      {/* 1. MAIN LANDING VIEW: STUDENT PROFILE & OVERVIEW                         */}
+      {/* ========================================================================= */}
+      {portalTab === 'profile' && (
+        <div className="space-y-6">
+          
+          {/* Main Comprehensive Profile Card */}
+          <div className="p-6 sm:p-8 rounded-3xl border border-slate-200 bg-white shadow-sm space-y-6">
+            
+            {/* Header with College Emblem */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+              <div className="flex items-center gap-4">
+                <img 
+                  src="/iiitp_logo.png" 
+                  alt="IIIT Pune" 
+                  className="w-16 h-16 object-contain drop-shadow-xs" 
+                />
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 leading-tight">
+                    INDIAN INSTITUTE OF INFORMATION TECHNOLOGY PUNE
+                  </h3>
+                  <p className="text-xs font-bold text-[#0c2340] tracking-wider uppercase mt-0.5">
+                    Official Student Identity Record
                   </p>
-
-                  <div className="border-t border-slate-100 my-4"></div>
-
-                  <div className="space-y-4">
-                    {statusSteps.map((step, idx) => {
-                      const isDone = idx <= currentStatusIndex;
-                      const isCurrent = idx === currentStatusIndex;
-                      return (
-                        <div key={step.key} className="flex gap-3.5 relative">
-                          <div className={`w-6 h-6 rounded-full shrink-0 flex items-center justify-center border text-[10px] font-bold z-10 transition-colors ${
-                            isDone 
-                              ? 'bg-red-600 border-red-600 text-white' 
-                              : 'bg-slate-100 border-slate-300 text-slate-400'
-                          } ${isCurrent ? 'ring-4 ring-red-500/20 animate-pulse' : ''}`}>
-                            {idx + 1}
-                          </div>
-                          <div>
-                            <h4 className={`text-xs font-black uppercase tracking-wide ${isDone ? 'text-slate-900' : 'text-slate-400'}`}>
-                              {step.label}
-                            </h4>
-                            <p className="text-[10px] text-slate-500 mt-0.5">{step.desc}</p>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="border-t border-slate-100 my-4"></div>
-
-                  {assignedResponder ? (
-                    <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-emerald-700 block">
-                        ASSIGNED RESPONDER
-                      </span>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-lg shadow-xs">
-                          💂
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-black text-slate-900">{assignedResponder.user?.name}</h4>
-                          <p className="text-[10px] text-slate-500 mt-0.5">{assignedResponder.role}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-xs pt-1.5 border-t border-slate-200 text-slate-700">
-                        <span className="flex items-center gap-1 font-medium">
-                          <Clock className="w-3.5 h-3.5 text-amber-600" />
-                          ETA: {getERTMinutes() ? `${getERTMinutes()} mins` : 'Estimating...'}
-                        </span>
-                        <span className="text-emerald-700 font-bold">
-                          {getDistanceText() || 'En route'}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl flex items-center gap-2 font-medium">
-                      <Clock className="w-4 h-4 animate-spin text-amber-600" />
-                      <span>Security command is dispatching the nearest responder...</span>
-                    </div>
-                  )}
-
-                  <button
-                    onClick={handleCancelRequest}
-                    disabled={cancelLoading}
-                    className="w-full mt-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider transition-colors border border-slate-200 disabled:opacity-50 cursor-pointer"
-                  >
-                    {cancelLoading ? 'Cancelling...' : 'Cancel Request (False Alarm)'}
-                  </button>
                 </div>
               </div>
-
-              {/* Interactive Live Map Tracking */}
-              <div className="lg:col-span-2 p-4 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[520px] lg:h-auto">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-red-600" />
-                    Live Incident Dispatch Map
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-semibold">Campus Coordinates Live</span>
-                </div>
-                
-                <div className="flex-1 rounded-xl overflow-hidden relative border border-slate-200">
-                  <MapContainer 
-                    center={[activeEmergency.latitude, activeEmergency.longitude]} 
-                    zoom={17} 
-                    scrollWheelZoom={false}
-                    style={{ height: '100%', width: '100%' }}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; OpenStreetMap'
-                    />
-                    <Marker 
-                      position={[activeEmergency.latitude, activeEmergency.longitude]} 
-                      icon={createMarkerIcon(EMERGENCY_COLORS[activeEmergency.type] || '#dc2626', EMERGENCY_EMOJIS[activeEmergency.type] || '🚨')}
-                    />
-                    {assignedResponder && (
-                      <Marker 
-                        position={[assignedResponder.latitude, assignedResponder.longitude]} 
-                        icon={createMarkerIcon('#16a34a', '💂')}
-                      />
-                    )}
-                    {assignedResponder && (
-                      <Polyline 
-                        positions={[
-                          [assignedResponder.latitude, assignedResponder.longitude],
-                          [activeEmergency.latitude, activeEmergency.longitude]
-                        ]} 
-                        color="#f59e0b"
-                        weight={4}
-                        dashArray="8, 6"
-                      />
-                    )}
-                  </MapContainer>
-                </div>
-              </div>
+              <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-black rounded-xl uppercase self-start sm:self-center">
+                ACTIVE & VERIFIED STUDENT ✓
+              </span>
             </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Top Panel: Giant Pulse Trigger */}
-              <div className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-10 flex flex-col items-center justify-center text-center relative overflow-hidden shadow-sm">
-                
-                <span className="px-3.5 py-1 bg-red-50 border border-red-200 text-red-700 rounded-full text-xxs font-black tracking-widest uppercase mb-6">
-                  CAMPUS SAFETY CONSOLE
-                </span>
 
-                <button
-                  onClick={() => setIsSosOpen(true)}
-                  className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-gradient-to-b from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-xl shadow-red-500/25 flex flex-col items-center justify-center text-white border-4 border-red-300 hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 cursor-pointer relative z-10"
+            {/* Profile Grid Details */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              
+              {/* Left: Avatar & Key Badges */}
+              <div className="md:col-span-1 p-6 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center justify-center text-center space-y-3">
+                <div className="w-24 h-24 rounded-full bg-[#0c2340] text-white font-black text-3xl flex items-center justify-center shadow-md">
+                  {user?.name ? user.name.split(' ').map(n => n[0]).join('') : 'HN'}
+                </div>
+                <div>
+                  <h4 className="text-base font-black text-slate-900">{user?.name || 'Harshit Nagpal'}</h4>
+                  <p className="text-xs font-mono font-bold text-[#0c2340] mt-0.5">MIS: {user?.userId || '112415079'}</p>
+                </div>
+                <div className="w-full pt-2 border-t border-slate-200 text-xxs font-bold text-slate-500 space-y-1 text-left">
+                  <p>• Department: <span className="text-slate-800 font-semibold">{user?.department || 'Computer Science & Engineering'}</span></p>
+                  <p>• Batch: <span className="text-slate-800 font-semibold">{user?.batch || '2024-2028'}</span></p>
+                  <p>• Semester: <span className="text-slate-800 font-semibold">{user?.semester || 3}rd Semester</span></p>
+                </div>
+              </div>
+
+              {/* Center & Right: Detailed Academic Data */}
+              <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">FULL NAME</span>
+                  <p className="text-sm font-bold text-slate-900">{user?.name || 'Harshit Nagpal'}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">MIS / ROLL NUMBER</span>
+                  <p className="text-sm font-mono font-bold text-[#0c2340]">{user?.userId || '112415079'}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">DEGREE & PROGRAMME</span>
+                  <p className="text-sm font-bold text-slate-900">{user?.programme || 'Bachelor of Technology (B.Tech)'}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">COURSE / BRANCH</span>
+                  <p className="text-sm font-bold text-[#0c2340]">
+                    {user?.email?.includes('@ece.') ? 'Electronics & Communication Engineering (ECE)' : 'Computer Science & Engineering (CSE)'}
+                  </p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">INSTITUTIONAL EMAIL</span>
+                  <p className="text-xs font-mono font-semibold text-slate-700 break-all">{user?.email}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PRIMARY PHONE NUMBER</span>
+                  <p className="text-xs font-mono font-semibold text-slate-700">{user?.contactNumber || '+91 99887 76655'}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ENROLLED SECTION</span>
+                  <p className="text-xs font-bold text-slate-800">{user?.section || 'Section A (CSE - MIS 001 to 082)'}</p>
+                </div>
+
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HOSTEL RESIDENCE</span>
+                  <p className="text-xs font-bold text-slate-800">{user?.hostelBlock || 'Vindhyachal Boys Hostel (BH-1)'}</p>
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Quick Portal Action Cards */}
+            <div className="border-t border-slate-100 pt-5">
+              <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-3.5">
+                Quick Campus Portals & Services
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div 
+                  onClick={() => setPortalTab('attendance')}
+                  className="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
                 >
-                  <ShieldAlert className="w-14 h-14 sm:w-16 sm:h-16 animate-pulse" />
-                  <span className="text-base sm:text-lg font-black tracking-wider uppercase mt-2">TRIGGER SOS</span>
-                  <span className="text-[10px] text-red-100 tracking-wider font-bold uppercase mt-0.5">PRESS IN EMERGENCY</span>
-                </button>
-
-                <h3 className="text-xl sm:text-2xl font-black mt-8 text-slate-900">Need Urgent Security or Medical Support?</h3>
-                <p className="text-slate-500 text-xs sm:text-sm max-w-md mt-2 leading-relaxed">
-                  Pressing the button will notify campus emergency teams immediately. Captures location, user ID, and recommends closest response agents.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Emergency Contacts Directory */}
-                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
-                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-[#0c2340]" />
-                    IIIT Pune Emergency Contacts
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {contacts.map((contact) => (
-                      <div key={contact.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors">
-                        <div>
-                          <h4 className="text-xs font-bold text-slate-900 leading-none">{contact.name}</h4>
-                          <span className="inline-block text-[10px] text-slate-500 mt-1 font-semibold uppercase tracking-wider">
-                            {contact.department}
-                          </span>
-                        </div>
-                        <a
-                          href={`tel:${contact.number}`}
-                          className="p-2 bg-blue-50 hover:bg-blue-100 text-[#0c2340] rounded-xl border border-blue-200 flex items-center justify-center transition-colors"
-                        >
-                          <Phone className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-                    ))}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">Attendance Calendar</span>
+                    <Calendar className="w-4 h-4 text-emerald-600" />
                   </div>
+                  <p className="text-[10px] text-slate-500 mt-1">Daily lectures & percentage tracking</p>
                 </div>
 
-                {/* History */}
-                <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
-                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-blue-600" />
-                    Your Incident History
-                  </h3>
-
-                  {history.length > 0 ? (
-                    <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
-                      {history.map((req) => (
-                        <div key={req.id} className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-black text-slate-900">{req.id}</span>
-                              <span className="text-[10px] font-bold uppercase text-slate-600">
-                                {req.type}
-                              </span>
-                            </div>
-                            <p className="text-[10px] text-slate-500 mt-0.5">
-                              Date: {new Date(req.createdAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                          <span className="px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold rounded-lg uppercase">
-                            Resolved
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs font-medium">
-                      No previous emergency reports logged.
-                    </div>
-                  )}
+                <div 
+                  onClick={() => setPortalTab('registration')}
+                  className="p-4 bg-white border border-slate-200 hover:border-blue-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-blue-700">Semester Registration</span>
+                    <FileCheck className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">Warden & Advisor verification</p>
                 </div>
+
+                <div 
+                  onClick={() => setPortalTab('nodues')}
+                  className="p-4 bg-white border border-slate-200 hover:border-amber-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-amber-700">No-Dues Clearance</span>
+                    <GraduationCap className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">15-Department clearance certificate</p>
+                </div>
+
+                <div 
+                  onClick={() => setPortalTab('contacts')}
+                  className="p-4 bg-white border border-slate-200 hover:border-red-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-900 group-hover:text-red-700">Emergency Contacts</span>
+                    <Phone className="w-4 h-4 text-red-600" />
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1">Ambulance, Hospital & Security</p>
+                </div>
+
               </div>
             </div>
-          )}
-        </>
+
+          </div>
+
+        </div>
       )}
 
-      {/* VIEW 2: SUBJECT ATTENDANCE TRACKER */}
+      {/* ========================================================================= */}
+      {/* 2. ATTENDANCE & INTERACTIVE DAILY CALENDAR                                */}
+      {/* ========================================================================= */}
       {portalTab === 'attendance' && (
         <div className="space-y-6">
-          {/* Header Summary Banner */}
+          
+          {/* Top Overview Meter */}
           <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-black uppercase rounded tracking-wider">
-                  INSTITUTIONAL ATTENDANCE TRACKER
+                  DAILY ACADEMIC ATTENDANCE TRACKER
                 </span>
                 <span className="text-xxs text-slate-500 font-mono font-bold">
-                  Enrolled Section: {attendanceData.studentSection || 'Section A (CSE)'}
+                  Section: {attendanceData.studentSection || 'Section A (CSE)'}
                 </span>
               </div>
-              <h3 className="text-xl font-black text-slate-900">Autumn Semester Subject Attendance Roster</h3>
+              <h3 className="text-xl font-black text-slate-900">Semester Daily Attendance Calendar & Roster</h3>
               <p className="text-xs text-slate-500">
-                Official records updated directly by course faculty. Maintain &ge; 75% in each subject for end-semester exam eligibility.
+                Live attendance records updated by faculty instructors. Maintain &ge; 75% overall and per subject.
               </p>
             </div>
 
-            {/* Quick Overall Average */}
-            {attendanceData.summary.length > 0 && (() => {
-              const totalAttended = attendanceData.summary.reduce((acc, curr) => acc + curr.attendedClasses, 0);
-              const totalClasses = attendanceData.summary.reduce((acc, curr) => acc + curr.totalClasses, 0);
-              const overallPct = totalClasses > 0 ? Math.round((totalAttended / totalClasses) * 100) : 100;
-              const hasShortage = attendanceData.summary.some(s => s.isShortage);
-
-              return (
-                <div className="flex items-center gap-4 bg-slate-50 p-4 border border-slate-200 rounded-2xl shrink-0">
-                  <div className="text-center">
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Overall Percentage</span>
-                    <span className={`text-2xl font-black font-mono ${overallPct >= 75 ? 'text-emerald-700' : 'text-red-600'}`}>
-                      {overallPct}%
-                    </span>
-                  </div>
-                  <div className="h-10 w-px bg-slate-200"></div>
-                  <div>
-                    <span className="text-[10px] text-slate-500 font-bold uppercase block">Exam Eligibility</span>
-                    <span className={`inline-block px-2.5 py-1 text-[10px] font-black rounded uppercase ${
-                      !hasShortage 
-                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-                        : 'bg-red-50 text-red-700 border border-red-200'
-                    }`}>
-                      {!hasShortage ? 'ELIGIBLE ✓' : 'SHORTAGE ALERT ⚠️'}
-                    </span>
-                  </div>
-                </div>
-              );
-            })()}
+            {/* Total Percentage Stats */}
+            <div className="flex items-center gap-4 bg-slate-50 p-4 border border-slate-200 rounded-2xl shrink-0">
+              <div className="text-center">
+                <span className="text-[10px] text-slate-500 font-bold uppercase block">Overall Percentage</span>
+                <span className={`text-2xl font-black font-mono ${overallPct >= 75 ? 'text-emerald-700' : 'text-red-600'}`}>
+                  {overallPct}%
+                </span>
+              </div>
+              <div className="h-10 w-px bg-slate-200"></div>
+              <div>
+                <span className="text-[10px] text-slate-500 font-bold uppercase block">Exam Eligibility</span>
+                <span className={`inline-block px-2.5 py-1 text-[10px] font-black rounded uppercase ${
+                  !hasShortage 
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+                    : 'bg-red-50 text-red-700 border border-red-200'
+                }`}>
+                  {!hasShortage ? 'ELIGIBLE ✓' : 'SHORTAGE ALERT ⚠️'}
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* Subject Cards Grid */}
-          {loadingAttendance ? (
-            <div className="p-12 text-center text-slate-500 text-xs font-bold space-y-2">
-              <div className="w-6 h-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p>Loading Live Attendance Records...</p>
+          {/* Interactive Calendar & Daily Breakdown Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            {/* Left: Monthly Calendar Component */}
+            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+              
+              {/* Calendar Header with Month Selector */}
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#0c2340]" />
+                  <h3 className="text-base font-black text-slate-900">
+                    {monthNames[month]} {year}
+                  </h3>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button 
+                    onClick={handlePrevMonth}
+                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors cursor-pointer"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={handleNextMonth}
+                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors cursor-pointer"
+                  >
+                    <ChevronRightIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Day Headers (Sun - Sat) */}
+              <div className="grid grid-cols-7 gap-1 text-center font-bold text-xs text-slate-400">
+                <span>Sun</span>
+                <span>Mon</span>
+                <span>Tue</span>
+                <span>Wed</span>
+                <span>Thu</span>
+                <span>Fri</span>
+                <span>Sat</span>
+              </div>
+
+              {/* Day Cells Grid */}
+              <div className="grid grid-cols-7 gap-1.5">
+                {/* Empty cells before month start */}
+                {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                  <div key={`empty-${i}`} className="h-14 bg-slate-50/40 rounded-xl border border-transparent"></div>
+                ))}
+
+                {/* Days of current month */}
+                {Array.from({ length: daysInMonth }).map((_, i) => {
+                  const dayNum = i + 1;
+                  const dayStr = dayNum < 10 ? `0${dayNum}` : `${dayNum}`;
+                  const monthStr = (month + 1) < 10 ? `0${month + 1}` : `${month + 1}`;
+                  const fullDateStr = `${year}-${monthStr}-${dayStr}`;
+
+                  const dayRecords = historyByDate[fullDateStr] || [];
+                  const isSelected = selectedCalendarDate === fullDateStr;
+                  const isWeekend = new Date(year, month, dayNum).getDay() === 0 || new Date(year, month, dayNum).getDay() === 6;
+
+                  const hasAbsent = dayRecords.some(r => r.status === 'ABSENT');
+                  const hasPresent = dayRecords.some(r => r.status === 'PRESENT');
+
+                  return (
+                    <div
+                      key={fullDateStr}
+                      onClick={() => setSelectedCalendarDate(fullDateStr)}
+                      className={`h-14 p-1.5 rounded-xl border flex flex-col justify-between transition-all cursor-pointer select-none ${
+                        isSelected 
+                          ? 'border-[#0c2340] ring-2 ring-[#0c2340]/20 bg-blue-50/30' 
+                          : 'border-slate-200 hover:border-slate-300 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-bold ${isSelected ? 'text-[#0c2340]' : 'text-slate-800'}`}>
+                          {dayNum}
+                        </span>
+                        {isWeekend && (
+                          <span className="text-[8px] font-semibold text-slate-300 uppercase">OFF</span>
+                        )}
+                      </div>
+
+                      {/* Status Badges */}
+                      <div className="flex items-center gap-1">
+                        {hasAbsent ? (
+                          <span className="w-2 h-2 rounded-full bg-red-500" title="Absent in lecture"></span>
+                        ) : hasPresent ? (
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" title="Present in all lectures"></span>
+                        ) : isWeekend ? (
+                          <span className="w-1.5 h-1.5 rounded-full bg-slate-200"></span>
+                        ) : null}
+
+                        {dayRecords.length > 0 && (
+                          <span className="text-[9px] font-mono text-slate-500 font-semibold">
+                            {dayRecords.filter(r => r.status === 'PRESENT').length}/{dayRecords.length}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Legend */}
+              <div className="flex items-center gap-4 text-[11px] text-slate-500 pt-3 border-t border-slate-100 font-medium">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Present (All Classes)
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> Absent (Shortage on day)
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300"></span> Weekend / Holiday
+                </span>
+              </div>
+
             </div>
-          ) : attendanceData.summary.length > 0 ? (
+
+            {/* Right: Selected Date Class Timeline */}
+            <div className="lg:col-span-1 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+              <div className="border-b border-slate-100 pb-3">
+                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">DATE DETAILS</span>
+                <h3 className="text-base font-black text-slate-900">{selectedCalendarDate}</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  {selectedDateLectures.length} scheduled lectures recorded
+                </p>
+              </div>
+
+              {selectedDateLectures.length > 0 ? (
+                <div className="space-y-3">
+                  {selectedDateLectures.map((lec) => (
+                    <div 
+                      key={lec.id} 
+                      className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
+                        lec.status === 'PRESENT' 
+                          ? 'bg-emerald-50/40 border-emerald-200' 
+                          : 'bg-red-50/40 border-red-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-slate-900">{lec.subjectCode}</span>
+                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded ${
+                          lec.status === 'PRESENT' 
+                            ? 'bg-emerald-100 text-emerald-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {lec.status}
+                        </span>
+                      </div>
+                      <p className="text-[11px] font-medium text-slate-700">{lec.subjectName}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs">
+                  No classes conducted on this date.
+                </div>
+              )}
+            </div>
+
+          </div>
+
+          {/* Subject-Wise Attendance Progress Cards */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">
+              Subject-Wise Breakdown & Criteria
+            </h3>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {attendanceData.summary.map((subject) => {
                 const isShortage = subject.isShortage;
@@ -775,7 +650,7 @@ export default function StudentDashboard() {
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-[10px] text-slate-500 font-bold">
                         <span>Attended: {subject.attendedClasses} / {subject.totalClasses} Lectures</span>
-                        <span>Min Target: 75%</span>
+                        <span>Target: 75%</span>
                       </div>
                       <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                         <div 
@@ -792,7 +667,7 @@ export default function StudentDashboard() {
                       {isShortage ? (
                         <span className="text-red-600 font-bold flex items-center gap-1">
                           <AlertOctagon className="w-3.5 h-3.5" />
-                          Attendance below 75% requirement
+                          Attendance below 75%
                         </span>
                       ) : (
                         <span className="text-emerald-700 font-bold flex items-center gap-1">
@@ -809,58 +684,24 @@ export default function StudentDashboard() {
                 );
               })}
             </div>
-          ) : (
-            <div className="p-8 text-center bg-white border border-dashed border-slate-200 rounded-2xl text-slate-500 text-xs">
-              No attendance records recorded yet.
-            </div>
-          )}
+          </div>
 
-          {/* Detailed Attendance History Logs */}
-          {attendanceData.detailedHistory && attendanceData.detailedHistory.length > 0 && (
-            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                <Clock className="w-4 h-4 text-blue-600" />
-                Lecture Attendance Log History
-              </h3>
-
-              <div className="overflow-x-auto rounded-xl border border-slate-200">
-                <table className="w-full text-left text-xs text-slate-700">
-                  <thead className="bg-slate-50 text-[10px] uppercase font-black tracking-wider text-slate-600 border-b border-slate-200">
-                    <tr>
-                      <th className="py-3 px-4">Date</th>
-                      <th className="py-3 px-4">Subject Code</th>
-                      <th className="py-3 px-4">Course Name</th>
-                      <th className="py-3 px-4">Faculty Instructor</th>
-                      <th className="py-3 px-4 text-center">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 bg-white font-mono">
-                    {attendanceData.detailedHistory.map((item) => (
-                      <tr key={item.id} className="hover:bg-slate-50">
-                        <td className="py-2.5 px-4 font-bold text-slate-600">{item.date}</td>
-                        <td className="py-2.5 px-4 font-bold text-[#0c2340]">{item.subjectCode}</td>
-                        <td className="py-2.5 px-4 text-slate-900 font-sans font-medium">{item.subjectName}</td>
-                        <td className="py-2.5 px-4 text-slate-600 font-sans">{item.facultyName}</td>
-                        <td className="py-2.5 px-4 text-center">
-                          <span className={`px-2.5 py-0.5 rounded text-[10px] font-black uppercase ${
-                            item.status === 'PRESENT'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                              : 'bg-red-50 text-red-700 border border-red-200'
-                          }`}>
-                            {item.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
-      {/* VIEW: ACADEMICS & NOTICES */}
+      {/* ========================================================================= */}
+      {/* 3. SEMESTER REGISTRATION TAB                                             */}
+      {/* ========================================================================= */}
+      {portalTab === 'registration' && <SemesterRegistrationTab />}
+
+      {/* ========================================================================= */}
+      {/* 4. NO-DUES CLEARANCE TAB                                                 */}
+      {/* ========================================================================= */}
+      {portalTab === 'nodues' && <NoDuesClearanceTab />}
+
+      {/* ========================================================================= */}
+      {/* 5. ACADEMICS & TIMETABLE TAB                                             */}
+      {/* ========================================================================= */}
       {portalTab === 'academics' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -910,35 +751,35 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            {/* Right: Timetable & Credit Summary */}
+            {/* Right: Timetable */}
             <div className="space-y-6">
               <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
                 <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-blue-600" />
-                  Today's Lecture Schedule
+                  Today's Lecture Timetable
                 </h3>
 
                 <div className="space-y-2.5 text-xs">
                   <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-slate-900">Data Structures & Algorithms</h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">LH-102 • Prof. Anagha Khiste</p>
+                      <h4 className="font-bold text-slate-900">Linear & Non-Linear Optimization</h4>
+                      <p className="text-[10px] text-slate-500 mt-0.5">LH-102 • Ms. Anagha Khiste</p>
                     </div>
                     <span className="text-[10px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-1 rounded">09:30 AM</span>
                   </div>
 
                   <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-slate-900">Digital Electronics & Microprocessors</h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">ECE Lab-2 • Dr. Suresh Patil</p>
+                      <h4 className="font-bold text-slate-900">Machine Learning (ML)</h4>
+                      <p className="text-[10px] text-slate-500 mt-0.5">LH-101 • Dr. Sunita Chaki</p>
                     </div>
                     <span className="text-[10px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-1 rounded">11:30 AM</span>
                   </div>
 
                   <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-slate-900">Computer Networks & Socket Lab</h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Computer Lab 3 • Lab Asst. Kulkarni</p>
+                      <h4 className="font-bold text-slate-900">Advanced Data Structures (ADS)</h4>
+                      <p className="text-[10px] text-slate-500 mt-0.5">Computer Lab 3 • Dr. Suraj Kumar</p>
                     </div>
                     <span className="text-[10px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-1 rounded">02:00 PM</span>
                   </div>
@@ -949,7 +790,70 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* VIEW 3: CAMPUS FACILITY BOOKINGS */}
+      {/* ========================================================================= */}
+      {/* 6. EMERGENCY CONTACTS DIRECTORY                                          */}
+      {/* ========================================================================= */}
+      {portalTab === 'contacts' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                  <Phone className="w-5 h-5 text-red-600" />
+                  IIIT Pune Official Emergency Hotline Directory
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  24x7 Campus Ambulances, Empanelled Hospital, Wardens & Security Control Room
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              {contacts.map((contact) => {
+                const isHospital = contact.name.toLowerCase().includes('harneshwar');
+                return (
+                  <div 
+                    key={contact.id} 
+                    className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors shadow-xs"
+                  >
+                    <div>
+                      <span className="inline-block text-[9px] text-[#0c2340] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg mb-1.5">
+                        {contact.department.split('(')[0]}
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-900 leading-snug">{contact.name}</h4>
+                      {isHospital && (
+                        <a 
+                          href="https://www.harneshwarhospital.com/" 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-[11px] text-blue-700 font-bold hover:underline flex items-center gap-1 mt-1"
+                        >
+                          Visit Hospital Website <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+                      <span className="font-mono text-xs font-bold text-slate-800">{contact.number}</span>
+                      <a
+                        href={`tel:${contact.number.split('/')[0].trim()}`}
+                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-xs flex items-center justify-center transition-colors"
+                        title="Call Line"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 7. CAMPUS FACILITY BOOKINGS                                               */}
+      {/* ========================================================================= */}
       {portalTab === 'facilities' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1064,72 +968,8 @@ export default function StudentDashboard() {
         </div>
       )}
 
-      {/* VIEW: SEMESTER REGISTRATION */}
-      {portalTab === 'registration' && <SemesterRegistrationTab />}
-
-      {/* VIEW: NO-DUES CLEARANCE */}
-      {portalTab === 'nodues' && <NoDuesClearanceTab />}
-
-      {/* VIEW 5: STUDENT IDENTITY & PROFILE */}
-      {portalTab === 'profile' && (
-        <div className="space-y-6">
-          <div className="max-w-xl mx-auto p-8 rounded-3xl border border-slate-200 bg-white shadow-xl relative overflow-hidden space-y-6">
-            
-            {/* Card Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0c2340] font-black">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-base font-black text-slate-900 leading-none">IIIT PUNE</h3>
-                  <p className="text-[9px] text-slate-500 font-bold tracking-widest uppercase mt-0.5">Digital Student Pass</p>
-                </div>
-              </div>
-              <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[9px] font-black rounded uppercase">
-                VERIFIED ACTIVE
-              </span>
-            </div>
-
-            {/* Student Info */}
-            <div className="grid grid-cols-3 gap-4 text-xs">
-              <div className="col-span-1 flex flex-col items-center justify-center p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <div className="w-16 h-16 rounded-full bg-[#0c2340] text-white flex items-center justify-center text-2xl font-black uppercase shadow-sm">
-                  {user?.name?.split(' ').map(n => n[0]).join('') || 'HN'}
-                </div>
-                <span className="text-[10px] font-mono text-slate-500 font-bold mt-2">MIS: {user?.userId || '112415079'}</span>
-              </div>
-
-              <div className="col-span-2 space-y-2.5 justify-center flex flex-col">
-                <div>
-                  <p className="text-[9px] text-slate-500 font-bold uppercase">Student Full Name</p>
-                  <h4 className="text-base font-black text-slate-900">{user?.name}</h4>
-                </div>
-
-                <div>
-                  <p className="text-[9px] text-slate-500 font-bold uppercase">Academic Branch & Batch</p>
-                  <p className="text-xs font-bold text-[#0c2340]">
-                    {user?.email?.includes('@ece.') ? 'B.Tech Electronics & Communication (ECE)' : 'B.Tech Computer Science & Engineering (CSE)'} • 2024-2028
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[9px] text-slate-500 font-bold uppercase">Official Institutional Email</p>
-                  <p className="text-xs font-mono text-slate-600">{user?.email}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-t border-slate-100 pt-4 flex items-center justify-between text-xxs text-slate-500">
-              <span>Authority: Academic Affairs Directorate</span>
-              <span>Issued: August 2024</span>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* SOS Modal backdrop trigger */}
-      <SOSModal isOpen={isSosOpen} onClose={() => setIsSosOpen(false)} onSOSTriggered={fetchData} />
+      {/* Global SOS Modal trigger */}
+      <SOSModal isOpen={isSosOpen} onClose={() => setIsSosOpen(false)} onSOSTriggered={() => {}} />
     </div>
   );
 }

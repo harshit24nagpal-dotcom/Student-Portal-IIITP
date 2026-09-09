@@ -304,29 +304,43 @@ async function main() {
     });
   }
 
-  // Seed Attendance Sessions & Records for Harshit
-  if (harshit) {
-    const dates = ['2026-08-20', '2026-08-22', '2026-08-25', '2026-08-27', '2026-09-01'];
-    
-    for (const d of dates) {
-      const sessionML = await prisma.attendanceSession.create({
+  // Seed Attendance Sessions & Records for students across August & September 2026
+  console.log('Seeding daily calendar attendance sessions and logs...');
+  const activeCourses = [courseLNO, courseML, courseADS];
+  
+  // Working days in Aug & Sept 2026 (Mon-Fri)
+  const classDays = [
+    '2026-08-03', '2026-08-04', '2026-08-05', '2026-08-06', '2026-08-07',
+    '2026-08-10', '2026-08-11', '2026-08-12', '2026-08-13', '2026-08-14',
+    '2026-08-17', '2026-08-18', '2026-08-19', '2026-08-20', '2026-08-21',
+    '2026-08-24', '2026-08-25', '2026-08-26', '2026-08-27', '2026-08-28',
+    '2026-08-31', '2026-09-01', '2026-09-02', '2026-09-03', '2026-09-04',
+    '2026-09-07', '2026-09-08'
+  ];
+
+  for (const day of classDays) {
+    for (const c of activeCourses) {
+      const session = await prisma.attendanceSession.create({
         data: {
-          courseId: courseML.id,
-          date: d,
-          topic: `Lecture on ML - Date ${d}`,
-          conductedById: facultyAnagha.id
+          courseId: c.id,
+          date: day,
+          topic: `Lecture on ${c.name} (${c.code}) - ${day}`,
+          conductedById: facultyAnagha.id,
         }
       });
 
-      // Mark all students present except Harshit absent on 1 date
       for (const student of sectionAStudents) {
-        const isAbsent = (student.id === harshit.id && d === '2026-08-27');
+        // Deterministic realistic attendance: ~88% present, absent on a few days
+        const misNum = parseInt(student.userId.slice(-3)) || 0;
+        const dayNum = parseInt(day.slice(-2)) || 0;
+        const isAbsent = (misNum + dayNum) % 8 === 0;
+
         await prisma.attendanceRecord.create({
           data: {
-            sessionId: sessionML.id,
-            courseId: courseML.id,
+            sessionId: session.id,
+            courseId: c.id,
             studentId: student.id,
-            status: isAbsent ? 'ABSENT' : 'PRESENT'
+            status: isAbsent ? 'ABSENT' : 'PRESENT',
           }
         });
       }
@@ -375,26 +389,51 @@ async function main() {
 
   // Campus Locations & Contacts
   const locations = [
-    { name: 'Academic Block A', latitude: 18.488200, longitude: 73.816200, type: 'ACADEMIC' },
+    { name: 'Academic Block A - LH 102', latitude: 18.488200, longitude: 73.816200, type: 'ACADEMIC' },
+    { name: 'Academic Block B - Computing Lab', latitude: 18.488300, longitude: 73.816300, type: 'ACADEMIC' },
     { name: 'Main Gate & Security Hub', latitude: 18.488700, longitude: 73.816800, type: 'SECURITY' },
-    { name: 'Boys Hostel (Vindhyachal)', latitude: 18.486200, longitude: 73.815100, type: 'HOSTEL' },
-    { name: 'Girls Hostel (Sahyadri)', latitude: 18.486800, longitude: 73.814200, type: 'HOSTEL' },
-    { name: 'Campus Medical Center', latitude: 18.487100, longitude: 73.815000, type: 'MEDICAL' },
+    { name: 'Boys Hostel (Vindhyachal BH-1)', latitude: 18.486200, longitude: 73.815100, type: 'HOSTEL' },
+    { name: 'Girls Hostel (Sahyadri GH-1)', latitude: 18.486800, longitude: 73.814200, type: 'HOSTEL' },
+    { name: 'Campus Health Center', latitude: 18.487100, longitude: 73.815000, type: 'MEDICAL' },
     { name: 'Central Library & Admin', latitude: 18.487900, longitude: 73.815700, type: 'ACADEMIC' },
-    { name: 'Emergency Assembly Point 1', latitude: 18.487500, longitude: 73.816400, type: 'ASSEMBLY' },
-    { name: 'Emergency Exit East', latitude: 18.488000, longitude: 73.817000, type: 'EXIT' },
+    { name: 'Campus Cafeteria & Food Court', latitude: 18.487300, longitude: 73.815300, type: 'ACADEMIC' },
+    { name: 'Sports Complex & Grounds', latitude: 18.486500, longitude: 73.814800, type: 'ACADEMIC' },
   ];
   for (const loc of locations) {
     await prisma.campusLocation.create({ data: loc });
   }
 
   const contacts = [
-    { name: 'Main Security Control Room', number: '+91 20 2345 6789', department: 'Security' },
-    { name: 'Campus Ambulance & Clinic', number: '+91 98765 43210', department: 'Medical' },
-    { name: 'Faculty Emergency Head', number: '+91 98765 99999', department: 'Administration' },
-    { name: 'Student Welfare & Support', number: '+91 98765 12345', department: 'Counseling' },
-    { name: 'Anti-Ragging Hotline', number: '1800-180-5522', department: 'Safety Committee' },
-    { name: 'Local Fire Station (Ambegaon)', number: '101', department: 'External Emergency' },
+    { 
+      name: 'Campus Emergency Ambulance', 
+      number: '+91 9826381867', 
+      department: 'Emergency Health & Ambulance Services' 
+    },
+    { 
+      name: 'Harneshwar Multispeciality Hospital (Tie-up Hospital)', 
+      number: '+91 20 2742 2222 / +91 98220 12345', 
+      department: 'Empanelled Hospital (https://www.harneshwarhospital.com/)' 
+    },
+    { 
+      name: 'Chief Hostel Warden (Residence)', 
+      number: '+91 98230 12345', 
+      department: 'Hostel Affairs & Student Residence' 
+    },
+    { 
+      name: 'Student Grievance Cell', 
+      number: '+91 20 2345 6711', 
+      department: 'Student Affairs & Grievance Redressal' 
+    },
+    { 
+      name: 'Campus Security Landline', 
+      number: '020-23456789 / +91 9123456780', 
+      department: 'Main Gate & Central Control Room' 
+    },
+    { 
+      name: 'Anti-Ragging Squad Hotline', 
+      number: '1800-180-5522 / +91 20 2345 6710', 
+      department: 'Disciplinary & Anti-Ragging Committee' 
+    },
   ];
   for (const contact of contacts) {
     await prisma.emergencyContact.create({ data: contact });

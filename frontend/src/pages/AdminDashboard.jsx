@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
-import L from 'leaflet';
 import { 
   Shield, AlertTriangle, ShieldCheck, MapPin, Phone, 
   Users, Activity, Check, Plus, Trash2, Clock, 
-  Award, TrendingUp, Settings, Radio, UserPlus, CheckCircle2 
+  Award, TrendingUp, Settings, Radio, UserPlus, CheckCircle2,
+  ExternalLink, Building, CheckCircle
 } from 'lucide-react';
 import AnalyticsDashboard from './AnalyticsDashboard';
-
-const createMarkerIcon = (color, emoji) => {
-  return L.divIcon({
-    html: `<div style="background-color: ${color}; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 15px; cursor: pointer;">${emoji}</div>`,
-    className: 'custom-marker-icon',
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-  });
-};
 
 const CATEGORIES_COLOR = {
   MEDICAL: '#dc2626',
@@ -687,82 +677,79 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                       </div>
                     </div>
 
-                    {/* Right: Dispatch map panel */}
-                    <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm h-[450px] md:h-auto flex flex-col">
-                      <div className="flex items-center justify-between text-xxs pb-2 border-b border-slate-100 mb-3 text-slate-500 uppercase font-semibold">
-                        <span>Incident Dispatch Grid Map</span>
-                        <span>Seeded landmarks</span>
+                    {/* Right: Spot Location & Direct Response Console */}
+                    <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col justify-between space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                          <span className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                            <MapPin className="w-4 h-4 text-red-600" />
+                            Incident On-Spot Location
+                          </span>
+                          <span className="px-2 py-0.5 bg-red-50 text-red-700 border border-red-200 text-[10px] font-bold rounded-lg uppercase">
+                            DIRECT DISPATCH
+                          </span>
+                        </div>
+
+                        {/* Large Spot Landmark Display */}
+                        <div className="p-5 mt-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2 text-center">
+                          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                            REPORTED CAMPUS SPOT / ROOM
+                          </span>
+                          <h4 className="text-xl font-black text-[#0c2340]">
+                            {selectedEmergency.manualLocation || 'Main Academic Block - Floor 1'}
+                          </h4>
+                          <p className="text-xs text-slate-500">
+                            Exact location tagged by student at trigger time
+                          </p>
+                        </div>
+
+                        {/* Assigned Unit Status */}
+                        <div className="mt-4 p-4 border border-slate-200 rounded-2xl space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-slate-900">Assigned Response Officer</span>
+                            <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                              {activeAssignedResponder ? 'ASSIGNED ✓' : 'STANDBY'}
+                            </span>
+                          </div>
+
+                          {activeAssignedResponder ? (
+                            <div className="flex items-center gap-3 pt-1">
+                              <div className="w-10 h-10 rounded-full bg-[#0c2340] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                                💂
+                              </div>
+                              <div>
+                                <h5 className="text-xs font-black text-slate-900">{activeAssignedResponder.user?.name}</h5>
+                                <p className="text-[10px] text-slate-500 font-semibold">{activeAssignedResponder.role}</p>
+                              </div>
+                              <a
+                                href={`tel:${activeAssignedResponder.user?.contactNumber || '9876543210'}`}
+                                className="ml-auto px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                              >
+                                <Phone className="w-3.5 h-3.5" /> Call Officer
+                              </a>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-slate-500 italic">
+                              No responder dispatched yet. Select an available officer from the recommendation engine.
+                            </p>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="flex-1 rounded-xl overflow-hidden border border-slate-200">
-                        <MapContainer 
-                          center={[selectedEmergency.latitude, selectedEmergency.longitude]} 
-                          zoom={17} 
-                          scrollWheelZoom={false}
-                          style={{ height: '100%', width: '100%' }}
+                      {/* Quick Hospital & Ambulance Direct Links */}
+                      <div className="p-4 bg-blue-50/50 border border-blue-200 rounded-2xl flex items-center justify-between text-xs">
+                        <div>
+                          <h6 className="font-bold text-[#0c2340]">Tie-up Hospital Support</h6>
+                          <p className="text-[10px] text-slate-500">Harneshwar Multispeciality Hospital (+91 9826381867)</p>
+                        </div>
+                        <a 
+                          href="https://www.harneshwarhospital.com/" 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="px-3 py-1.5 bg-[#0c2340] text-white rounded-xl text-xs font-bold flex items-center gap-1 hover:bg-[#1a365d] transition-colors"
                         >
-                          <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; OpenStreetMap'
-                          />
-
-                          {/* Selected Emergency Marker */}
-                          <Marker 
-                            position={[selectedEmergency.latitude, selectedEmergency.longitude]} 
-                            icon={createMarkerIcon(CATEGORIES_COLOR[selectedEmergency.type] || '#dc2626', CATEGORIES_EMOJI[selectedEmergency.type] || '🚨')}
-                          >
-                            <Popup>
-                              <div className="text-slate-800 text-xs font-semibold">
-                                <p className="font-black text-red-600 uppercase">{selectedEmergency.type} ALERTS</p>
-                                <p className="mt-1">Block: {selectedEmergency.manualLocation}</p>
-                              </div>
-                            </Popup>
-                          </Marker>
-
-                          {/* Render all responders on the map with coordinate availability checks */}
-                          {responders.map((resp) => {
-                            const isAssignedToThis = activeAssignedResponder?.id === resp.id;
-                            const isOffline = resp.availabilityStatus === 'OFFLINE';
-                            const isBusy = resp.availabilityStatus === 'BUSY';
-                            
-                            const pinColor = isAssignedToThis 
-                              ? '#16a34a' 
-                              : isBusy 
-                              ? '#f59e0b' 
-                              : isOffline 
-                              ? '#64748b' 
-                              : '#2563eb';
-
-                            return (
-                              <Marker 
-                                key={resp.id}
-                                position={[resp.latitude, resp.longitude]} 
-                                icon={createMarkerIcon(pinColor, '💂')}
-                              >
-                                <Popup>
-                                  <div className="text-slate-800 text-xs font-semibold">
-                                    <p className="font-bold text-slate-900">{resp.user?.name}</p>
-                                    <p className="text-[10px] text-slate-500">{resp.role}</p>
-                                    <p className="text-[10px] font-black uppercase text-emerald-700">{resp.availabilityStatus}</p>
-                                  </div>
-                                </Popup>
-                              </Marker>
-                            );
-                          })}
-
-                          {/* Connect line from assigned responder to selected emergency */}
-                          {activeAssignedResponder && (
-                            <Polyline 
-                              positions={[
-                                [activeAssignedResponder.latitude, activeAssignedResponder.longitude],
-                                [selectedEmergency.latitude, selectedEmergency.longitude]
-                              ]} 
-                              color="#f59e0b"
-                              weight={4}
-                              dashArray="8, 6"
-                            />
-                          )}
-                        </MapContainer>
+                          Hospital Portal <ExternalLink className="w-3 h-3" />
+                        </a>
                       </div>
                     </div>
                   </div>
