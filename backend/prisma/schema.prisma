@@ -53,6 +53,14 @@ model User {
   notifications    Notification[]
   auditLogs        AuditLog[]
   uploadedFiles    FileUpload[]
+
+  // Relations: Hostel Management & Campus Life
+  hostelInOutLogs    HostelInOutLog[]
+  hostelLeaves       HostelLeave[]
+  hostelTickets      HostelTicket[]
+  complaints         Complaint[]
+  lostFoundItems     LostAndFoundItem[] @relation("ReportedLostFound")
+  claimedLostFound   LostAndFoundItem[] @relation("ClaimedLostFound")
 }
 
 // ===================================================================
@@ -456,4 +464,102 @@ model SystemConfig {
   value     String   // "75", "65", etc.
   module    String   // "ATTENDANCE", "REGISTRATION", "NO_DUES", "SYSTEM"
   updatedAt DateTime @updatedAt
+}
+
+// ===================================================================
+// HOSTEL MANAGEMENT MODULE
+// ===================================================================
+
+model HostelInOutLog {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  direction   String   // "OUT", "IN"
+  destination String   // e.g. "Main Market", "Railway Station", "Library"
+  reason      String?  // Purpose of exit/entry
+  gateNumber  String   @default("Gate 1 - Main Entrance")
+  status      String   @default("LOGGED") // "LOGGED", "OUT", "RETURNED"
+  timestamp   DateTime @default(now())
+}
+
+model HostelLeave {
+  id             Int      @id @default(autoincrement())
+  studentId      Int
+  student        User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  leaveType      String   // "HOME_LEAVE", "ACADEMIC_LEAVE", "MEDICAL_LEAVE", "EMERGENCY_LEAVE"
+  startDate      String   // "YYYY-MM-DD"
+  endDate        String   // "YYYY-MM-DD"
+  startMeal      String   @default("DINNER") // "BREAKFAST", "LUNCH", "SNACKS", "DINNER"
+  endMeal        String   @default("LUNCH")
+  destination    String
+  reason         String
+  parentContact  String
+  parentConsent  Boolean  @default(true)
+  status         String   @default("PENDING") // "PENDING", "APPROVED", "REJECTED", "EXPIRED"
+  wardenRemarks  String?
+  appliedAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model HostelTicket {
+  id                 Int       @id @default(autoincrement())
+  studentId          Int
+  student            User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  hostelBlock        String    // e.g. "Hostel Block A", "Hostel Block B"
+  roomNumber         String    // e.g. "A-204"
+  category           String    // "PLUMBING", "ELECTRICAL", "CLEANLINESS_HYGIENE", "CARPENTRY_FURNITURE", "WIFI_NETWORK", "PEST_CONTROL", "OTHER"
+  title              String
+  description        String
+  priority           String    @default("MEDIUM") // "LOW", "MEDIUM", "HIGH", "EMERGENCY"
+  status             String    @default("OPEN") // "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"
+  proofOfResolution  String?   // Proof photo URL or work certificate
+  resolutionRemarks  String?   // Technician / Warden explanation
+  resolvedBy         String?   // "Technician Ramesh (Maintenance)"
+  resolvedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+}
+
+// ===================================================================
+// COMPLAINTS & GRIEVANCE REDRESSAL MODULE
+// ===================================================================
+
+model Complaint {
+  id             Int       @id @default(autoincrement())
+  studentId      Int
+  student        User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  category       String    // "HOSTEL_MAINTENANCE", "MESS_FOOD_QUALITY", "ACADEMIC", "CAMPUS_SECURITY", "ANTI_RAGGING", "GENERAL"
+  subject        String
+  description    String
+  isAnonymous    Boolean   @default(false)
+  status         String    @default("PENDING") // "PENDING", "UNDER_REVIEW", "IN_PROGRESS", "RESOLVED", "REJECTED"
+  adminRemarks   String?
+  resolvedAt     DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// ===================================================================
+// LOST AND FOUND MODULE
+// ===================================================================
+
+model LostAndFoundItem {
+  id           Int       @id @default(autoincrement())
+  type         String    // "LOST", "FOUND"
+  title        String
+  category     String    // "ELECTRONICS", "ID_CARDS_WALLETS", "KEYS", "CLOTHING", "DOCUMENTS_BOOKS", "OTHER"
+  description  String
+  location     String    // Location lost or found
+  date         String    // "YYYY-MM-DD"
+  contactInfo  String
+  reportedById Int
+  reportedBy   User      @relation("ReportedLostFound", fields: [reportedById], references: [id], onDelete: Cascade)
+  status       String    @default("OPEN") // "OPEN", "CLAIMED", "RESOLVED"
+  claimedById  Int?
+  claimedBy    User?     @relation("ClaimedLostFound", fields: [claimedById], references: [id])
+  claimedAt    DateTime?
+  claimNotes   String?
+  image        String?   // Optional photo URL or path
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }

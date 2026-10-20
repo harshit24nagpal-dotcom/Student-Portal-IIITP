@@ -11,12 +11,21 @@ import {
 import SOSModal from '../components/SOSModal';
 import SemesterRegistrationTab from '../components/SemesterRegistrationTab';
 import NoDuesClearanceTab from '../components/NoDuesClearanceTab';
+import HostelInOutTab from '../components/HostelInOutTab';
+import HostelLeaveTab from '../components/HostelLeaveTab';
+import MessManagementTab from '../components/MessManagementTab';
+import HostelTicketingTab from '../components/HostelTicketingTab';
+import ComplaintsTab from '../components/ComplaintsTab';
+import LostAndFoundTab from '../components/LostAndFoundTab';
+import { 
+  LogOut, LogIn, Utensils, Wrench, MessageSquare, Tag, EyeOff, ShieldCheck
+} from 'lucide-react';
 
 export default function StudentDashboard() {
   const { user, token } = useAuth();
   const { socket } = useSocket();
-  
   // Default landing tab is Profile / Student Identity Overview
+  const [activePortalDivision, setActivePortalDivision] = useState('academic'); // 'academic' | 'hostel'
   const [portalTab, setPortalTab] = useState('profile'); // 'profile' | 'attendance' | 'registration' | 'nodues' | 'academics' | 'contacts' | 'facilities'
   const [activeEmergency, setActiveEmergency] = useState(null);
   const [contacts, setContacts] = useState([]);
@@ -156,101 +165,214 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* Navigation Tabs Bar */}
+      {/* PRIMARY DIVISION SWITCHER: ACADEMIC PORTAL vs HOSTEL MANAGEMENT */}
+      <div className="p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center gap-2">
+        <button
+          onClick={() => {
+            setActivePortalDivision('academic');
+            if (!['profile', 'attendance', 'registration', 'nodues', 'academics', 'contacts', 'facilities'].includes(portalTab)) {
+              setPortalTab('profile');
+            }
+          }}
+          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activePortalDivision === 'academic'
+              ? 'bg-[#0c2340] text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <GraduationCap className="w-4 h-4" />
+          <span>🎓 Academic Portal</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActivePortalDivision('hostel');
+            if (!['inout', 'leaves', 'mess', 'tickets', 'complaints', 'lostfound'].includes(portalTab)) {
+              setPortalTab('inout');
+            }
+          }}
+          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activePortalDivision === 'hostel'
+              ? 'bg-[#1c398e] text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <Building className="w-4 h-4" />
+          <span>🏢 Hostel Management & Campus Life</span>
+        </button>
+      </div>
+
+      {/* SUB-MODULE TABS FOR ACTIVE DIVISION */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-2 overflow-x-auto">
         <div className="flex gap-2">
-          
-          <button
-            onClick={() => setPortalTab('profile')}
-            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'profile'
-                ? 'bg-[#0c2340] text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <User className="w-4 h-4" />
-            <span>Student Profile</span>
-          </button>
+          {activePortalDivision === 'academic' ? (
+            <>
+              <button
+                onClick={() => setPortalTab('profile')}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'profile'
+                    ? 'bg-[#0c2340] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <User className="w-4 h-4" />
+                <span>Student Profile</span>
+              </button>
 
-          <button
-            onClick={() => setPortalTab('attendance')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'attendance'
-                ? 'bg-emerald-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Attendance & Calendar</span>
-          </button>
+              <button
+                onClick={() => setPortalTab('attendance')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'attendance'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Attendance & Calendar</span>
+              </button>
 
-          <button
-            onClick={() => setPortalTab('registration')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'registration'
-                ? 'bg-[#0c2340] text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <FileCheck className="w-4 h-4" />
-            <span>Semester Registration</span>
-          </button>
+              <button
+                onClick={() => setPortalTab('registration')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'registration'
+                    ? 'bg-[#0c2340] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <FileCheck className="w-4 h-4" />
+                <span>Semester Registration</span>
+              </button>
 
-          <button
-            onClick={() => setPortalTab('nodues')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'nodues'
-                ? 'bg-amber-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            <span>No-Dues Clearance</span>
-          </button>
+              <button
+                onClick={() => setPortalTab('nodues')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'nodues'
+                    ? 'bg-amber-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <GraduationCap className="w-4 h-4" />
+                <span>No-Dues Clearance</span>
+              </button>
 
-          <button
-            onClick={() => setPortalTab('academics')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'academics'
-                ? 'bg-[#0c2340] text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span>Academics & Notices</span>
-          </button>
+              <button
+                onClick={() => setPortalTab('academics')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'academics'
+                    ? 'bg-[#0c2340] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <BookOpen className="w-4 h-4" />
+                <span>Academics & Notices</span>
+              </button>
 
-          <button
-            onClick={() => setPortalTab('contacts')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'contacts'
-                ? 'bg-red-600 text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <Phone className="w-4 h-4" />
-            <span>Emergency Contacts</span>
-          </button>
+              <button
+                onClick={() => setPortalTab('contacts')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'contacts'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Phone className="w-4 h-4" />
+                <span>Emergency Contacts</span>
+              </button>
 
-          <button
-            onClick={() => setPortalTab('facilities')}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-              portalTab === 'facilities'
-                ? 'bg-[#0c2340] text-white shadow-sm'
-                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <Building className="w-4 h-4" />
-            <span>Facilities</span>
-          </button>
+              <button
+                onClick={() => setPortalTab('facilities')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'facilities'
+                    ? 'bg-[#0c2340] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Building className="w-4 h-4" />
+                <span>Facilities</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => setPortalTab('inout')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'inout'
+                    ? 'bg-[#1c398e] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Digital In / Out Pass</span>
+              </button>
 
+              <button
+                onClick={() => setPortalTab('leaves')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'leaves'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span>Digital Leave / Outpass</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('mess')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'mess'
+                    ? 'bg-emerald-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Utensils className="w-4 h-4" />
+                <span>Mess Headcount & Diners</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('tickets')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'tickets'
+                    ? 'bg-amber-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Wrench className="w-4 h-4" />
+                <span>Hostel Problems & Proof</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('complaints')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'complaints'
+                    ? 'bg-red-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Campus Grievance / Complaints</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('lostfound')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'lostfound'
+                    ? 'bg-purple-600 text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Tag className="w-4 h-4" />
+                <span>Lost & Found Bulletin</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
       {/* ========================================================================= */}
       {/* 1. MAIN LANDING VIEW: STUDENT PROFILE & OVERVIEW                         */}
       {/* ========================================================================= */}
-      {portalTab === 'profile' && (
+      {activePortalDivision === 'academic' && portalTab === 'profile' && (
         <div className="space-y-6">
           
           {/* Main Comprehensive Profile Card */}
@@ -408,7 +530,7 @@ export default function StudentDashboard() {
       {/* ========================================================================= */}
       {/* 2. ATTENDANCE & INTERACTIVE DAILY CALENDAR                                */}
       {/* ========================================================================= */}
-      {portalTab === 'attendance' && (
+      {activePortalDivision === 'academic' && portalTab === 'attendance' && (
         <div className="space-y-6">
           
           {/* Top Overview Meter */}
@@ -702,7 +824,7 @@ export default function StudentDashboard() {
       {/* ========================================================================= */}
       {/* 5. ACADEMICS & TIMETABLE TAB                                             */}
       {/* ========================================================================= */}
-      {portalTab === 'academics' && (
+      {activePortalDivision === 'academic' && portalTab === 'academics' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left: Official Circulars */}
@@ -793,7 +915,7 @@ export default function StudentDashboard() {
       {/* ========================================================================= */}
       {/* 6. EMERGENCY CONTACTS DIRECTORY                                          */}
       {/* ========================================================================= */}
-      {portalTab === 'contacts' && (
+      {activePortalDivision === 'academic' && portalTab === 'contacts' && (
         <div className="space-y-6">
           <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
@@ -854,7 +976,7 @@ export default function StudentDashboard() {
       {/* ========================================================================= */}
       {/* 7. CAMPUS FACILITY BOOKINGS                                               */}
       {/* ========================================================================= */}
-      {portalTab === 'facilities' && (
+      {activePortalDivision === 'academic' && portalTab === 'facilities' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Booking Form */}
@@ -966,6 +1088,32 @@ export default function StudentDashboard() {
             </div>
           </div>
         </div>
+      )}
+      {/* ========================================================================= */}
+      {/* HOSTEL MANAGEMENT & CAMPUS LIFE TAB VIEWS                                */}
+      {/* ========================================================================= */}
+      {activePortalDivision === 'hostel' && portalTab === 'inout' && (
+        <HostelInOutTab token={token} user={user} />
+      )}
+
+      {activePortalDivision === 'hostel' && portalTab === 'leaves' && (
+        <HostelLeaveTab token={token} user={user} />
+      )}
+
+      {activePortalDivision === 'hostel' && portalTab === 'mess' && (
+        <MessManagementTab token={token} />
+      )}
+
+      {activePortalDivision === 'hostel' && portalTab === 'tickets' && (
+        <HostelTicketingTab token={token} user={user} />
+      )}
+
+      {activePortalDivision === 'hostel' && portalTab === 'complaints' && (
+        <ComplaintsTab token={token} user={user} />
+      )}
+
+      {activePortalDivision === 'hostel' && portalTab === 'lostfound' && (
+        <LostAndFoundTab token={token} user={user} />
       )}
 
       {/* Global SOS Modal trigger */}

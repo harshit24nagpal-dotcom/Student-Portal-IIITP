@@ -18,6 +18,9 @@ import registrationRouter from './routes/registration.js';
 import noduesRouter from './routes/nodues.js';
 import filesRouter from './routes/files.js';
 import notificationsRouter from './routes/notifications.js';
+import hostelRouter from './routes/hostel.js';
+import complaintsRouter from './routes/complaints.js';
+import lostfoundRouter from './routes/lostfound.js';
 
 // Import background services
 import { startEscalationService } from './services/escalation.js';
@@ -66,6 +69,9 @@ app.use('/api/registration', registrationRouter);
 app.use('/api/nodues', noduesRouter);
 app.use('/api/files', filesRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/hostel', hostelRouter);
+app.use('/api/complaints', complaintsRouter);
+app.use('/api/lostfound', lostfoundRouter);
 
 // Basic health check endpoint
 app.get('/health', (req, res) => {

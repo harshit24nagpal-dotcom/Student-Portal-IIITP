@@ -8,6 +8,10 @@ import {
   ExternalLink, Building, CheckCircle
 } from 'lucide-react';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import HostelTicketingTab from '../components/HostelTicketingTab';
+import ComplaintsTab from '../components/ComplaintsTab';
+import LostAndFoundTab from '../components/LostAndFoundTab';
+import { Wrench, MessageSquare, Tag } from 'lucide-react';
 
 const CATEGORIES_COLOR = {
   MEDICAL: '#dc2626',
@@ -474,6 +478,49 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               <span>System Analytics</span>
             </button>
           </div>
+
+            <div className="pt-2 border-t border-slate-100">
+              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider px-3 mb-1">
+                HOSTEL & CAMPUS LIFE
+              </p>
+
+              <button
+                onClick={() => setActiveTab('hostel_tickets')}
+                className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+                  activeTab === 'hostel_tickets' 
+                    ? 'bg-amber-50 text-amber-800 border border-amber-200' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <Wrench className="w-4 h-4 text-amber-600" />
+                <span>Hostel Tickets</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('complaints')}
+                className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+                  activeTab === 'complaints' 
+                    ? 'bg-red-50 text-red-700 border border-red-200' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4 text-red-600" />
+                <span>Campus Grievances</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('lostfound')}
+                className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+                  activeTab === 'lostfound' 
+                    ? 'bg-purple-50 text-purple-700 border border-purple-200' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                <Tag className="w-4 h-4 text-purple-600" />
+                <span>Lost & Found</span>
+              </button>
+            </div>
+
         </div>
 
         <div className="px-6 text-xxs text-slate-400 font-medium space-y-0.5">
