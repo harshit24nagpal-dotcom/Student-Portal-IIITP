@@ -12,6 +12,7 @@ import HostelTicketingTab from '../components/HostelTicketingTab';
 import ComplaintsTab from '../components/ComplaintsTab';
 import LostAndFoundTab from '../components/LostAndFoundTab';
 import { Wrench, MessageSquare, Tag } from 'lucide-react';
+import { API_URL } from '../config/api';
 
 const CATEGORIES_COLOR = {
   MEDICAL: '#dc2626',
@@ -80,7 +81,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/auth/users', {
+      const res = await fetch(`${API_URL}/auth/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -96,7 +97,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
     setUserErrorMsg('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/admin-create-user', {
+      const res = await fetch(`${API_URL}/auth/admin-create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +132,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const fetchEmergencies = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/emergencies/active', {
+      const res = await fetch(`${API_URL}/emergencies/active`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -159,7 +160,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const fetchEmergencyRecommendations = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${id}`, {
+      const res = await fetch(`${API_URL}/emergencies/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -171,7 +172,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const fetchResponders = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/responders', {
+      const res = await fetch(`${API_URL}/responders`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -183,7 +184,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const fetchLocations = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/locations', {
+      const res = await fetch(`${API_URL}/locations`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -195,7 +196,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
   const fetchContacts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/contacts', {
+      const res = await fetch(`${API_URL}/contacts`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -255,7 +256,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
   const handleAssignResponder = async (responderId) => {
     if (!selectedEmergency) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${selectedEmergency.id}/assign`, {
+      const res = await fetch(`${API_URL}/emergencies/${selectedEmergency.id}/assign`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -278,7 +279,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
     if (!newLocName) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/locations', {
+      const res = await fetch(`${API_URL}/locations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -307,7 +308,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
     if (!newContactName || !newContactNum || !newContactDept) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/contacts', {
+      const res = await fetch(`${API_URL}/contacts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -334,7 +335,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
   // Delete Contact
   const handleDeleteContact = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/contacts/${id}`, {
+      const res = await fetch(`${API_URL}/contacts/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -351,7 +352,7 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
     const notes = prompt('Enter resolution notes:');
     if (notes === null) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/emergencies/${id}/resolve`, {
+      const res = await fetch(`${API_URL}/emergencies/${id}/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

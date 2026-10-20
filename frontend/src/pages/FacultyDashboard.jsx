@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, getFileUrl } from '../config/api';
 import { 
   BookOpen, Users, Calendar, CheckCircle2, XCircle, 
   Save, Filter, AlertCircle, Sparkles, CheckSquare, XSquare, ShieldAlert,
@@ -33,7 +34,7 @@ export default function FacultyDashboard() {
 
   // Fetch subjects
   useEffect(() => {
-    fetch('http://localhost:5000/api/attendance/subjects', {
+    fetch(`${API_URL}/attendance/subjects`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -57,7 +58,7 @@ export default function FacultyDashboard() {
     if (!selectedSection) return;
     setLoadingStudents(true);
 
-    fetch(`http://localhost:5000/api/attendance/section-students?section=${encodeURIComponent(selectedSection)}`, {
+    fetch(`${API_URL}/attendance/section-students?section=${encodeURIComponent(selectedSection)}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -66,7 +67,7 @@ export default function FacultyDashboard() {
         setStudents(studentArr);
 
         if (selectedSubjectCode && attendanceDate) {
-          fetch(`http://localhost:5000/api/attendance/marked-sheet?subjectCode=${selectedSubjectCode}&section=${encodeURIComponent(selectedSection)}&date=${attendanceDate}`, {
+          fetch(`${API_URL}/attendance/marked-sheet?subjectCode=${selectedSubjectCode}&section=${encodeURIComponent(selectedSection)}&date=${attendanceDate}`, {
             headers: { Authorization: `Bearer ${token}` }
           })
             .then(res => res.json())
@@ -91,7 +92,7 @@ export default function FacultyDashboard() {
 
   // Fetch Advisor pending registrations
   const fetchAdvisorPending = () => {
-    fetch('http://localhost:5000/api/registration/advisor/pending', {
+    fetch(`${API_URL}/registration/advisor/pending`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -105,7 +106,7 @@ export default function FacultyDashboard() {
 
   // Fetch Advisee attendance metrics
   const fetchAdviseeMetrics = () => {
-    fetch('http://localhost:5000/api/attendance/advisor-students', {
+    fetch(`${API_URL}/attendance/advisor-students`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -151,7 +152,7 @@ export default function FacultyDashboard() {
 
     try {
       const selectedSub = subjectsList.find(s => s.code === selectedSubjectCode && s.section === selectedSection);
-      const res = await fetch('http://localhost:5000/api/attendance/mark', {
+      const res = await fetch(`${API_URL}/attendance/mark`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -183,7 +184,7 @@ export default function FacultyDashboard() {
     if (!selectedReg) return;
     setAdvisorLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/registration/advisor/verify', {
+      const res = await fetch(`${API_URL}/registration/advisor/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -439,7 +440,7 @@ export default function FacultyDashboard() {
                     <div key={doc.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
                       <p className="font-bold text-[#1c398e] text-[10px]">{doc.documentType}</p>
                       <p className="text-slate-800 font-semibold truncate mt-0.5">{doc.documentName}</p>
-                      <a href={`http://localhost:5000${doc.filePath}`} target="_blank" rel="noreferrer" className="mt-2 block text-center py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded text-[10px] font-semibold uppercase">
+                      <a href={getFileUrl(doc.filePath)} target="_blank" rel="noreferrer" className="mt-2 block text-center py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded text-[10px] font-semibold uppercase">
                         Download Doc
                       </a>
                     </div>

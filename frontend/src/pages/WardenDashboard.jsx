@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL, getFileUrl } from '../config/api';
 import { 
   Building, CheckCircle2, XCircle, Clock, AlertTriangle, 
   FileText, Download, User, RefreshCw, CheckSquare, XSquare,
@@ -52,7 +53,7 @@ export default function WardenDashboard() {
   // Fetch pending registrations
   const fetchPendingRegs = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/registration/warden/pending', {
+      const res = await fetch(`${API_URL}/registration/warden/pending`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -164,7 +165,7 @@ export default function WardenDashboard() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/registration/warden/verify', {
+      const res = await fetch(`${API_URL}/registration/warden/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

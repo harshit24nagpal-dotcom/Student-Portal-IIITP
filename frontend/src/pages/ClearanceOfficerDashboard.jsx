@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { API_URL } from '../config/api';
 import { 
   GraduationCap, CheckCircle2, XCircle, Clock, AlertTriangle, 
   DollarSign, FileText, User, RefreshCw, CheckSquare, XSquare, Filter
@@ -23,8 +24,8 @@ export default function ClearanceOfficerDashboard() {
     setLoading(true);
     try {
       const url = selectedDeptId 
-        ? `http://localhost:5000/api/nodues/officer/pending?departmentId=${selectedDeptId}`
-        : 'http://localhost:5000/api/nodues/officer/pending';
+        ? `${API_URL}/nodues/officer/pending?departmentId=${selectedDeptId}`
+        : `${API_URL}/nodues/officer/pending`;
 
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
@@ -56,7 +57,7 @@ export default function ClearanceOfficerDashboard() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/nodues/officer/action', {
+      const res = await fetch(`${API_URL}/nodues/officer/action`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

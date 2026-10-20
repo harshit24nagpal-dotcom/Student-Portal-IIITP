@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
+import { API_URL } from '../config/api';
 import { 
   AlertOctagon, Heart, Flame, ShieldAlert, 
   Activity, AlertCircle, HelpCircle, X, 
@@ -35,7 +36,7 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
   // Fetch campus locations for manual dropdown
   useEffect(() => {
     if (isOpen && token) {
-      fetch('http://localhost:5000/api/locations', {
+      fetch(`${API_URL}/locations`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())
@@ -121,7 +122,7 @@ export default function SOSModal({ isOpen, onClose, onSOSTriggered }) {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/emergencies', {
+      const response = await fetch(`${API_URL}/emergencies`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
