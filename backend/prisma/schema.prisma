@@ -61,6 +61,19 @@ model User {
   complaints         Complaint[]
   lostFoundItems     LostAndFoundItem[] @relation("ReportedLostFound")
   claimedLostFound   LostAndFoundItem[] @relation("ClaimedLostFound")
+
+  // Academic & Placement Credentials
+  cgpa               Float?   @default(8.45)
+  activeBacklogs     Int?     @default(0)
+  roomNumber         String?  // Allocated room e.g. "A-204"
+  bedNumber          String?  // "Bed 1", "Bed 2"
+
+  // Relations: Placement & Career
+  placementApplications PlacementApplication[]
+
+  // Relations: Roommate Matching & Allotment
+  roommatePreference RoommatePreference?
+  roomAllotment      RoomAllotment?
 }
 
 // ===================================================================
@@ -562,4 +575,90 @@ model LostAndFoundItem {
   image        String?   // Optional photo URL or path
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+}
+
+// ===================================================================
+// ANNOUNCEMENTS MODULE (Academic & Hostel)
+// ===================================================================
+model Announcement {
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String
+  portalType String   // "ACADEMIC", "HOSTEL", "COMMON"
+  category   String   // "DRESS_CODE", "MESS_UPDATE", "CIRCULAR", "EXAM", "FESTIVAL", "GENERAL"
+  priority   String   @default("NORMAL") // "NORMAL", "HIGH", "URGENT"
+  date       String   // "YYYY-MM-DD"
+  badgeText  String?  // e.g. "Navratri Special", "Mess Delayed 30m"
+  authorRole String   @default("ADMINISTRATION")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ===================================================================
+// ROOMMATE PREFERENCE & ROOM ALLOTMENT MODULE
+// ===================================================================
+model RoommatePreference {
+  id               Int      @id @default(autoincrement())
+  studentId        Int      @unique
+  student          User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  sleepSchedule    String   // "EARLY_RISER", "NIGHT_OWL", "FLEXIBLE"
+  studyHabit       String   // "QUIET_STUDY", "MUSIC_GROUP", "LIBRARY"
+  cleanlinessLevel String   // "STRICT_NEAT", "MODERATE", "CASUAL"
+  dietPreference   String   // "PURE_VEG", "NON_VEG", "ANY"
+  hobbyInterest    String   // "CODING", "GAMING", "SPORTS_FITNESS", "MUSIC_ARTS"
+  acPreference     String   @default("AC_COOL") // "AC_COOL", "NATURAL_AIR"
+  bioNotes         String?
+  updatedAt        DateTime @updatedAt
+}
+
+model RoomAllotment {
+  id          Int      @id @default(autoincrement())
+  studentId   Int      @unique
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  hostelBlock String   // "Hostel Block A", "Hostel Block B", "Hostel Block C (Girls)"
+  roomNumber  String   // "A-201", "A-202", etc.
+  bedNumber   String   // "Bed 1 (Window)", "Bed 2 (Door)"
+  allottedAt  DateTime @default(now())
+  status      String   @default("CONFIRMED")
+}
+
+// ===================================================================
+// TARGETED PLACEMENT & INTERNSHIP CRM MODULE
+// ===================================================================
+model PlacementDrive {
+  id              Int      @id @default(autoincrement())
+  companyName     String   // e.g. "Google", "Microsoft", "NVIDIA"
+  logo            String?
+  role            String   // "Software Development Engineer", "Embedded Systems Intern"
+  type            String   // "FULL_TIME", "INTERNSHIP", "6_MONTH"
+  ctc             String   // "₹24 LPA", "₹1.2 Lakh/mo"
+  location        String   // "Pune / Bengaluru / Hyderabad"
+  minCgpa         Float    @default(7.0)
+  allowedBranches String   // "CSE,ECE"
+  maxBacklogs     Int      @default(0)
+  eligibleBatch   String   @default("2024-2028")
+  deadline        String   // "2026-10-31"
+  description     String
+  selectionRounds String   // "Online Assessment -> Technical Round -> System Design -> HR Round"
+  status          String   @default("ACTIVE") // "ACTIVE", "CLOSED", "RESULTS_ANNOUNCED"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  applications    PlacementApplication[]
+}
+
+model PlacementApplication {
+  id              Int            @id @default(autoincrement())
+  driveId         Int
+  drive           PlacementDrive @relation(fields: [driveId], references: [id], onDelete: Cascade)
+  studentId       Int
+  student         User           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  status          String         @default("APPLIED") // "APPLIED", "OA_CLEARED", "INTERVIEW_SCHEDULED", "OFFERED", "REJECTED"
+  interviewSlot   String?
+  interviewLink   String?
+  remarks         String?
+  appliedAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([driveId, studentId])
 }

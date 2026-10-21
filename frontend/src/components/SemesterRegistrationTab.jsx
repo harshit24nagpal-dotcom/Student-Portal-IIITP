@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL, getFileUrl } from '../config/api';
+import RoommateAllotmentTab from './RoommateAllotmentTab';
+import { Bed, Sparkles } from 'lucide-react';
 import { 
   FileText, Upload, CheckCircle2, Clock, XCircle, AlertTriangle, 
   Building, UserCheck, ShieldCheck, Download, RefreshCw, FileCheck
@@ -17,6 +19,7 @@ export default function SemesterRegistrationTab() {
   // File upload state
   const [erpFile, setErpFile] = useState(null);
   const [feeFile, setFeeFile] = useState(null);
+  const [showRoommateSection, setShowRoommateSection] = useState(false);
 
   const fetchStatus = async () => {
     setLoading(true);
@@ -233,6 +236,44 @@ export default function SemesterRegistrationTab() {
           {error}
         </div>
       )}
+
+      {/* Roommate Matching & Room Allotment During Registration */}
+      <div className="p-5 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-2xl space-y-3 shadow-2xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-purple-100 text-purple-700 rounded-xl shrink-0">
+              <Bed className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 bg-purple-200/70 text-purple-900 text-[9px] font-black uppercase rounded">
+                  NEW ALLOTMENT PROTOCOL
+                </span>
+                <span className="text-xxs text-slate-500 font-bold">Chaos-Free Allotment</span>
+              </div>
+              <h4 className="text-sm font-bold text-slate-900 mt-0.5">
+                Roommate Compatibility Survey & Bed Selection
+              </h4>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Fill out the brief preference survey (early riser vs. night owl, quiet study vs. music lover) to match compatible roommates and select your room bed.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowRoommateSection(!showRoommateSection)}
+            className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold uppercase rounded-xl transition-all cursor-pointer self-start sm:self-auto shrink-0 shadow-2xs"
+          >
+            {showRoommateSection ? 'Collapse Allotment' : '🛏️ Match & Pick Room'}
+          </button>
+        </div>
+
+        {showRoommateSection && (
+          <div className="pt-4 border-t border-purple-200/80">
+            <RoommateAllotmentTab token={token} user={user} />
+          </div>
+        )}
+      </div>
 
       {/* Main Form & Status Display Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

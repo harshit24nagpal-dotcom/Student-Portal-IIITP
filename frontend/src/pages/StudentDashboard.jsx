@@ -17,8 +17,12 @@ import MessManagementTab from '../components/MessManagementTab';
 import HostelTicketingTab from '../components/HostelTicketingTab';
 import ComplaintsTab from '../components/ComplaintsTab';
 import LostAndFoundTab from '../components/LostAndFoundTab';
+import AnnouncementsTab from '../components/AnnouncementsTab';
+import PlacementDriveTab from '../components/PlacementDriveTab';
+import RoommateAllotmentTab from '../components/RoommateAllotmentTab';
 import { 
-  LogOut, LogIn, Utensils, Wrench, MessageSquare, Tag, EyeOff, ShieldCheck
+  LogOut, LogIn, Utensils, Wrench, MessageSquare, Tag, EyeOff, ShieldCheck,
+  Briefcase, Megaphone, Bed, Sparkles as SparklesIcon
 } from 'lucide-react';
 import { API_URL } from '../config/api';
 

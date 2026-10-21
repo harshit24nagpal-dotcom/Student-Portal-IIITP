@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL, getFileUrl } from '../config/api';
+import AnnouncementsTab from '../components/AnnouncementsTab';
+import RoommateAllotmentTab from '../components/RoommateAllotmentTab';
+import { Megaphone, Bed } from 'lucide-react';
 import { 
   Building, CheckCircle2, XCircle, Clock, AlertTriangle, 
   FileText, Download, User, RefreshCw, CheckSquare, XSquare,

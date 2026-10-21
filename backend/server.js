@@ -21,6 +21,9 @@ import notificationsRouter from './routes/notifications.js';
 import hostelRouter from './routes/hostel.js';
 import complaintsRouter from './routes/complaints.js';
 import lostfoundRouter from './routes/lostfound.js';
+import announcementsRouter from './routes/announcements.js';
+import placementRouter from './routes/placement.js';
+import roommateRouter from './routes/roommate.js';
 
 // Import background services
 import { startEscalationService } from './services/escalation.js';
@@ -72,6 +75,9 @@ app.use('/api/notifications', notificationsRouter);
 app.use('/api/hostel', hostelRouter);
 app.use('/api/complaints', complaintsRouter);
 app.use('/api/lostfound', lostfoundRouter);
+app.use('/api/announcements', announcementsRouter);
+app.use('/api/placement', placementRouter);
+app.use('/api/roommate', roommateRouter);
 
 // Basic health check endpoint
 app.get('/health', (req, res) => {
