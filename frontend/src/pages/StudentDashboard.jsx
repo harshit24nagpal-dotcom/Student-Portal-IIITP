@@ -170,18 +170,18 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* PRIMARY DIVISION SWITCHER: ACADEMIC PORTAL vs HOSTEL MANAGEMENT */}
-      <div className="p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center gap-2">
+      {/* PRIMARY DIVISION SWITCHER: 3 PILLARS */}
+      <div className="p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs grid grid-cols-1 md:grid-cols-3 gap-2">
         <button
           onClick={() => {
             setActivePortalDivision('academic');
-            if (!['profile', 'attendance', 'registration', 'nodues', 'academics', 'contacts', 'facilities'].includes(portalTab)) {
-              setPortalTab('profile');
+            if (!['profile', 'placement', 'announcements_acad', 'attendance', 'registration', 'nodues', 'academics', 'facilities'].includes(portalTab)) {
+              setPortalTab('placement');
             }
           }}
-          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activePortalDivision === 'academic'
-              ? 'bg-[#0c2340] text-white shadow-sm'
+              ? 'bg-[#0c2340] text-white shadow-sm ring-2 ring-blue-900/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
@@ -192,29 +192,46 @@ export default function StudentDashboard() {
         <button
           onClick={() => {
             setActivePortalDivision('hostel');
-            if (!['inout', 'leaves', 'mess', 'tickets', 'complaints', 'lostfound'].includes(portalTab)) {
-              setPortalTab('inout');
+            if (!['inout', 'leaves', 'mess', 'roommate', 'tickets', 'announcements_hostel'].includes(portalTab)) {
+              setPortalTab('roommate');
             }
           }}
-          className={`flex-1 py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activePortalDivision === 'hostel'
-              ? 'bg-[#1c398e] text-white shadow-sm'
+              ? 'bg-[#1c398e] text-white shadow-sm ring-2 ring-blue-800/20'
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
           }`}
         >
           <Building className="w-4 h-4" />
-          <span>🏢 Hostel Management & Campus Life</span>
+          <span>🏢 Hostel Management</span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActivePortalDivision('campus');
+            if (!['lostfound', 'complaints', 'contacts'].includes(portalTab)) {
+              setPortalTab('lostfound');
+            }
+          }}
+          className={`py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activePortalDivision === 'campus'
+              ? 'bg-purple-900 text-white shadow-sm ring-2 ring-purple-900/20'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          <ShieldAlert className="w-4 h-4" />
+          <span>🏛️ Campus Life & Grievances</span>
         </button>
       </div>
 
       {/* SUB-MODULE TABS FOR ACTIVE DIVISION */}
       <div className="flex items-center justify-between border-b border-slate-200 pb-2 overflow-x-auto">
-        <div className="flex gap-2">
-          {activePortalDivision === 'academic' ? (
+        <div className="flex gap-2 flex-wrap sm:flex-nowrap">
+          {activePortalDivision === 'academic' && (
             <>
               <button
                 onClick={() => setPortalTab('profile')}
-                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'profile'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -222,6 +239,33 @@ export default function StudentDashboard() {
               >
                 <User className="w-4 h-4" />
                 <span>Student Profile</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('placement')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'placement'
+                    ? 'bg-blue-700 text-white shadow-sm ring-2 ring-blue-300'
+                    : 'bg-blue-50 text-blue-900 hover:bg-blue-100 border border-blue-200'
+                }`}
+              >
+                <Briefcase className="w-4 h-4 text-blue-600" />
+                <span>Placement CRM</span>
+                <span className="px-1.5 py-0.5 bg-amber-400 text-amber-950 font-black text-[9px] rounded-full uppercase">
+                  DRIVES
+                </span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('announcements_acad')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'announcements_acad'
+                    ? 'bg-[#0c2340] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Megaphone className="w-4 h-4 text-purple-600" />
+                <span>Academic Circulars</span>
               </button>
 
               <button
@@ -269,19 +313,7 @@ export default function StudentDashboard() {
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
-                <span>Academics & Notices</span>
-              </button>
-
-              <button
-                onClick={() => setPortalTab('contacts')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-                  portalTab === 'contacts'
-                    ? 'bg-red-600 text-white shadow-sm'
-                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
-                }`}
-              >
-                <Phone className="w-4 h-4" />
-                <span>Emergency Contacts</span>
+                <span>Courses & Syllabi</span>
               </button>
 
               <button
@@ -293,11 +325,28 @@ export default function StudentDashboard() {
                 }`}
               >
                 <Building className="w-4 h-4" />
-                <span>Facilities</span>
+                <span>Campus Facilities</span>
               </button>
             </>
-          ) : (
+          )}
+
+          {activePortalDivision === 'hostel' && (
             <>
+              <button
+                onClick={() => setPortalTab('roommate')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'roommate'
+                    ? 'bg-indigo-700 text-white shadow-sm ring-2 ring-indigo-300'
+                    : 'bg-indigo-50 text-indigo-900 hover:bg-indigo-100 border border-indigo-200'
+                }`}
+              >
+                <Bed className="w-4 h-4 text-indigo-600" />
+                <span>Roommate Matching & Bed Allotment</span>
+                <span className="px-1.5 py-0.5 bg-indigo-200 text-indigo-950 font-black text-[9px] rounded-full uppercase">
+                  AI MATCH
+                </span>
+              </button>
+
               <button
                 onClick={() => setPortalTab('inout')}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
@@ -347,27 +396,55 @@ export default function StudentDashboard() {
               </button>
 
               <button
-                onClick={() => setPortalTab('complaints')}
+                onClick={() => setPortalTab('announcements_hostel')}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-                  portalTab === 'complaints'
-                    ? 'bg-red-600 text-white shadow-sm'
+                  portalTab === 'announcements_hostel'
+                    ? 'bg-[#1c398e] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <MessageSquare className="w-4 h-4" />
-                <span>Campus Grievance / Complaints</span>
+                <Megaphone className="w-4 h-4 text-amber-500" />
+                <span>Hostel & Mess Notices</span>
               </button>
+            </>
+          )}
 
+          {activePortalDivision === 'campus' && (
+            <>
               <button
                 onClick={() => setPortalTab('lostfound')}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'lostfound'
-                    ? 'bg-purple-600 text-white shadow-sm'
+                    ? 'bg-purple-700 text-white shadow-sm ring-2 ring-purple-300'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                <Tag className="w-4 h-4" />
-                <span>Lost & Found Bulletin</span>
+                <Tag className="w-4 h-4 text-purple-600" />
+                <span>Lost & Found Community Hub</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('complaints')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'complaints'
+                    ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-300'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4 text-red-600" />
+                <span>Campus Grievances & Redressal</span>
+              </button>
+
+              <button
+                onClick={() => setPortalTab('contacts')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                  portalTab === 'contacts'
+                    ? 'bg-[#0c2340] text-white shadow-sm'
+                    : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <Phone className="w-4 h-4 text-emerald-600" />
+                <span>Emergency Hotline & Hospitals</span>
               </button>
             </>
           )}
@@ -476,12 +553,60 @@ export default function StudentDashboard() {
             {/* Quick Portal Action Cards */}
             <div className="border-t border-slate-100 pt-5">
               <h4 className="text-xs font-black uppercase tracking-wider text-slate-500 mb-3.5">
-                Quick Campus Portals & Services
+                Quick Campus Portals & High-Priority Actions
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 
                 <div 
-                  onClick={() => setPortalTab('attendance')}
+                  onClick={() => { setActivePortalDivision('academic'); setPortalTab('placement'); }}
+                  className="p-4 bg-blue-50/60 border border-blue-200 hover:border-blue-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-blue-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-blue-900 group-hover:text-blue-700">Placement CRM</span>
+                    <Briefcase className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <p className="text-[10px] text-blue-700 font-medium mt-1">Active drives: Google, Microsoft, NVIDIA</p>
+                  <span className="mt-2 inline-block px-2 py-0.5 bg-blue-600 text-white text-[9px] font-black rounded-md uppercase">1-Click Apply →</span>
+                </div>
+
+                <div 
+                  onClick={() => { setActivePortalDivision('hostel'); setPortalTab('roommate'); }}
+                  className="p-4 bg-indigo-50/60 border border-indigo-200 hover:border-indigo-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-indigo-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-indigo-900 group-hover:text-indigo-700">Roommate & Bed Allotment</span>
+                    <Bed className="w-4 h-4 text-indigo-600" />
+                  </div>
+                  <p className="text-[10px] text-indigo-700 font-medium mt-1">Lifestyle Survey & 96% Match Algorithm</p>
+                  <span className="mt-2 inline-block px-2 py-0.5 bg-indigo-600 text-white text-[9px] font-black rounded-md uppercase">Select Room & Bed →</span>
+                </div>
+
+                <div 
+                  onClick={() => { setActivePortalDivision('academic'); setPortalTab('announcements_acad'); }}
+                  className="p-4 bg-purple-50/60 border border-purple-200 hover:border-purple-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-purple-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-purple-900 group-hover:text-purple-700">Campus Circulars</span>
+                    <Megaphone className="w-4 h-4 text-purple-600" />
+                  </div>
+                  <p className="text-[10px] text-purple-700 font-medium mt-1">Navratri Dress Code & Mess Delay Alerts</p>
+                  <span className="mt-2 inline-block px-2 py-0.5 bg-purple-700 text-white text-[9px] font-black rounded-md uppercase">View Notices →</span>
+                </div>
+
+                <div 
+                  onClick={() => { setActivePortalDivision('campus'); setPortalTab('lostfound'); }}
+                  className="p-4 bg-amber-50/60 border border-amber-200 hover:border-amber-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-amber-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-amber-900 group-hover:text-amber-700">Lost & Found Hub</span>
+                    <Tag className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <p className="text-[10px] text-amber-700 font-medium mt-1">Lost Casio Calculator, Boat Earbuds, ID</p>
+                  <span className="mt-2 inline-block px-2 py-0.5 bg-amber-600 text-white text-[9px] font-black rounded-md uppercase">Claim & Report →</span>
+                </div>
+
+                <div 
+                  onClick={() => { setActivePortalDivision('academic'); setPortalTab('attendance'); }}
                   className="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
@@ -492,18 +617,18 @@ export default function StudentDashboard() {
                 </div>
 
                 <div 
-                  onClick={() => setPortalTab('registration')}
+                  onClick={() => { setActivePortalDivision('academic'); setPortalTab('registration'); }}
                   className="p-4 bg-white border border-slate-200 hover:border-blue-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 group-hover:text-blue-700">Semester Registration</span>
                     <FileCheck className="w-4 h-4 text-blue-600" />
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1">Warden & Advisor verification</p>
+                  <p className="text-[10px] text-slate-500 mt-1">Fee verification & Roommate questionnaire</p>
                 </div>
 
                 <div 
-                  onClick={() => setPortalTab('nodues')}
+                  onClick={() => { setActivePortalDivision('academic'); setPortalTab('nodues'); }}
                   className="p-4 bg-white border border-slate-200 hover:border-amber-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
@@ -514,7 +639,7 @@ export default function StudentDashboard() {
                 </div>
 
                 <div 
-                  onClick={() => setPortalTab('contacts')}
+                  onClick={() => { setActivePortalDivision('campus'); setPortalTab('contacts'); }}
                   className="p-4 bg-white border border-slate-200 hover:border-red-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
@@ -1095,7 +1220,36 @@ export default function StudentDashboard() {
         </div>
       )}
       {/* ========================================================================= */}
-      {/* HOSTEL MANAGEMENT & CAMPUS LIFE TAB VIEWS                                */}
+      {/* ========================================================================= */}
+      {/* TARGETED PLACEMENT CRM TAB                                               */}
+      {/* ========================================================================= */}
+      {activePortalDivision === 'academic' && portalTab === 'placement' && (
+        <PlacementDriveTab token={token} user={user} />
+      )}
+
+      {/* ========================================================================= */}
+      {/* ACADEMIC CIRCULARS & NOTICES TAB                                         */}
+      {/* ========================================================================= */}
+      {activePortalDivision === 'academic' && portalTab === 'announcements_acad' && (
+        <AnnouncementsTab token={token} portalType="ACADEMIC" />
+      )}
+
+      {/* ========================================================================= */}
+      {/* HOSTEL ROOMMATE MATCHING & BED ALLOTMENT TAB                             */}
+      {/* ========================================================================= */}
+      {activePortalDivision === 'hostel' && portalTab === 'roommate' && (
+        <RoommateAllotmentTab token={token} user={user} />
+      )}
+
+      {/* ========================================================================= */}
+      {/* HOSTEL & MESS CIRCULARS TAB                                              */}
+      {/* ========================================================================= */}
+      {activePortalDivision === 'hostel' && portalTab === 'announcements_hostel' && (
+        <AnnouncementsTab token={token} portalType="HOSTEL" />
+      )}
+
+      {/* ========================================================================= */}
+      {/* HOSTEL MANAGEMENT TAB VIEWS                                              */}
       {/* ========================================================================= */}
       {activePortalDivision === 'hostel' && portalTab === 'inout' && (
         <HostelInOutTab token={token} user={user} />
@@ -1113,12 +1267,74 @@ export default function StudentDashboard() {
         <HostelTicketingTab token={token} user={user} />
       )}
 
-      {activePortalDivision === 'hostel' && portalTab === 'complaints' && (
+      {/* ========================================================================= */}
+      {/* CAMPUS LIFE & GRIEVANCES TAB VIEWS                                       */}
+      {/* ========================================================================= */}
+      {activePortalDivision === 'campus' && portalTab === 'complaints' && (
         <ComplaintsTab token={token} user={user} />
       )}
 
-      {activePortalDivision === 'hostel' && portalTab === 'lostfound' && (
+      {activePortalDivision === 'campus' && portalTab === 'lostfound' && (
         <LostAndFoundTab token={token} user={user} />
+      )}
+
+      {/* Global Emergency Contacts accessible from anywhere */}
+      {(portalTab === 'contacts' || (activePortalDivision === 'campus' && portalTab === 'contacts')) && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                  <Phone className="w-5 h-5 text-red-600" />
+                  IIIT Pune Official Emergency Hotline Directory
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  24x7 Campus Ambulances, Empanelled Hospital, Wardens & Security Control Room
+                </p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              {contacts.map((contact) => {
+                const isHospital = contact.name.toLowerCase().includes('harneshwar');
+                return (
+                  <div 
+                    key={contact.id} 
+                    className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors shadow-xs"
+                  >
+                    <div>
+                      <span className="inline-block text-[9px] text-[#0c2340] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg mb-1.5">
+                        {contact.department.split('(')[0]}
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-900 leading-snug">{contact.name}</h4>
+                      {isHospital && (
+                        <a 
+                          href="https://www.harneshwarhospital.com/" 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-[11px] text-blue-700 font-bold hover:underline flex items-center gap-1 mt-1"
+                        >
+                          Visit Hospital Website <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-200">
+                      <span className="font-mono text-xs font-bold text-slate-800">{contact.number}</span>
+                      <a
+                        href={`tel:${contact.number.split('/')[0].trim()}`}
+                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-xs flex items-center justify-center transition-colors"
+                        title="Call Line"
+                      >
+                        <Phone className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Global SOS Modal trigger */}

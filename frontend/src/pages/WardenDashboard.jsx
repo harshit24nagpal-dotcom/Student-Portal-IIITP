@@ -883,6 +883,14 @@ export default function WardenDashboard() {
       {/* =================================================================== */}
       {/* 6. HOSTEL COMPLAINTS & GRIEVANCE REDRESSAL                         */}
       {/* =================================================================== */}
+      {activeTab === 'roommate' && (
+        <RoommateAllotmentTab token={token} user={user} />
+      )}
+
+      {activeTab === 'announcements' && (
+        <AnnouncementsTab token={token} portalType="HOSTEL" />
+      )}
+
       {activeTab === 'complaints' && (
         <div className="space-y-4">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">
