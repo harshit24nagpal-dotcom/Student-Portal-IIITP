@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -29,8 +29,8 @@ router.get('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Post an announcement
-router.post('/', authenticateToken, async (req, res) => {
+// Post an announcement (Authorized staff only)
+router.post('/', authenticateToken, authorizeRoles('ADMIN', 'HOSTEL_WARDEN', 'FACULTY', 'FACULTY_ADVISOR', 'SECURITY', 'CLEARANCE_OFFICER'), async (req, res) => {
   try {
     const { title, content, portalType, category, priority, badgeText } = req.body;
     if (!title || !content) {

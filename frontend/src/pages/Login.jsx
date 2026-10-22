@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
-  Lock, Mail, Eye, EyeOff, AlertTriangle, ArrowRight, ShieldCheck, UserCheck 
+  Lock, Mail, Eye, EyeOff, AlertTriangle, ArrowRight, ShieldCheck, 
+  UserCheck, Building, GraduationCap, ShieldAlert, Sparkles, Phone, ExternalLink, HelpCircle
 } from 'lucide-react';
 
 export default function Login() {
@@ -9,7 +10,7 @@ export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
 
   // Form inputs
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -22,13 +23,62 @@ export default function Login() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [autoFilledRole, setAutoFilledRole] = useState(null);
+
+  // Pre-configured official demo accounts
+  const demoAccounts = [
+    {
+      role: 'STUDENT',
+      title: 'Student Portal',
+      name: 'Harshit Nagpal',
+      mis: '112415079',
+      dept: 'B.Tech CSE (3rd Sem)',
+      identifier: '112415079',
+      password: '112415079',
+      badge: 'STUDENT',
+      color: 'blue'
+    },
+    {
+      role: 'HOSTEL_WARDEN',
+      title: 'Hostel Administration',
+      name: 'Prof. Ramesh Patil',
+      mis: 'EMP103',
+      dept: 'Chief Hostel Warden',
+      identifier: 'warden@iiitp.ac.in',
+      password: 'warden123',
+      badge: 'WARDEN',
+      color: 'indigo'
+    },
+    {
+      role: 'ADMIN',
+      title: 'Institutional Control',
+      name: 'Chief Security Admin',
+      mis: 'EMP202',
+      dept: 'Super Administration & Dispatch',
+      identifier: 'admin@iiitp.ac.in',
+      password: 'admin123',
+      badge: 'ADMIN',
+      color: 'slate'
+    },
+    {
+      role: 'FACULTY_ADVISOR',
+      title: 'Academic Advisor',
+      name: 'Dr. Shrikant Salve',
+      mis: 'EMP102',
+      dept: 'CSE Faculty Advisor',
+      identifier: 'advisor.cse@iiitp.ac.in',
+      password: 'advisor123',
+      badge: 'FACULTY',
+      color: 'emerald'
+    }
+  ];
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await login(identifier, password);
     } catch (err) {
       setError(err.message || 'Invalid institutional credentials. Please try again.');
     } finally {
@@ -49,6 +99,13 @@ export default function Login() {
     }
   };
 
+  const handleAutofill = (acc) => {
+    setIdentifier(acc.identifier);
+    setPassword(acc.password);
+    setAutoFilledRole(acc.role);
+    setError('');
+  };
+
   const handleQuickDemoLogin = async (roleToUse) => {
     setError('');
     setLoading(true);
@@ -62,56 +119,59 @@ export default function Login() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 sm:p-6 overflow-hidden font-sans bg-slate-900 text-slate-800">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-3 sm:p-6 overflow-x-hidden font-sans bg-slate-900 text-slate-800">
       
-      {/* 1. Visible Campus Background with Balanced Weight */}
+      {/* 1. High-Resolution Campus Backdrop */}
       <img
         src="/iiitp_campus.jpg"
         alt="IIIT Pune Campus"
-        className="absolute inset-0 w-full h-full object-cover object-center opacity-60 filter brightness-95 saturate-110 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover object-center opacity-40 filter brightness-90 saturate-105 pointer-events-none"
       />
 
-      {/* 2. Soft Tint Overlay to enhance contrast for the login card */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-slate-900/20 to-slate-950/40 backdrop-blur-[1px] pointer-events-none"></div>
+      {/* 2. Soft Gradient Tint Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/60 to-slate-950/80 backdrop-blur-[2px] pointer-events-none"></div>
 
       {/* 3. Centered Elevated Institutional Login Card */}
-      <div className="relative z-10 w-full max-w-[430px] bg-white/95 backdrop-blur-md rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] border border-white/80 px-7 py-6 sm:px-9 sm:py-7 my-4 transition-all">
+      <div className="relative z-10 w-full max-w-[500px] bg-white/95 backdrop-blur-md rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-white/90 p-6 sm:p-8 my-4 transition-all">
         
-        {/* Official Circular IIIT Pune Emblem Logo Header */}
+        {/* Official IIIT Pune Emblem & Header */}
         <div className="text-center">
-          <div className="flex justify-center mb-2.5">
+          <div className="flex justify-center mb-2">
             <img 
               src="/iiitp_logo.png" 
-              alt="Indian Institute of Information Technology Pune Logo" 
-              className="w-24 h-24 sm:w-28 sm:h-28 object-contain drop-shadow-md transition-transform hover:scale-105"
+              alt="Indian Institute of Information Technology Pune Emblem" 
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-md transition-transform hover:scale-105 duration-300"
             />
           </div>
-          <h1 className="text-xl sm:text-[23px] font-black text-[#0c2340] tracking-tight leading-tight">
-            IIIT PUNE PORTAL
+          <span className="px-3 py-1 bg-blue-50 border border-blue-200 text-[#0c2340] text-[10px] font-black uppercase rounded-full tracking-wider inline-block mb-1">
+            Official Institutional Campus Connect
+          </span>
+          <h1 className="text-lg sm:text-xl font-black text-[#0c2340] tracking-tight leading-tight">
+            INDIAN INSTITUTE OF INFORMATION TECHNOLOGY PUNE
           </h1>
-          <p className="text-[11px] sm:text-xs text-slate-600 font-semibold mt-0.5 tracking-wide">
-            Indian Institute of Information Technology Pune
+          <p className="text-[11px] text-slate-500 font-semibold mt-0.5 tracking-wide">
+            Autonomous Institute under Ministry of Education, Govt. of India
           </p>
         </div>
 
-        {/* Thin Subtle Divider Line */}
+        {/* Subtle Divider Line */}
         <div className="w-full h-px bg-slate-200/80 my-3.5"></div>
 
         {/* Welcome Section */}
         <div className="mb-3.5">
           <h2 className="text-xl font-black text-slate-900 leading-snug">
-            {isRegistering ? 'Student Registration' : 'Welcome'}
+            {isRegistering ? 'New Student Registration' : 'Welcome'}
           </h2>
           <p className="text-xs text-slate-500 mt-0.5 font-medium">
             {isRegistering 
-              ? 'Create your account to access campus services.' 
-              : 'Sign in to access your campus portal.'}
+              ? 'Register with your institute email (<MIS>@cse.iiitp.ac.in).' 
+              : 'Sign in using your Roll / MIS Number or Institute Email.'}
           </p>
         </div>
 
-        {/* Error Alert */}
+        {/* Error Alert Banner */}
         {error && (
-          <div className="mb-3.5 p-2.5 bg-red-50/90 border border-red-200 text-red-700 text-xs rounded-xl flex items-start gap-2 font-medium animate-in fade-in">
+          <div className="mb-3.5 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-start gap-2 font-medium animate-in fade-in">
             <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -121,34 +181,41 @@ export default function Login() {
         {!isRegistering ? (
           <form onSubmit={handleLoginSubmit} className="space-y-3.5">
             
-            {/* Email Input */}
+            {/* Roll / MIS Number or Email Input */}
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 tracking-wider uppercase mb-1">
-                EMAIL
+              <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1">
+                ROLL / MIS NUMBER OR EMAIL
               </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your institute email"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#5367c8] focus:ring-2 focus:ring-[#5367c8]/20 transition-all font-normal"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  required
+                  value={identifier}
+                  onChange={(e) => { setIdentifier(e.target.value); setAutoFilledRole(null); }}
+                  placeholder="e.g. 112415079 or 112415079@cse.iiitp.ac.in"
+                  className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10 transition-all font-medium"
+                />
+              </div>
             </div>
 
             {/* Password Input */}
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 tracking-wider uppercase mb-1">
-                PASSWORD
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase">
+                  PASSWORD (DEFAULT: MIS NUMBER)
+                </label>
+                <span className="text-[10px] text-blue-700 font-bold">
+                  Students: Use MIS No.
+                </span>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="w-full pl-3.5 pr-10 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#5367c8] focus:ring-2 focus:ring-[#5367c8]/20 transition-all font-normal"
+                  onChange={(e) => { setPassword(e.target.value); setAutoFilledRole(null); }}
+                  placeholder="Enter your password (e.g. 112415079)"
+                  className="w-full pl-3.5 pr-10 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10 transition-all font-medium"
                 />
                 <button
                   type="button"
@@ -161,6 +228,14 @@ export default function Login() {
               </div>
             </div>
 
+            {/* Default Password Reminder Hint */}
+            <div className="p-2.5 bg-blue-50/70 border border-blue-200/80 rounded-xl flex items-center gap-2 text-xxs sm:text-[11px] text-blue-900">
+              <span className="font-black text-blue-700 uppercase shrink-0">STUDENT AUTH:</span>
+              <p className="font-semibold text-slate-700">
+                Default password for students is your 9-digit MIS Number (e.g., <span className="font-mono font-bold text-[#0c2340]">112415079</span>).
+              </p>
+            </div>
+
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between text-xs pt-0.5">
               <label className="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
@@ -168,14 +243,14 @@ export default function Login() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded border-slate-300 text-[#5367c8] focus:ring-[#5367c8] cursor-pointer"
+                  className="w-3.5 h-3.5 rounded border-slate-300 text-[#0c2340] focus:ring-[#0c2340] cursor-pointer"
                 />
-                <span className="font-medium text-slate-600">Remember me</span>
+                <span className="font-medium text-slate-600">Remember credentials</span>
               </label>
               <button
                 type="button"
-                onClick={() => alert("For password reset assistance, please contact the IT Helpdesk at support@iiitp.ac.in")}
-                className="font-semibold text-[#d94f38] hover:text-[#b83b26] transition-colors cursor-pointer"
+                onClick={() => alert("For password reset assistance, contact Campus IT Desk: support@iiitp.ac.in | Landline: 020-23456789")}
+                className="font-semibold text-red-600 hover:text-red-700 transition-colors cursor-pointer"
               >
                 Forgot Password?
               </button>
@@ -185,136 +260,167 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 sm:py-3 bg-[#5367c8] hover:bg-[#475bc2] active:scale-[0.99] text-white font-semibold rounded-xl text-xs sm:text-sm tracking-wider uppercase shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 mt-1"
+              className="w-full py-2.5 sm:py-3 bg-[#0c2340] hover:bg-[#16355d] active:scale-[0.99] text-white font-extrabold rounded-xl text-xs sm:text-sm tracking-wider uppercase shadow-md shadow-blue-950/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 mt-1"
             >
-              <span>{loading ? 'SIGNING IN...' : 'SIGN IN'}</span>
+              <span>{loading ? 'AUTHENTICATING SESSION...' : 'SIGN IN TO PORTAL'}</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         ) : (
           /* Student Registration Form */
           <form onSubmit={handleRegisterSubmit} className="space-y-3 text-xs">
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 tracking-wider uppercase mb-1">FULL NAME</label>
+              <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1">FULL NAME</label>
               <input
                 type="text"
                 required
                 value={regName}
                 onChange={(e) => setRegName(e.target.value)}
                 placeholder="e.g. Harshit Nagpal"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#5367c8] focus:ring-2 focus:ring-[#5367c8]/20"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 tracking-wider uppercase mb-1">INSTITUTE EMAIL</label>
+              <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1">INSTITUTE EMAIL</label>
               <input
                 type="email"
                 required
                 value={regEmail}
                 onChange={(e) => setRegEmail(e.target.value)}
                 placeholder="e.g. 112415079@cse.iiitp.ac.in"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#5367c8] focus:ring-2 focus:ring-[#5367c8]/20"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 tracking-wider uppercase mb-1">CONTACT NUMBER</label>
+              <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1">PRIMARY PHONE NUMBER</label>
               <input
                 type="text"
                 value={regContact}
                 onChange={(e) => setRegContact(e.target.value)}
                 placeholder="+91 9988776655"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#5367c8] focus:ring-2 focus:ring-[#5367c8]/20"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 tracking-wider uppercase mb-1">PASSWORD</label>
+              <label className="block text-[11px] font-bold text-slate-600 tracking-wider uppercase mb-1">PASSWORD</label>
               <input
                 type="password"
                 required
                 value={regPassword}
                 onChange={(e) => setRegPassword(e.target.value)}
-                placeholder="Min 6 characters"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#5367c8] focus:ring-2 focus:ring-[#5367c8]/20"
+                placeholder="Choose password (or use MIS number)"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-[#5367c8] hover:bg-[#475bc2] text-white font-semibold rounded-xl text-xs tracking-wider uppercase shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#16355d] text-white font-extrabold rounded-xl text-xs tracking-wider uppercase shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
-              {loading ? 'REGISTERING...' : 'REGISTER ACCOUNT'}
+              {loading ? 'REGISTERING ACCOUNT...' : 'COMPLETE REGISTRATION'}
             </button>
           </form>
         )}
 
-        {/* Bottom Help & Switch Section */}
-        <div className="mt-4 pt-3 border-t border-slate-100 text-center space-y-2.5">
-          <p className="text-xs text-slate-500">
-            Need help?{' '}
-            <button
-              type="button"
-              onClick={() => alert("Campus IT Support: it_support@iiitp.ac.in | Phone: +91 20 2345 6789")}
-              className="font-semibold text-[#1c398e] hover:underline cursor-pointer"
-            >
-              Contact Campus Support
-            </button>
-          </p>
-
-          <div className="flex items-center justify-center gap-2 text-[11px]">
-            <button
-              type="button"
-              onClick={() => { setIsRegistering(!isRegistering); setError(''); }}
-              className="font-medium text-slate-500 hover:text-[#5367c8] transition-colors cursor-pointer"
-            >
-              {isRegistering ? 'Back to Sign In' : 'New student registration'}
-            </button>
+        {/* Interactive Demo & Quick Login Credentials Panel */}
+        <div className="mt-5 pt-4 border-t border-slate-100">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              Official Login Credentials Directory
+            </span>
+            <span className="text-[10px] text-blue-800 font-bold">1-Click Auto-Fill</span>
           </div>
 
-          {/* Quick Demo Access Pills */}
-          <div className="pt-1">
-            <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block mb-1.5">
-              Quick Demo Access
-            </span>
-            <div className="flex flex-wrap items-center justify-center gap-1.5">
+          <div className="grid grid-cols-2 gap-2 text-left">
+            {demoAccounts.map((acc) => {
+              const isSelected = autoFilledRole === acc.role;
+              return (
+                <div
+                  key={acc.role}
+                  className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500/30'
+                      : 'bg-slate-50/80 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60'
+                  }`}
+                  onClick={() => handleAutofill(acc)}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[#0c2340]">
+                      {acc.badge}
+                    </span>
+                    <span className="text-[10px] text-blue-700 font-bold hover:underline">
+                      Fill →
+                    </span>
+                  </div>
+                  <h4 className="text-xs font-bold text-slate-900 mt-1 truncate">{acc.name}</h4>
+                  <p className="text-[10px] font-mono text-slate-500 truncate">ID: {acc.identifier}</p>
+                  <p className="text-[10px] font-mono font-semibold text-slate-700">Pass: {acc.password}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Direct Instant Login Pills */}
+          <div className="mt-3 flex items-center justify-between gap-1 flex-wrap pt-2 border-t border-slate-100">
+            <span className="text-[9px] font-bold text-slate-400 uppercase">Instant Login:</span>
+            <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => handleQuickDemoLogin('STUDENT')}
-                className="px-2.5 py-1 bg-slate-50 hover:bg-[#5367c8] hover:text-white text-slate-600 border border-slate-200/70 rounded-lg text-[11px] font-medium transition-all cursor-pointer"
+                className="px-2 py-0.5 bg-blue-50 hover:bg-[#0c2340] hover:text-white text-blue-900 border border-blue-200 rounded text-[10px] font-bold transition-all cursor-pointer"
               >
                 Student
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('FACULTY')}
-                className="px-2.5 py-1 bg-slate-50 hover:bg-[#5367c8] hover:text-white text-slate-600 border border-slate-200/70 rounded-lg text-[11px] font-medium transition-all cursor-pointer"
-              >
-                Faculty
-              </button>
-              <button
-                type="button"
                 onClick={() => handleQuickDemoLogin('HOSTEL_WARDEN')}
-                className="px-2.5 py-1 bg-slate-50 hover:bg-[#5367c8] hover:text-white text-slate-600 border border-slate-200/70 rounded-lg text-[11px] font-medium transition-all cursor-pointer"
+                className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-900 hover:text-white text-indigo-900 border border-indigo-200 rounded text-[10px] font-bold transition-all cursor-pointer"
               >
                 Warden
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('CLEARANCE_OFFICER')}
-                className="px-2.5 py-1 bg-slate-50 hover:bg-[#5367c8] hover:text-white text-slate-600 border border-slate-200/70 rounded-lg text-[11px] font-medium transition-all cursor-pointer"
-              >
-                Officer
-              </button>
-              <button
-                type="button"
                 onClick={() => handleQuickDemoLogin('ADMIN')}
-                className="px-2.5 py-1 bg-slate-50 hover:bg-[#5367c8] hover:text-white text-slate-600 border border-slate-200/70 rounded-lg text-[11px] font-medium transition-all cursor-pointer"
+                className="px-2 py-0.5 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-900 border border-slate-300 rounded text-[10px] font-bold transition-all cursor-pointer"
               >
                 Admin
               </button>
+              <button
+                type="button"
+                onClick={() => handleQuickDemoLogin('FACULTY_ADVISOR')}
+                className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-900 hover:text-white text-emerald-900 border border-emerald-200 rounded text-[10px] font-bold transition-all cursor-pointer"
+              >
+                Advisor
+              </button>
             </div>
+          </div>
+        </div>
+
+        {/* Bottom Switcher & Emergency Support Footer */}
+        <div className="mt-4 pt-3 border-t border-slate-100 text-center space-y-2">
+          <div className="flex items-center justify-center gap-3 text-xs">
+            <button
+              type="button"
+              onClick={() => { setIsRegistering(!isRegistering); setError(''); }}
+              className="font-bold text-[#0c2340] hover:underline transition-colors cursor-pointer"
+            >
+              {isRegistering ? '← Back to Sign In' : 'New student account registration →'}
+            </button>
+          </div>
+
+          <div className="pt-2 text-[10px] text-slate-500 font-medium space-y-1">
+            <p>
+              24x7 Ambulance: <a href="tel:+919826381867" className="font-bold text-red-600 hover:underline">+91 9826381867</a> • 
+              Hospital: <a href="https://www.harneshwarhospital.com/" target="_blank" rel="noreferrer" className="font-bold text-blue-700 hover:underline">Harneshwar Hospital</a>
+            </p>
+            <p>
+              Main Campus Security: <span className="font-mono font-bold text-slate-700">020-23456789</span> • Student Grievance: <span className="font-mono font-bold text-slate-700">020-23456711</span>
+            </p>
           </div>
         </div>
 
@@ -323,4 +429,3 @@ export default function Login() {
     </div>
   );
 }
-

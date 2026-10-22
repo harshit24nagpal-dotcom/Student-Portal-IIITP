@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -38,7 +38,7 @@ router.get('/subjects', authenticateToken, (req, res) => {
 });
 
 // GET student roster for a specific section
-router.get('/section-students', authenticateToken, async (req, res) => {
+router.get('/section-students', authenticateToken, authorizeRoles('FACULTY', 'FACULTY_ADVISOR', 'ADMIN'), async (req, res) => {
   try {
     const { section } = req.query;
 
@@ -80,7 +80,7 @@ router.get('/section-students', authenticateToken, async (req, res) => {
 });
 
 // POST Mark daily attendance (Faculty/Admin action)
-router.post('/mark', authenticateToken, async (req, res) => {
+router.post('/mark', authenticateToken, authorizeRoles('FACULTY', 'FACULTY_ADVISOR', 'ADMIN'), async (req, res) => {
   try {
     const { subjectCode, subjectName, section, date, records } = req.body;
 

@@ -116,12 +116,19 @@ router.put('/:id/claim', authenticateToken, async (req, res) => {
   }
 });
 
-// Resolve item (mark returned)
+// Resolve item (mark returned) - only by the reporter or campus staff
 router.put('/:id/resolve', authenticateToken, async (req, res) => {
   try {
     const itemId = parseInt(req.params.id);
     const item = await prisma.lostAndFoundItem.findUnique({ where: { id: itemId } });
     if (!item) return res.status(404).json({ error: 'Item not found' });
+
+    // Authorization: only reporting user or authorized staff
+    const isReporter = item.reportedById === req.user.id;
+    const isStaff = ['ADMIN', 'HOSTEL_WARDEN', 'SECURITY'].includes(req.user.role);
+    if (!isReporter && !isStaff) {
+      return res.status(403).json({ error: 'Unauthorized. Only the person who reported this item or campus security can resolve it.' });
+    }
 
     const updated = await prisma.lostAndFoundItem.update({
       where: { id: itemId },
