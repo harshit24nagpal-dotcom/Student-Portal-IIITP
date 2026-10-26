@@ -193,11 +193,14 @@ router.post('/', authenticateToken, async (req, res) => {
       });
 
       // Create status history entry
+      const adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+      const systemActorId = adminUser ? adminUser.id : reporter.id;
+
       await prisma.emergencyStatusHistory.create({
         data: {
           requestId: emergency.id,
           status: 'RESPONDER_ASSIGNED',
-          changedById: 3, // System admin/auto
+          changedById: systemActorId,
           note: `System auto-assigned top-ranked responder: ${bestResponder.user.name} (${bestResponder.role}) with recommendation score: ${bestResponder.score}`,
         },
       });
@@ -209,6 +212,29 @@ router.post('/', authenticateToken, async (req, res) => {
           title: `🚨 EMERGENCY ASSIGNED: ${emergency.id}`,
           message: `You have been assigned to a ${type} emergency at ${manualLocation || 'GPS location'}.`,
           type: 'CRITICAL',
+          category: 'EMERGENCY',
+        },
+      });
+
+      // MULTI-CHANNEL TELEMETRY: Simulated Out-of-Band SMS Dispatch
+      await prisma.notification.create({
+        data: {
+          recipientId: bestResponder.userId,
+          title: `[SMS GATEWAY] Emergency Dispatch Transmitted`,
+          message: `[SMS DISPATCH] Sent to ${bestResponder.user.name} (+${bestResponder.user.contactNumber}): "IIITP SOS: Critical ${type} emergency at ${manualLocation || 'Campus Coordinates'}. Respond within 25s!"`,
+          type: 'INFO',
+          category: 'SMS_GATEWAY',
+        },
+      });
+
+      // MULTI-CHANNEL TELEMETRY: Simulated Out-of-Band IVR Call
+      await prisma.notification.create({
+        data: {
+          recipientId: bestResponder.userId,
+          title: `[IVR AUTO-DIALER] Priority Call Initiated`,
+          message: `[IVR CALL] Emergency dispatch voice alert placed to ${bestResponder.user.name} (+${bestResponder.user.contactNumber}). Status: CONNECTED.`,
+          type: 'INFO',
+          category: 'IVR_DISPATCH',
         },
       });
     }

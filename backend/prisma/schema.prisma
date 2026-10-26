@@ -525,6 +525,8 @@ model HostelTicket {
   description        String
   priority           String    @default("MEDIUM") // "LOW", "MEDIUM", "HIGH", "EMERGENCY"
   status             String    @default("OPEN") // "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"
+  beforePhoto        String?   // Photo of issue before completion
+  afterPhoto         String?   // Photo of resolved issue after completion
   proofOfResolution  String?   // Proof photo URL or work certificate
   resolutionRemarks  String?   // Technician / Warden explanation
   resolvedBy         String?   // "Technician Ramesh (Maintenance)"

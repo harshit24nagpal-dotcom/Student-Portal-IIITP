@@ -151,6 +151,20 @@ router.post('/leaves', authenticateToken, async (req, res) => {
       io.emit('hostel_leave_event', { type: 'LEAVE_APPLIED', data: leave });
     }
 
+    // Notify Wardens & Admin in DB
+    const wardens = await prisma.user.findMany({ where: { role: { in: ['HOSTEL_WARDEN', 'ADMIN'] } } });
+    for (const w of wardens) {
+      await prisma.notification.create({
+        data: {
+          recipientId: w.id,
+          title: `New Leave Application: ${req.user.name}`,
+          message: `${req.user.name} (${req.user.userId}) submitted a ${leaveType} leave request from ${startDate} to ${endDate}.`,
+          type: 'INFO',
+          category: 'HOSTEL'
+        }
+      }).catch(() => {});
+    }
+
     res.status(201).json(leave);
   } catch (error) {
     console.error('Leave Apply Error:', error);
@@ -215,6 +229,17 @@ router.put('/leaves/:id/status', authenticateToken, authorizeRoles('HOSTEL_WARDE
     if (io) {
       io.emit('hostel_leave_event', { type: 'LEAVE_UPDATED', data: updated });
     }
+
+    // Persist notification for student
+    await prisma.notification.create({
+      data: {
+        recipientId: updated.studentId,
+        title: `Hostel Leave ${status}`,
+        message: `Your leave application has been ${status.toLowerCase()} by Warden ${req.user.name}. Remarks: ${wardenRemarks || (status === 'APPROVED' ? 'Approved' : 'Rejected')}`,
+        type: status === 'APPROVED' ? 'SUCCESS' : 'ALERT',
+        category: 'HOSTEL'
+      }
+    }).catch(() => {});
 
     res.json(updated);
   } catch (error) {
@@ -313,7 +338,7 @@ router.get('/mess/headcount', authenticateToken, async (req, res) => {
 // Student raises a maintenance issue ticket
 router.post('/tickets', authenticateToken, async (req, res) => {
   try {
-    const { hostelBlock, roomNumber, category, title, description, priority } = req.body;
+    const { hostelBlock, roomNumber, category, title, description, priority, beforePhoto } = req.body;
     if (!category || !title || !description) {
       return res.status(400).json({ error: 'Category, title, and description are required' });
     }
@@ -327,7 +352,8 @@ router.post('/tickets', authenticateToken, async (req, res) => {
         title,
         description,
         priority: (priority || 'MEDIUM').toUpperCase(),
-        status: 'OPEN'
+        status: 'OPEN',
+        beforePhoto: beforePhoto || null
       },
       include: {
         student: {
@@ -339,6 +365,20 @@ router.post('/tickets', authenticateToken, async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       io.emit('hostel_ticket_event', { type: 'TICKET_CREATED', data: ticket });
+    }
+
+    // Notify Wardens & Admin in DB
+    const wardens = await prisma.user.findMany({ where: { role: { in: ['HOSTEL_WARDEN', 'ADMIN'] } } });
+    for (const w of wardens) {
+      await prisma.notification.create({
+        data: {
+          recipientId: w.id,
+          title: `New Maintenance Ticket: ${title}`,
+          message: `${req.user.name} (${roomNumber || 'Hostel'}) raised a ${priority || 'MEDIUM'} priority ticket: "${title}".`,
+          type: (priority || '').toUpperCase() === 'HIGH' ? 'ALERT' : 'INFO',
+          category: 'HOSTEL'
+        }
+      }).catch(() => {});
     }
 
     res.status(201).json(ticket);
@@ -382,7 +422,7 @@ router.get('/tickets/all', authenticateToken, async (req, res) => {
 router.put('/tickets/:id/resolve', authenticateToken, authorizeRoles('HOSTEL_WARDEN', 'ADMIN'), async (req, res) => {
   try {
     const ticketId = parseInt(req.params.id);
-    const { status, proofOfResolution, resolutionRemarks, resolvedBy } = req.body;
+    const { status, proofOfResolution, resolutionRemarks, resolvedBy, beforePhoto, afterPhoto } = req.body;
 
     if (!proofOfResolution && status === 'RESOLVED') {
       return res.status(400).json({ error: 'Proof of Resolution (work summary / verification details) is required' });
@@ -395,7 +435,9 @@ router.put('/tickets/:id/resolve', authenticateToken, authorizeRoles('HOSTEL_WAR
         proofOfResolution: proofOfResolution || 'Verified on-site by Hostel Maintenance Team',
         resolutionRemarks: resolutionRemarks || 'Work inspected and completed according to standard specs.',
         resolvedBy: resolvedBy || `${req.user.name} (${req.user.role})`,
-        resolvedAt: new Date()
+        resolvedAt: new Date(),
+        ...(beforePhoto !== undefined ? { beforePhoto } : {}),
+        ...(afterPhoto !== undefined ? { afterPhoto } : {})
       },
       include: {
         student: {
@@ -408,6 +450,17 @@ router.put('/tickets/:id/resolve', authenticateToken, authorizeRoles('HOSTEL_WAR
     if (io) {
       io.emit('hostel_ticket_event', { type: 'TICKET_RESOLVED', data: updated });
     }
+
+    // Persist notification for student
+    await prisma.notification.create({
+      data: {
+        recipientId: updated.studentId,
+        title: `Maintenance Ticket Resolved (#${ticketId})`,
+        message: `Your maintenance ticket "${updated.title}" has been marked RESOLVED by ${req.user.name}. Resolution proof: ${proofOfResolution}`,
+        type: 'SUCCESS',
+        category: 'HOSTEL'
+      }
+    }).catch(() => {});
 
     res.json(updated);
   } catch (error) {

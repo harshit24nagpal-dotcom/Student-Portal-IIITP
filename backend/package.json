@@ -8,11 +8,11 @@
     "start": "node server.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
-    "db:seed": "node prisma/seed.js",
+    "db:seed": "node prisma/seed.js && node prisma/seed_hostel.js && node prisma/seed_v2.js",
     "build": "prisma generate"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js && node prisma/seed_hostel.js && node prisma/seed_v2.js"
   },
   "dependencies": {
     "@prisma/client": "^5.10.2",

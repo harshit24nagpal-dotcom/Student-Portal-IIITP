@@ -189,6 +189,17 @@ router.put('/applications/:id/status', authenticateToken, authorizeRoles('ADMIN'
       }
     });
 
+    // Persist notification for student
+    await prisma.notification.create({
+      data: {
+        recipientId: updated.studentId,
+        title: `Placement Update: ${updated.drive.companyName}`,
+        message: `Your application status for ${updated.drive.companyName} (${updated.drive.role}) is now "${status}". ${interviewSlot ? `Interview Slot: ${interviewSlot}.` : ''} ${remarks || ''}`.trim(),
+        type: ['SHORTLISTED', 'INTERVIEW_SCHEDULED', 'OFFERED', 'SELECTED'].includes(status) ? 'SUCCESS' : 'INFO',
+        category: 'PLACEMENT'
+      }
+    }).catch(() => {});
+
     res.json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update application status' });

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Wrench, CheckCircle2, Clock, AlertTriangle, ShieldCheck, 
-  Send, User, Home, Filter, RefreshCw, FileCheck, Sparkles, Check
+  Send, User, Home, Filter, RefreshCw, FileCheck, Sparkles, Check,
+  Camera, Upload, Image as ImageIcon
 } from 'lucide-react';
+import { API_URL, getFileUrl } from '../config/api';
 
 export default function HostelTicketingTab({ token, user }) {
   const [tickets, setTickets] = useState([]);
@@ -18,6 +20,32 @@ export default function HostelTicketingTab({ token, user }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('MEDIUM');
+  const [beforePhoto, setBeforePhoto] = useState('');
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  const handleUploadPhoto = async (file) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    setUploadingPhoto(true);
+    try {
+      const res = await fetch(`${API_URL}/files/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.file?.filePath) {
+        setBeforePhoto(data.file.filePath);
+      } else {
+        setError(data.error || 'Failed to upload photo');
+      }
+    } catch (err) {
+      setError('Network error during photo upload');
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
 
   // Filter State
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -67,7 +95,8 @@ export default function HostelTicketingTab({ token, user }) {
           category,
           title,
           description,
-          priority
+          priority,
+          beforePhoto
         })
       });
 
@@ -76,6 +105,7 @@ export default function HostelTicketingTab({ token, user }) {
         setMessage('Ticket registered successfully! Maintenance team has been assigned.');
         setTitle('');
         setDescription('');
+        setBeforePhoto('');
         fetchMyTickets();
       } else {
         setError(data.error || 'Failed to submit ticket');
@@ -242,6 +272,40 @@ export default function HostelTicketingTab({ token, user }) {
             </div>
 
             <div>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1 flex items-center justify-between">
+                <span>Attach Problem Photo (Before Fix)</span>
+                <span className="text-[10px] text-slate-400 font-normal lowercase">(optional)</span>
+              </label>
+
+              {beforePhoto ? (
+                <div className="relative group rounded-xl overflow-hidden border border-slate-200">
+                  <img src={getFileUrl(beforePhoto)} alt="Problem Before Fix" className="w-full h-28 object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setBeforePhoto('')}
+                    className="absolute top-2 right-2 px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-bold shadow cursor-pointer"
+                  >
+                    Remove Photo
+                  </button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 hover:border-[#1c398e] bg-slate-50 hover:bg-white rounded-xl cursor-pointer transition-all text-center">
+                  <Camera className="w-5 h-5 text-slate-400 mb-1" />
+                  <span className="text-xs font-bold text-slate-700">
+                    {uploadingPhoto ? 'Uploading Photo...' : 'Click to Upload Problem Photo'}
+                  </span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">JPEG, PNG up to 10MB</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => e.target.files?.[0] && handleUploadPhoto(e.target.files[0])}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div>
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
                 Priority
               </label>
@@ -350,9 +414,24 @@ export default function HostelTicketingTab({ token, user }) {
                       </div>
                     </div>
 
+                    {/* Problem Photo before resolution */}
+                    {!isResolved && t.beforePhoto && (
+                      <div className="pt-2 border-t border-slate-100 flex items-center gap-3">
+                        <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-slate-200 hover:opacity-90 transition-opacity shrink-0">
+                          <img src={getFileUrl(t.beforePhoto)} alt="Problem Before Fix" className="w-24 h-18 object-cover" />
+                        </a>
+                        <div className="text-xs space-y-0.5">
+                          <span className="text-[9px] font-black uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 inline-block">
+                            Attached Photo (Before Fix)
+                          </span>
+                          <p className="text-[11px] text-slate-500">Student attached visual proof of issue for maintenance team.</p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* ⭐ PROOF OF RESOLUTION SECTION ⭐ */}
                     {isResolved && (
-                      <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-xl space-y-2">
+                      <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-xl space-y-2.5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5 text-emerald-800 text-xs font-black uppercase tracking-wider">
                             <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -363,6 +442,41 @@ export default function HostelTicketingTab({ token, user }) {
                           </span>
                         </div>
 
+                        {/* BEFORE & AFTER PHOTO COMPARISON */}
+                        {(t.beforePhoto || t.afterPhoto) && (
+                          <div className="grid grid-cols-2 gap-2.5 pt-1 pb-1">
+                            {t.beforePhoto ? (
+                              <div className="space-y-1">
+                                <span className="text-[9px] font-black uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 block text-center">
+                                  Before Fix (Problem)
+                                </span>
+                                <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-slate-200 hover:opacity-90 transition-opacity">
+                                  <img src={getFileUrl(t.beforePhoto)} alt="Problem Before Fix" className="w-full h-28 object-cover" />
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="h-28 rounded-xl border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 text-center p-2">
+                                No before photo attached
+                              </div>
+                            )}
+
+                            {t.afterPhoto ? (
+                              <div className="space-y-1">
+                                <span className="text-[9px] font-black uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 block text-center">
+                                  After Completion (Resolved ✓)
+                                </span>
+                                <a href={getFileUrl(t.afterPhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-emerald-300 hover:opacity-90 transition-opacity shadow-xs">
+                                  <img src={getFileUrl(t.afterPhoto)} alt="Resolved After Fix" className="w-full h-28 object-cover" />
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="h-28 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/50 flex items-center justify-center text-[10px] text-emerald-700 text-center p-2">
+                                Physical resolution confirmed on-site
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         <div className="text-xs text-slate-700 bg-white/80 p-2.5 rounded-lg border border-emerald-100">
                           <p className="font-semibold text-emerald-950">Work Done / Action Taken:</p>
                           <p className="text-slate-700 mt-0.5">
@@ -370,7 +484,7 @@ export default function HostelTicketingTab({ token, user }) {
                           </p>
                           {t.resolutionRemarks && (
                             <p className="text-[11px] text-slate-500 italic mt-1">
-                              "{t.resolutionRemarks}"
+                              &quot;{t.resolutionRemarks}&quot;
                             </p>
                           )}
                         </div>

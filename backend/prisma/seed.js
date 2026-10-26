@@ -51,8 +51,11 @@ async function main() {
     ]
   });
 
-  const studentHashedPassword = bcrypt.hashSync('iiitp@2024', 10);
-  const adminHashedPassword = bcrypt.hashSync('iiitp@123', 10);
+  const adminHashedPassword = bcrypt.hashSync('admin123', 10);
+  const wardenHashedPassword = bcrypt.hashSync('warden123', 10);
+  const advisorHashedPassword = bcrypt.hashSync('advisor123', 10);
+  const clearanceHashedPassword = bcrypt.hashSync('officer123', 10);
+  const securityHashedPassword = bcrypt.hashSync('security123', 10);
   const defaultHashedPassword = bcrypt.hashSync('password', 10);
 
   console.log('Seeding staff and key roles...');
@@ -74,7 +77,7 @@ async function main() {
     data: {
       email: 'security@iiitp.ac.in',
       name: 'Security Head Room',
-      passwordHash: adminHashedPassword,
+      passwordHash: securityHashedPassword,
       role: 'SECURITY',
       contactNumber: '+91 9000000002',
       userId: 'EMP203',
@@ -98,7 +101,7 @@ async function main() {
     data: {
       email: 'advisor.cse@iiitp.ac.in',
       name: 'Dr. Shrikant Salve (Faculty Advisor)',
-      passwordHash: defaultHashedPassword,
+      passwordHash: advisorHashedPassword,
       role: 'FACULTY_ADVISOR',
       contactNumber: '+91 9876543222',
       userId: 'EMP102',
@@ -110,7 +113,7 @@ async function main() {
     data: {
       email: 'warden@iiitp.ac.in',
       name: 'Prof. Ramesh Patil (Hostel Warden)',
-      passwordHash: defaultHashedPassword,
+      passwordHash: wardenHashedPassword,
       role: 'HOSTEL_WARDEN',
       contactNumber: '+91 9876543333',
       userId: 'EMP103',
@@ -122,7 +125,7 @@ async function main() {
     data: {
       email: 'clearance.officer@iiitp.ac.in',
       name: 'Mr. S. K. Sharma (Clearance Officer)',
-      passwordHash: defaultHashedPassword,
+      passwordHash: clearanceHashedPassword,
       role: 'CLEARANCE_OFFICER',
       contactNumber: '+91 9876543444',
       userId: 'EMP104',
@@ -185,7 +188,7 @@ async function main() {
       data: {
         email,
         name: s.name,
-        passwordHash: studentHashedPassword,
+        passwordHash: bcrypt.hashSync(s.mis, 10),
         role: 'STUDENT',
         contactNumber: '+91 9988776655',
         userId: s.mis,
@@ -208,7 +211,7 @@ async function main() {
       data: {
         email,
         name: s.name,
-        passwordHash: studentHashedPassword,
+        passwordHash: bcrypt.hashSync(s.mis, 10),
         role: 'STUDENT',
         contactNumber: '+91 9988776655',
         userId: s.mis,
@@ -229,7 +232,7 @@ async function main() {
     data: {
       email: '112001001@cse.iiitp.ac.in',
       name: 'Aarav Verma (Graduating Finalist)',
-      passwordHash: studentHashedPassword,
+      passwordHash: bcrypt.hashSync('112001001', 10),
       role: 'STUDENT',
       contactNumber: '+91 9876500001',
       userId: '112001001',

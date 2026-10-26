@@ -5,7 +5,8 @@ import {
   Shield, AlertTriangle, ShieldCheck, MapPin, Phone, 
   Users, Activity, Check, Plus, Trash2, Clock, 
   Award, TrendingUp, Settings, Radio, UserPlus, CheckCircle2,
-  ExternalLink, Building, CheckCircle
+  ExternalLink, Building, CheckCircle, Smartphone, PhoneCall,
+  BellRing, History, ShieldAlert, Zap
 } from 'lucide-react';
 import AnalyticsDashboard from './AnalyticsDashboard';
 import HostelTicketingTab from '../components/HostelTicketingTab';
@@ -235,6 +236,8 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
     socket.on('new_emergency', handleNewEmergency);
     socket.on('emergency_updated', handleEmergencyUpdated);
     socket.on('emergency_escalated', handleEmergencyUpdated);
+    socket.on('emergency_reassigned', handleEmergencyUpdated);
+    socket.on('emergency_all_call', handleEmergencyUpdated);
     socket.on('responder_location_updated', handleResponderLocation);
     socket.on('user_created', handleUserCreated);
 
@@ -242,6 +245,8 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
       socket.off('new_emergency', handleNewEmergency);
       socket.off('emergency_updated', handleEmergencyUpdated);
       socket.off('emergency_escalated', handleEmergencyUpdated);
+      socket.off('emergency_reassigned', handleEmergencyUpdated);
+      socket.off('emergency_all_call', handleEmergencyUpdated);
       socket.off('responder_location_updated', handleResponderLocation);
       socket.off('user_created', handleUserCreated);
     };
@@ -669,6 +674,51 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                             ></div>
                           </div>
                         </div>
+
+                        {/* Auto-Cascade SLA & Multi-Channel Dispatch Telemetry */}
+                        <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-extrabold text-slate-800 flex items-center gap-1.5">
+                              <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
+                              Responder SLA & Cascade Guard
+                            </span>
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
+                              selectedEmergency.assignments?.some(a => a.status === 'PENDING')
+                                ? 'bg-amber-100 text-amber-800 border border-amber-300 animate-pulse'
+                                : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                            }`}>
+                              {selectedEmergency.assignments?.some(a => a.status === 'PENDING')
+                                ? '25s SLA Running'
+                                : 'Officer Acknowledged'}
+                            </span>
+                          </div>
+
+                          {/* Multi-Channel Telemetry Indicators */}
+                          <div className="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+                            <div className="p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
+                              <span className="text-slate-400 font-bold block text-[8px] uppercase">SMS GATEWAY</span>
+                              <span className="text-emerald-700 font-black flex items-center justify-center gap-0.5 mt-0.5">
+                                <Smartphone className="w-2.5 h-2.5" /> Dispatched
+                              </span>
+                            </div>
+                            <div className="p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
+                              <span className="text-slate-400 font-bold block text-[8px] uppercase">IVR AUTO-DIAL</span>
+                              <span className="text-emerald-700 font-black flex items-center justify-center gap-0.5 mt-0.5">
+                                <PhoneCall className="w-2.5 h-2.5" /> Connected
+                              </span>
+                            </div>
+                            <div className="p-1.5 bg-white border border-slate-200 rounded-lg shadow-2xs">
+                              <span className="text-slate-400 font-bold block text-[8px] uppercase">DESKTOP SIREN</span>
+                              <span className="text-emerald-700 font-black flex items-center justify-center gap-0.5 mt-0.5">
+                                <BellRing className="w-2.5 h-2.5" /> Broadcast
+                              </span>
+                            </div>
+                          </div>
+
+                          <p className="text-[10px] text-slate-500 italic">
+                            * Unacknowledged dispatches auto-cascade to next ranked officer within 25 seconds.
+                          </p>
+                        </div>
                       </div>
 
                       {/* AI Distance & ERT Recommender List */}
@@ -723,6 +773,45 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
                           })}
                         </div>
                       </div>
+
+                      {/* Emergency Cascade & Escalation Trail */}
+                      {selectedEmergency.statusHistory && selectedEmergency.statusHistory.length > 0 && (
+                        <div className="p-4 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-2.5">
+                          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                            <span className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-1.5">
+                              <History className="w-3.5 h-3.5 text-slate-600" />
+                              Cascade & Escalation Trail
+                            </span>
+                            <span className="text-[9px] text-slate-500 font-bold">
+                              {selectedEmergency.statusHistory.length} Events
+                            </span>
+                          </div>
+
+                          <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1 text-xs">
+                            {selectedEmergency.statusHistory.map((hist, idx) => (
+                              <div key={idx} className="p-2 bg-slate-50 border border-slate-150 rounded-lg space-y-1">
+                                <div className="flex items-center justify-between text-[10px]">
+                                  <span className={`font-black uppercase px-1.5 py-0.2 rounded text-[8.5px] ${
+                                    hist.note?.includes('auto-cascaded') || hist.note?.includes('expired')
+                                      ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                                      : hist.note?.includes('escalated')
+                                      ? 'bg-red-100 text-red-800 border border-red-200'
+                                      : 'bg-slate-200 text-slate-700'
+                                  }`}>
+                                    {hist.status.replace(/_/g, ' ')}
+                                  </span>
+                                  <span className="text-slate-400 font-mono text-[9px]">
+                                    {new Date(hist.timestamp).toLocaleTimeString()}
+                                  </span>
+                                </div>
+                                <p className="text-[10.5px] text-slate-700 leading-snug">
+                                  {hist.note}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     {/* Right: Spot Location & Direct Response Console */}

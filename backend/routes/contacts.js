@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { authenticateToken } from '../middleware/auth.js';
+import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -18,7 +18,7 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // POST add a contact (Admin only)
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, authorizeRoles('ADMIN'), async (req, res) => {
   try {
     const { name, number, department } = req.body;
     if (!name || !number || !department) {
@@ -45,7 +45,7 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // DELETE a contact (Admin only)
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, authorizeRoles('ADMIN'), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const contact = await prisma.emergencyContact.findUnique({ where: { id } });

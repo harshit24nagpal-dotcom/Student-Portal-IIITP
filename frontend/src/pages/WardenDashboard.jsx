@@ -8,7 +8,8 @@ import {
   Building, CheckCircle2, XCircle, Clock, AlertTriangle, 
   FileText, Download, User, RefreshCw, CheckSquare, XSquare,
   LogOut, LogIn, Calendar, Utensils, Wrench, ShieldCheck, 
-  MessageSquare, Users, Leaf, ArrowRight, Eye, ShieldAlert, Check
+  MessageSquare, Users, Leaf, ArrowRight, Eye, ShieldAlert, Check,
+  Camera, Upload, Image as ImageIcon
 } from 'lucide-react';
 
 export default function WardenDashboard() {
@@ -46,6 +47,38 @@ export default function WardenDashboard() {
   const [proofText, setProofText] = useState('');
   const [resolutionRemarks, setResolutionRemarks] = useState('');
   const [technicianName, setTechnicianName] = useState('Technician Ramesh (Hostel Services)');
+  const [beforePhoto, setBeforePhoto] = useState('');
+  const [afterPhoto, setAfterPhoto] = useState('');
+  const [uploadingBefore, setUploadingBefore] = useState(false);
+  const [uploadingAfter, setUploadingAfter] = useState(false);
+
+  const handleUploadPhoto = async (file, type) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    if (type === 'before') setUploadingBefore(true);
+    else setUploadingAfter(true);
+
+    try {
+      const res = await fetch(`${API_URL}/files/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.file?.filePath) {
+        if (type === 'before') setBeforePhoto(data.file.filePath);
+        else setAfterPhoto(data.file.filePath);
+      } else {
+        setError(data.error || 'Failed to upload photo');
+      }
+    } catch (err) {
+      setError('Network error during photo upload');
+    } finally {
+      if (type === 'before') setUploadingBefore(false);
+      else setUploadingAfter(false);
+    }
+  };
 
   // 6. Complaints state
   const [complaints, setComplaints] = useState([]);
@@ -241,7 +274,9 @@ export default function WardenDashboard() {
           status: 'RESOLVED',
           proofOfResolution: proofText,
           resolutionRemarks,
-          resolvedBy: technicianName
+          resolvedBy: technicianName,
+          beforePhoto,
+          afterPhoto
         })
       });
 
@@ -250,6 +285,8 @@ export default function WardenDashboard() {
         setResolvingTicket(null);
         setProofText('');
         setResolutionRemarks('');
+        setBeforePhoto('');
+        setAfterPhoto('');
         fetchTickets();
       }
     } catch (err) {
@@ -382,18 +419,6 @@ export default function WardenDashboard() {
         </button>
 
         <button
-          onClick={() => setActiveTab('inout')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
-            activeTab === 'inout'
-              ? 'bg-amber-600 text-white shadow-sm'
-              : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
-          }`}
-        >
-          <LogOut className="w-4 h-4" />
-          <span>In/Out Gate Monitor ({gateData.outCount} Out)</span>
-        </button>
-
-        <button
           onClick={() => setActiveTab('mess')}
           className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
             activeTab === 'mess'
@@ -490,16 +515,57 @@ export default function WardenDashboard() {
 
                     {/* Proof of Resolution section if resolved */}
                     {isResolved && (
-                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-1">
+                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-2">
                         <span className="text-[10px] font-black uppercase text-emerald-800 flex items-center gap-1">
                           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                           Proof of Resolution Verified
                         </span>
+
+                        {/* Before & After Photos Side-by-Side */}
+                        {(t.beforePhoto || t.afterPhoto) && (
+                          <div className="grid grid-cols-2 gap-2 pt-1 pb-1">
+                            {t.beforePhoto ? (
+                              <div className="space-y-1">
+                                <span className="text-[9px] font-black uppercase text-amber-800 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-300 block text-center">
+                                  Before Fix
+                                </span>
+                                <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border border-slate-200 hover:opacity-90">
+                                  <img src={getFileUrl(t.beforePhoto)} alt="Before Fix" className="w-full h-24 object-cover" />
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="h-24 rounded-lg border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 text-center p-2">
+                                No before photo attached
+                              </div>
+                            )}
+
+                            {t.afterPhoto ? (
+                              <div className="space-y-1">
+                                <span className="text-[9px] font-black uppercase text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300 block text-center">
+                                  After Completion ✓
+                                </span>
+                                <a href={getFileUrl(t.afterPhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border border-emerald-300 hover:opacity-90">
+                                  <img src={getFileUrl(t.afterPhoto)} alt="After Completion" className="w-full h-24 object-cover" />
+                                </a>
+                              </div>
+                            ) : (
+                              <div className="h-24 rounded-lg border border-dashed border-emerald-200 bg-emerald-50/50 flex items-center justify-center text-[10px] text-emerald-600 text-center p-2">
+                                Verified on-site
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         <p className="text-slate-700 text-[11px] font-medium">
                           {t.proofOfResolution}
                         </p>
+                        {t.resolutionRemarks && (
+                          <p className="text-[10px] text-slate-500 italic">
+                            &quot;{t.resolutionRemarks}&quot;
+                          </p>
+                        )}
                         <p className="text-[10px] text-slate-500 pt-0.5">
-                          Technician: <strong>{t.resolvedBy || 'Hostel Maintenance'}</strong>
+                          Technician: <strong>{t.resolvedBy || 'Hostel Maintenance'}</strong> • {t.resolvedAt ? new Date(t.resolvedAt).toLocaleDateString() : 'Completed'}
                         </p>
                       </div>
                     )}
@@ -510,7 +576,11 @@ export default function WardenDashboard() {
                       <button
                         onClick={() => {
                           setResolvingTicket(t);
-                          setProofText(`Repaired ${t.category.toLowerCase()} issue in ${t.roomNumber}. Replaced parts tested on-site.`);
+                          setProofText(t.proofOfResolution || `Repaired ${t.category.toLowerCase()} issue in ${t.roomNumber}. Replaced parts tested on-site.`);
+                          setResolutionRemarks(t.resolutionRemarks || '');
+                          setTechnicianName(t.resolvedBy || 'Technician Ramesh (Hostel Services)');
+                          setBeforePhoto(t.beforePhoto || '');
+                          setAfterPhoto(t.afterPhoto || '');
                         }}
                         className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer transition-all"
                       >
@@ -552,12 +622,88 @@ export default function WardenDashboard() {
             </div>
 
             <form onSubmit={handleResolveTicket} className="space-y-3.5">
+              {/* BEFORE & AFTER PHOTO UPLOAD SECTION */}
+              <div className="space-y-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                  <Camera className="w-4 h-4 text-[#1c398e]" />
+                  Resolution Proof: Before & After Photos
+                </span>
+                
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  {/* 1. Before Fix Photo */}
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold uppercase text-slate-600 block">
+                      1. Before Fix Photo
+                    </span>
+                    {beforePhoto ? (
+                      <div className="relative group rounded-lg overflow-hidden border border-slate-300">
+                        <img src={getFileUrl(beforePhoto)} alt="Before Fix" className="w-full h-24 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setBeforePhoto('')}
+                          className="absolute top-1 right-1 p-1 bg-red-600 hover:bg-red-700 text-white rounded-full text-[10px] shadow cursor-pointer"
+                          title="Remove before photo"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 rounded-lg hover:border-[#1c398e] bg-white cursor-pointer transition-all p-2 text-center">
+                        <Upload className="w-4 h-4 text-slate-400 mb-1" />
+                        <span className="text-[10px] font-bold text-slate-600">
+                          {uploadingBefore ? 'Uploading...' : 'Upload Before Photo'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => e.target.files?.[0] && handleUploadPhoto(e.target.files[0], 'before')}
+                        />
+                      </label>
+                    )}
+                  </div>
+
+                  {/* 2. After Fix Photo */}
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold uppercase text-emerald-800 block">
+                      2. After Completion Photo *
+                    </span>
+                    {afterPhoto ? (
+                      <div className="relative group rounded-lg overflow-hidden border border-emerald-400">
+                        <img src={getFileUrl(afterPhoto)} alt="After Fix" className="w-full h-24 object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setAfterPhoto('')}
+                          className="absolute top-1 right-1 p-1 bg-red-600 hover:bg-red-700 text-white rounded-full text-[10px] shadow cursor-pointer"
+                          title="Remove after photo"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-emerald-300 rounded-lg hover:border-emerald-600 bg-emerald-50/30 cursor-pointer transition-all p-2 text-center">
+                        <Camera className="w-4 h-4 text-emerald-600 mb-1" />
+                        <span className="text-[10px] font-bold text-emerald-700">
+                          {uploadingAfter ? 'Uploading...' : 'Upload After Photo'}
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => e.target.files?.[0] && handleUploadPhoto(e.target.files[0], 'after')}
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
                   Proof of Resolution (Mandatory) *
                 </label>
                 <textarea
-                  rows="3"
+                  rows="2"
                   required
                   placeholder="Describe technical work done, replacement parts installed, meter tests, or physical inspection confirmation..."
                   value={proofText}
@@ -695,78 +841,6 @@ export default function WardenDashboard() {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* =================================================================== */}
-      {/* 3. DIGITAL IN / OUT GATE MONITOR                                    */}
-      {/* =================================================================== */}
-      {activeTab === 'inout' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">
-              Campus Gate Movement Live Feed ({gateData.allLogs?.length || 0} Events)
-            </h3>
-            <button
-              onClick={fetchGateLogs}
-              className="text-xs text-[#5367c8] hover:text-[#1c398e] flex items-center gap-1 font-semibold cursor-pointer"
-            >
-              <RefreshCw className="w-3 h-3" />
-              <span>Refresh</span>
-            </button>
-          </div>
-
-          <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1">
-            {gateData.allLogs?.map((log) => {
-              const isOut = log.direction === 'OUT';
-              return (
-                <div
-                  key={log.id}
-                  className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 shadow-2xs"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-xl ${isOut ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
-                      {isOut ? <LogOut className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase rounded ${
-                          isOut ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                        }`}>
-                          {log.direction} PASS
-                        </span>
-                        <span className="text-xs font-bold text-slate-900">
-                          {log.student?.name} (MIS: {log.student?.userId})
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-600 mt-0.5">
-                        Destination: <strong>{log.destination}</strong> • Via {log.gateNumber}
-                      </p>
-                      <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                        {new Date(log.timestamp).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span className={`inline-block px-2 py-0.5 text-[10px] font-bold uppercase rounded-full ${
-                      log.status === 'OUT' ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-slate-100 text-slate-600'
-                    }`}>
-                      {log.status === 'OUT' ? 'Currently Outside' : 'Returned'}
-                    </span>
-                    {log.status === 'OUT' && (
-                      <button
-                        onClick={() => handleMarkReturned(log.id)}
-                        className="block mt-1 text-[10px] text-emerald-700 font-bold underline cursor-pointer"
-                      >
-                        Force Mark Return
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       )}

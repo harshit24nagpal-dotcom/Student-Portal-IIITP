@@ -34,6 +34,21 @@ router.post('/', authenticateToken, async (req, res) => {
       io.emit('complaint_event', { type: 'COMPLAINT_SUBMITTED', data: complaint });
     }
 
+    // Persist notification for relevant staff
+    const targetRoles = category.toUpperCase() === 'HOSTEL' ? ['HOSTEL_WARDEN', 'ADMIN'] : ['ADMIN', 'FACULTY_ADVISOR'];
+    const staffRecipients = await prisma.user.findMany({ where: { role: { in: targetRoles } } });
+    for (const s of staffRecipients) {
+      await prisma.notification.create({
+        data: {
+          recipientId: s.id,
+          title: `New Grievance: ${subject}`,
+          message: `${isAnonymous ? 'Anonymous Student' : req.user.name} submitted a grievance under category ${category}.`,
+          type: 'INFO',
+          category: 'COMPLAINT'
+        }
+      }).catch(() => {});
+    }
+
     res.status(201).json(complaint);
   } catch (error) {
     console.error('Complaint submission error:', error);
@@ -107,6 +122,17 @@ router.put('/:id/status', authenticateToken, authorizeRoles('ADMIN', 'HOSTEL_WAR
     if (io) {
       io.emit('complaint_event', { type: 'COMPLAINT_UPDATED', data: updated });
     }
+
+    // Persist notification for student
+    await prisma.notification.create({
+      data: {
+        recipientId: updated.studentId,
+        title: `Grievance Status: ${status || 'RESOLVED'}`,
+        message: `Your grievance regarding "${updated.subject}" has been marked ${status || 'RESOLVED'}. Admin Remarks: ${adminRemarks || 'Resolution applied.'}`,
+        type: status === 'RESOLVED' ? 'SUCCESS' : 'INFO',
+        category: 'COMPLAINT'
+      }
+    }).catch(() => {});
 
     res.json(updated);
   } catch (error) {

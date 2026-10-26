@@ -135,6 +135,61 @@ export default function FacultyDashboard() {
     setAttendanceState(updated);
   };
 
+  const downloadAttendanceSheetCSV = () => {
+    if (!students || students.length === 0) {
+      setErrorMessage('No student roster loaded to export.');
+      return;
+    }
+    const selectedSub = subjectsList.find(s => s.code === selectedSubjectCode && s.section === selectedSection);
+    const subName = selectedSub?.name || selectedSubjectCode || 'Subject';
+    
+    const pCount = Object.values(attendanceState).filter(s => s === 'PRESENT').length;
+    const aCount = Object.values(attendanceState).filter(s => s === 'ABSENT').length;
+    const ratePct = students.length > 0 ? ((pCount / students.length) * 100).toFixed(1) : '0';
+
+    const headers = ['S.No', 'MIS / Roll No', 'Student Name', 'Branch / Department', 'Attendance Status'];
+    const rows = students.map((s, idx) => {
+      const st = attendanceState[s.id] || 'PRESENT';
+      return [
+        idx + 1,
+        `"${s.userId || ''}"`,
+        `"${s.name || ''}"`,
+        `"${s.department || ''}"`,
+        st
+      ].join(',');
+    });
+
+    const csvContent = [
+      `"INDIAN INSTITUTE OF INFORMATION TECHNOLOGY PUNE"`,
+      `"ACADEMIC DAILY ATTENDANCE ROSTER SHEET"`,
+      `"Subject Code:","${selectedSubjectCode}"`,
+      `"Subject Name:","${subName}"`,
+      `"Section:","${selectedSection}"`,
+      `"Date:","${attendanceDate}"`,
+      `"Total Enrolled:","${students.length}"`,
+      `"Present:","${pCount}"`,
+      `"Absent:","${aCount}"`,
+      `"Attendance Rate:","${ratePct}%"`,
+      `"Exported Date:","${new Date().toLocaleString()}"`,
+      ``,
+      headers.join(','),
+      ...rows
+    ].join('\r\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const safeDate = attendanceDate || new Date().toISOString().split('T')[0];
+    const safeSub = (selectedSubjectCode || 'SUBJECT').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const safeSec = (selectedSection || 'SEC').replace(/[^a-zA-Z0-9_-]/g, '_');
+    link.setAttribute('download', `Attendance_Sheet_${safeSub}_${safeSec}_${safeDate}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const handleSaveAttendance = async () => {
     if (!selectedSubjectCode || !selectedSection || !attendanceDate) {
       setErrorMessage('Please select subject, section, and date');
@@ -169,7 +224,9 @@ export default function FacultyDashboard() {
 
       const data = await res.json();
       if (res.ok) {
-        setSuccessMessage(`Successfully saved attendance for ${selectedSubjectCode} on ${attendanceDate}!`);
+        // Automatically save/download sheet to local computer
+        downloadAttendanceSheetCSV();
+        setSuccessMessage(`Successfully saved attendance to database & saved sheet to your local computer!`);
       } else {
         setErrorMessage(data.error || 'Failed to save attendance');
       }
@@ -376,15 +433,29 @@ export default function FacultyDashboard() {
               </table>
             </div>
 
-            <div className="pt-4 border-t border-slate-100 flex justify-end">
-              <button
-                onClick={handleSaveAttendance}
-                disabled={saving}
-                className="px-5 py-2.5 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all"
-              >
-                <Save className="w-4 h-4" />
-                {saving ? 'Saving Sheet...' : 'Submit & Save Attendance Sheet'}
-              </button>
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
+              <span className="text-xs text-slate-500 flex items-center gap-1.5">
+                <span className="text-emerald-600 font-bold">✓ Auto-Export:</span> Attendance sheet automatically saves to your local computer upon submitting.
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={downloadAttendanceSheetCSV}
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider border border-slate-200 flex items-center gap-2 cursor-pointer transition-all"
+                  title="Export Attendance Sheet directly to local computer"
+                >
+                  <Download className="w-4 h-4 text-slate-600" />
+                  Save Sheet to Computer (CSV)
+                </button>
+                <button
+                  onClick={handleSaveAttendance}
+                  disabled={saving}
+                  className="px-5 py-2.5 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? 'Saving Sheet...' : 'Submit & Save Attendance Sheet'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
