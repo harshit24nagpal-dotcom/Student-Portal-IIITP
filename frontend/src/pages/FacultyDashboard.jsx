@@ -271,7 +271,7 @@ export default function FacultyDashboard() {
   const absentCount = Object.values(attendanceState).filter(s => s === 'ABSENT').length;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-800">
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800 overflow-x-hidden">
       {/* Header */}
       <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>

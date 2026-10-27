@@ -6,7 +6,7 @@ import {
   MapPin, Phone, User, Clock, AlertTriangle, Shield, CheckCircle,
   BookOpen, Building, Calendar, GraduationCap, Sparkles, Send, Award, 
   CheckCircle2, ChevronRight, FileCheck, CheckSquare, AlertOctagon,
-  ChevronLeft, ChevronRight as ChevronRightIcon, ExternalLink, Mail, Hash, BookMarked, Download
+  ChevronLeft, ChevronRight as ChevronRightIcon, ExternalLink, Mail, Hash, BookMarked, Download, PhoneCall
 } from 'lucide-react';
 import SOSModal from '../components/SOSModal';
 import SemesterRegistrationTab from '../components/SemesterRegistrationTab';
@@ -192,10 +192,61 @@ export default function StudentDashboard() {
   const selectedDateLectures = historyByDate[selectedCalendarDate] || [];
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-800 bg-slate-50 min-h-[calc(100vh-65px)]">
+    <div className="p-3 sm:p-6 pb-24 sm:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800 bg-slate-50 min-h-[calc(100vh-65px)] overflow-x-hidden">
       
+      {/* 1-CLICK EMERGENCY ASSISTANCE & SPEED-DIAL BAR */}
+      <div className="p-3.5 sm:p-4 rounded-2xl border border-red-200 bg-linear-to-r from-red-50 via-white to-amber-50 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-xs shrink-0 animate-pulse">
+            <ShieldAlert className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-black uppercase text-red-700 tracking-wider">
+                24x7 CAMPUS EMERGENCY SOS & DIRECT SPEED-DIAL
+              </span>
+              <span className="hidden sm:inline-block px-1.5 py-0.2 bg-red-100 text-red-800 font-bold text-[8px] rounded uppercase">
+                1-Click Call
+              </span>
+            </div>
+            <p className="text-xs font-black text-slate-900 leading-tight">
+              In danger or need immediate help? Trigger CAD Broadcast or call direct:
+            </p>
+          </div>
+        </div>
+
+        {/* 1-Click Direct Phone Helpline Buttons */}
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <a
+            href="tel:9826381867"
+            className="flex-1 sm:flex-none px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+            title="Call Campus Security QRT"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            <span>Call Security</span>
+          </a>
+
+          <a
+            href="tel:9826381867"
+            className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+            title="Call Campus Ambulance"
+          >
+            <PhoneCall className="w-3.5 h-3.5" />
+            <span>Ambulance</span>
+          </a>
+
+          <button
+            onClick={() => setIsSosOpen(true)}
+            className="flex-1 sm:flex-none px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-800"
+          >
+            <AlertOctagon className="w-3.5 h-3.5 text-red-400" />
+            <span>Open SOS Console</span>
+          </button>
+        </div>
+      </div>
+
       {/* Top Greeting Header */}
-      <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-4 sm:p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-blue-50 border border-blue-200 text-[#0c2340] text-[10px] font-black uppercase rounded tracking-wider">
@@ -205,7 +256,7 @@ export default function StudentDashboard() {
               MIS: {user?.userId || '112415079'}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 mt-1 tracking-tight">
             Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name || 'Student'}!
           </h2>
           <p className="text-xs text-slate-500 mt-0.5 font-medium">
@@ -225,7 +276,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* PRIMARY DIVISION SWITCHER: 3 PILLARS */}
-      <div className="p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs grid grid-cols-1 md:grid-cols-3 gap-2">
+      <div className="p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs grid grid-cols-1 sm:grid-cols-3 gap-2">
         <button
           onClick={() => {
             setActivePortalDivision('academic');
@@ -1141,10 +1192,11 @@ export default function StudentDashboard() {
                       <span className="font-mono text-xs font-bold text-slate-800">{contact.number}</span>
                       <a
                         href={`tel:${contact.number.split('/')[0].trim()}`}
-                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-xs flex items-center justify-center transition-colors"
+                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-xl shadow-xs flex items-center gap-1.5 transition-transform active:scale-95"
                         title="Call Line"
                       >
                         <Phone className="w-3.5 h-3.5" />
+                        <span>Call</span>
                       </a>
                     </div>
                   </div>
@@ -1371,10 +1423,11 @@ export default function StudentDashboard() {
                       <span className="font-mono text-xs font-bold text-slate-800">{contact.number}</span>
                       <a
                         href={`tel:${contact.number.split('/')[0].trim()}`}
-                        className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-xs flex items-center justify-center transition-colors"
+                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-xl shadow-xs flex items-center gap-1.5 transition-transform active:scale-95"
                         title="Call Line"
                       >
                         <Phone className="w-3.5 h-3.5" />
+                        <span>Call</span>
                       </a>
                     </div>
                   </div>
@@ -1384,6 +1437,34 @@ export default function StudentDashboard() {
           </div>
         </div>
       )}
+
+      {/* MOBILE STICKY FLOATING QUICK CALL & SOS ACTION BAR (PHONE-ONLY) */}
+      <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-between gap-2 shadow-[0_-4px_25px_rgba(0,0,0,0.12)]">
+        <button
+          onClick={() => setIsSosOpen(true)}
+          className="flex-1 py-2.5 bg-red-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all animate-pulse cursor-pointer"
+        >
+          <ShieldAlert className="w-4 h-4" />
+          <span>SOS ALERT</span>
+        </button>
+
+        <a
+          href="tel:9826381867"
+          className="flex-1 py-2.5 bg-emerald-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+        >
+          <Phone className="w-4 h-4" />
+          <span>CALL SECURITY</span>
+        </a>
+
+        <a
+          href="tel:9826381867"
+          className="px-3.5 py-2.5 bg-[#0c2340] text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer"
+          title="Campus Ambulance"
+        >
+          <PhoneCall className="w-4 h-4 text-emerald-400" />
+          <span>AMB</span>
+        </a>
+      </div>
 
       {/* Global SOS Modal trigger */}
       <SOSModal isOpen={isSosOpen} onClose={() => setIsSosOpen(false)} onSOSTriggered={() => {}} />

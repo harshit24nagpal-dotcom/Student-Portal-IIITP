@@ -397,19 +397,19 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-65px)] font-sans text-slate-800 bg-slate-50">
       {/* Sidebar Navigation */}
-      <nav className="w-full lg:w-60 bg-white border-r border-slate-200 flex flex-col justify-between py-6 shrink-0 shadow-xs">
-        <div className="space-y-6">
-          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider px-6">
+      <nav className="w-full lg:w-60 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col justify-between py-3 lg:py-6 shrink-0 shadow-xs">
+        <div className="space-y-3 lg:space-y-6">
+          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider px-3 lg:px-6">
             COMMAND PORTALS
           </p>
 
-          <div className="flex flex-col px-3 gap-1">
+          <div className="flex flex-row lg:flex-col px-3 gap-1 overflow-x-auto whitespace-nowrap lg:whitespace-normal pb-1 lg:pb-0 scrollbar-none">
             <button
               onClick={() => setActiveTab('live')}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+              className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-2 lg:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                 activeTab === 'live' 
-                  ? 'bg-red-50 text-red-700 border border-red-200' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-red-50 text-red-700 border border-red-200 shadow-xs' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
               <Activity className="w-4 h-4 text-red-600" />
@@ -423,10 +423,10 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
             <button
               onClick={() => setActiveTab('responders')}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+              className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-2 lg:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                 activeTab === 'responders' 
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
               <Users className="w-4 h-4 text-emerald-600" />
@@ -435,10 +435,10 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
             <button
               onClick={() => setActiveTab('locations')}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+              className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-2 lg:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                 activeTab === 'locations' 
-                  ? 'bg-amber-50 text-amber-800 border border-amber-200' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-amber-50 text-amber-800 border border-amber-200 shadow-xs' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
               <MapPin className="w-4 h-4 text-amber-600" />
@@ -447,10 +447,10 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
             <button
               onClick={() => setActiveTab('contacts')}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+              className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-2 lg:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                 activeTab === 'contacts' 
-                  ? 'bg-blue-50 text-blue-700 border border-blue-200' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-xs' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
               <Phone className="w-4 h-4 text-[#0c2340]" />
@@ -459,10 +459,10 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
             <button
               onClick={() => setActiveTab('users')}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+              className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-2 lg:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                 activeTab === 'users' 
-                  ? 'bg-purple-50 text-purple-700 border border-purple-200' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-xs' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
               <UserPlus className="w-4 h-4 text-purple-600" />
@@ -474,28 +474,29 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
             <button
               onClick={() => setActiveTab('analytics')}
-              className={`w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+              className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-2 lg:py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                 activeTab === 'analytics' 
-                  ? 'bg-[#0c2340] text-white' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                  ? 'bg-[#0c2340] text-white shadow-xs' 
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
               }`}
             >
               <TrendingUp className="w-4 h-4 text-blue-600" />
-              <span>System Analytics</span>
+              <span>Analytics</span>
             </button>
           </div>
 
-            <div className="pt-2 border-t border-slate-100">
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider px-3 mb-1">
-                HOSTEL & CAMPUS LIFE
-              </p>
+          <div className="pt-2 border-t border-slate-100">
+            <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider px-3 lg:px-6 mb-1">
+              HOSTEL & CAMPUS LIFE
+            </p>
 
+            <div className="flex flex-row lg:flex-col px-3 gap-1 overflow-x-auto whitespace-nowrap lg:whitespace-normal scrollbar-none">
               <button
                 onClick={() => setActiveTab('hostel_tickets')}
-                className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                   activeTab === 'hostel_tickets' 
-                    ? 'bg-amber-50 text-amber-800 border border-amber-200' 
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-amber-50 text-amber-800 border border-amber-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
                 }`}
               >
                 <Wrench className="w-4 h-4 text-amber-600" />
@@ -504,39 +505,39 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
 
               <button
                 onClick={() => setActiveTab('complaints')}
-                className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                   activeTab === 'complaints' 
-                    ? 'bg-red-50 text-red-700 border border-red-200' 
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-red-50 text-red-700 border border-red-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
                 }`}
               >
                 <MessageSquare className="w-4 h-4 text-red-600" />
-                <span>Campus Grievances</span>
+                <span>Grievances</span>
               </button>
 
               <button
                 onClick={() => setActiveTab('lostfound')}
-                className={`w-full text-left px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2.5 transition-colors cursor-pointer ${
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
                   activeTab === 'lostfound' 
-                    ? 'bg-purple-50 text-purple-700 border border-purple-200' 
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-purple-50 text-purple-700 border border-purple-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
                 }`}
               >
                 <Tag className="w-4 h-4 text-purple-600" />
                 <span>Lost & Found</span>
               </button>
             </div>
-
+          </div>
         </div>
 
-        <div className="px-6 text-xxs text-slate-400 font-medium space-y-0.5">
+        <div className="hidden lg:block px-6 text-xxs text-slate-400 font-medium space-y-0.5">
           <p>Portal: v1.0.4 - Localhost</p>
           <p>Engine: Express • SQLite</p>
         </div>
       </nav>
 
       {/* Main Content Area */}
-      <div className="flex-grow p-6 overflow-y-auto">
+      <div className="flex-grow p-3 sm:p-6 overflow-y-auto overflow-x-hidden">
         
         {/* Tab 1: Live Incident Command Center */}
         {activeTab === 'live' && (

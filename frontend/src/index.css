@@ -3,11 +3,24 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     background-color: #f8fafc;
     color: #0f172a;
     font-family: 'Outfit', 'Inter', sans-serif;
   }
+}
+
+/* Hide scrollbar for clean horizontal swipeable tabs on phone */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Scrollbar customization */

@@ -419,7 +419,7 @@ export default function Login() {
               Hospital: <a href="https://www.harneshwarhospital.com/" target="_blank" rel="noreferrer" className="font-bold text-blue-700 hover:underline">Harneshwar Hospital</a>
             </p>
             <p>
-              Main Campus Security: <span className="font-mono font-bold text-slate-700">020-23456789</span> • Student Grievance: <span className="font-mono font-bold text-slate-700">020-23456711</span>
+              Main Campus Security: <a href="tel:02023456789" className="font-mono font-bold text-slate-800 hover:underline">020-23456789</a> • Student Grievance: <a href="tel:02023456711" className="font-mono font-bold text-slate-800 hover:underline">020-23456711</a>
             </p>
           </div>
         </div>

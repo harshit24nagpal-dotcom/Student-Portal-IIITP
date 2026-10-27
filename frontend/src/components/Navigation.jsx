@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import SOSModal from './SOSModal';
-import { Shield, LogOut, Radio, ChevronDown, Check, X } from 'lucide-react';
+import { Shield, LogOut, Radio, ChevronDown, Check, X, Phone, PhoneCall } from 'lucide-react';
 
 export default function Navigation({ activeTab, setActiveTab }) {
   const { user, logout, quickLogin } = useAuth();
@@ -131,10 +131,20 @@ export default function Navigation({ activeTab, setActiveTab }) {
             )}
           </div>
 
+          {/* 1-Click Phone Call Helpline (Direct Phone Calling) */}
+          <a
+            href="tel:9826381867"
+            className="px-2.5 sm:px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center gap-1 cursor-pointer active:scale-95 transition-all"
+            title="Instant 1-Click Call Campus Control (+91 9826381867)"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Call Help</span>
+          </a>
+
           {/* PULSING GLOBAL EMERGENCY BUTTON */}
           <button
             onClick={() => setIsSosOpen(true)}
-            className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer animate-pulse"
+            className="px-2.5 sm:px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center gap-1.5 cursor-pointer animate-pulse"
           >
             <Shield className="w-3.5 h-3.5" />
             <span>SOS</span>
