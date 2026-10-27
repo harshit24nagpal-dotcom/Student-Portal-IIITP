@@ -29,14 +29,25 @@ export default function Login() {
   const demoAccounts = [
     {
       role: 'STUDENT',
-      title: 'Student Portal',
+      title: 'Continuing Student',
       name: 'Harshit Nagpal',
       mis: '112415079',
       dept: 'B.Tech CSE (3rd Sem)',
       identifier: '112415079',
       password: '112415079',
-      badge: 'STUDENT',
+      badge: 'CONTINUING (SEM 3)',
       color: 'blue'
+    },
+    {
+      role: 'STUDENT',
+      title: 'Graduating Finalist',
+      name: 'Aarav Verma',
+      mis: '112001001',
+      dept: 'B.Tech CSE (8th Sem / Final)',
+      identifier: '112001001',
+      password: '112001001',
+      badge: 'FINAL YEAR (SEM 8)',
+      color: 'amber'
     },
     {
       role: 'HOSTEL_WARDEN',
@@ -368,13 +379,20 @@ export default function Login() {
           {/* Direct Instant Login Pills */}
           <div className="mt-3 flex items-center justify-between gap-1 flex-wrap pt-2 border-t border-slate-100">
             <span className="text-[9px] font-bold text-slate-400 uppercase">Instant Login:</span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap">
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('STUDENT')}
+                onClick={() => handleAutofill(demoAccounts[0])}
                 className="px-2 py-0.5 bg-blue-50 hover:bg-[#0c2340] hover:text-white text-blue-900 border border-blue-200 rounded text-[10px] font-bold transition-all cursor-pointer"
               >
-                Student
+                Student (Sem 3)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAutofill(demoAccounts[1])}
+                className="px-2 py-0.5 bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-900 border border-amber-300 rounded text-[10px] font-bold transition-all cursor-pointer"
+              >
+                Graduating (Sem 8)
               </button>
               <button
                 type="button"
