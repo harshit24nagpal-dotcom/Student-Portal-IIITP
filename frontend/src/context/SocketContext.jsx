@@ -40,7 +40,7 @@ export function SocketProvider({ children }) {
       addAlert({
         id: Date.now(),
         type: 'danger',
-        title: '🚨 NEW SOS TRIGGERED!',
+        title: 'NEW SOS DISPATCH TRIGGERED',
         message: `${data.emergency.reporterName} reported: ${data.emergency.type} at ${data.emergency.manualLocation || 'GPS coordinates'}`,
         timestamp: new Date(),
       });
@@ -51,7 +51,7 @@ export function SocketProvider({ children }) {
       addAlert({
         id: Date.now(),
         type: 'info',
-        title: '🔄 Emergency Status Update',
+        title: 'Emergency Status Update',
         message: `Incident ${data.requestId} is now: ${data.status.replace(/_/g, ' ')}`,
         timestamp: new Date(),
       });
@@ -65,7 +65,7 @@ export function SocketProvider({ children }) {
       addAlert({
         id: Date.now(),
         type: 'warning',
-        title: `🚨 EMERGENCY ESCALATED (LEVEL ${data.escalationLevel})`,
+        title: `EMERGENCY ESCALATED (LEVEL ${data.escalationLevel})`,
         message: `Incident ${data.requestId} has been escalated: ${data.reason}`,
         timestamp: new Date(),
       });

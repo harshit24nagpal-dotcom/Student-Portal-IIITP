@@ -87,9 +87,9 @@ export default function PlacementDriveTab({ token, user }) {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3.5">
-          <div className="p-3 bg-blue-100 text-[#1c398e] rounded-2xl">
+          <div className="p-3 bg-blue-100 text-[#1c398e] rounded-md">
             <Briefcase className="w-6 h-6" />
           </div>
           <div>
@@ -111,16 +111,16 @@ export default function PlacementDriveTab({ token, user }) {
         </div>
 
         {/* Student Credential Capsule */}
-        <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-2xl shrink-0">
-          <div className="px-3 py-1 bg-white rounded-xl border border-slate-200 text-center">
+        <div className="flex items-center gap-2 p-2 bg-slate-50 border border-slate-200 rounded-md shrink-0">
+          <div className="px-3 py-1 bg-white rounded-md border border-slate-200 text-center">
             <span className="text-[9px] font-bold uppercase text-slate-400 block">Verified CGPA</span>
             <span className="text-sm font-black text-[#1c398e] font-mono">{studentStats?.cgpa || '8.65'}</span>
           </div>
-          <div className="px-3 py-1 bg-white rounded-xl border border-slate-200 text-center">
+          <div className="px-3 py-1 bg-white rounded-md border border-slate-200 text-center">
             <span className="text-[9px] font-bold uppercase text-slate-400 block">Active Backlogs</span>
             <span className="text-sm font-black text-emerald-600 font-mono">{studentStats?.activeBacklogs || 0}</span>
           </div>
-          <div className="px-3 py-1 bg-white rounded-xl border border-slate-200 text-center">
+          <div className="px-3 py-1 bg-white rounded-md border border-slate-200 text-center">
             <span className="text-[9px] font-bold uppercase text-slate-400 block">Branch</span>
             <span className="text-sm font-black text-slate-800 font-mono">{studentStats?.branch || 'CSE'}</span>
           </div>
@@ -128,14 +128,14 @@ export default function PlacementDriveTab({ token, user }) {
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
           {error}
         </div>
@@ -146,14 +146,14 @@ export default function PlacementDriveTab({ token, user }) {
         <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           {[
             { id: 'ALL', label: 'All Opportunities' },
-            { id: 'ELIGIBLE_ONLY', label: '🟢 Eligible Only' },
+            { id: 'ELIGIBLE_ONLY', label: 'Eligible Only' },
             { id: 'FULL_TIME', label: 'Full-Time (FTE)' },
             { id: 'INTERNSHIP', label: 'Summer Internships' }
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setFilterType(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 filterType === tab.id
                   ? 'bg-[#0c2340] text-white shadow-2xs'
                   : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -180,7 +180,7 @@ export default function PlacementDriveTab({ token, user }) {
           Filtering student profile and computing drive eligibility...
         </div>
       ) : filteredDrives.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl text-slate-500 text-xs">
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-md text-slate-500 text-xs">
           No placement opportunities match the selected filter.
         </div>
       ) : (
@@ -192,7 +192,7 @@ export default function PlacementDriveTab({ token, user }) {
             return (
               <div
                 key={drive.id}
-                className={`p-5 rounded-2xl border bg-white shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4 ${
+                className={`p-5 rounded-md border bg-white shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4 ${
                   hasApplied 
                     ? 'border-blue-300 ring-1 ring-blue-100 bg-blue-50/20' 
                     : isEligible 
@@ -231,7 +231,7 @@ export default function PlacementDriveTab({ token, user }) {
                   {/* Eligibility Status Pill */}
                   <div className="pt-2 border-t border-slate-100">
                     {isEligible ? (
-                      <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
+                      <div className="p-2.5 rounded-md bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
                         <div className="flex items-center gap-2 font-bold">
                           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                           <span>Profile Matches All Criteria</span>
@@ -241,7 +241,7 @@ export default function PlacementDriveTab({ token, user }) {
                         </span>
                       </div>
                     ) : (
-                      <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-900 space-y-1">
+                      <div className="p-2.5 rounded-md bg-red-50 border border-red-200 text-xs text-red-900 space-y-1">
                         <div className="flex items-center gap-1.5 font-bold">
                           <XCircle className="w-4 h-4 text-red-600 shrink-0" />
                           <span>Not Eligible For This Drive:</span>
@@ -259,20 +259,20 @@ export default function PlacementDriveTab({ token, user }) {
                     {drive.description}
                   </p>
 
-                  <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100 text-[11px] text-slate-500 space-y-1">
+                  <div className="p-2.5 bg-slate-50 rounded-md border border-slate-100 text-[11px] text-slate-500 space-y-1">
                     <p><strong>Selection Rounds:</strong> {drive.selectionRounds}</p>
                     <p><strong>Deadline:</strong> {drive.deadline}</p>
                   </div>
 
                   {/* Active Application / Interview Schedule */}
                   {hasApplied && (
-                    <div className="p-3 bg-blue-50/90 border border-blue-200 rounded-xl space-y-2 text-xs">
+                    <div className="p-3 bg-blue-50/90 border border-blue-200 rounded-md space-y-2 text-xs">
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-blue-900 flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                           Application Pipeline Status
                         </span>
-                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded-full border ${getStageColor(drive.applicationStatus)}`}>
+                        <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border ${getStageColor(drive.applicationStatus)}`}>
                           {drive.applicationStatus}
                         </span>
                       </div>
@@ -288,7 +288,7 @@ export default function PlacementDriveTab({ token, user }) {
                               href={drive.interviewLink}
                               target="_blank"
                               rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 text-xs text-white bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-lg font-bold transition-all shadow-2xs mt-1"
+                              className="inline-flex items-center gap-1.5 text-xs text-white bg-blue-700 hover:bg-blue-800 px-3 py-1.5 rounded-md font-bold transition-all shadow-2xs mt-1"
                             >
                               <Video className="w-3.5 h-3.5" />
                               <span>Join Live Interview Meeting</span>
@@ -315,7 +315,7 @@ export default function PlacementDriveTab({ token, user }) {
                     <button
                       onClick={() => handleApply(drive.id)}
                       disabled={applyingId === drive.id}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-md tracking-wider shadow-2xs flex items-center gap-1.5 cursor-pointer transition-all disabled:opacity-50"
                     >
                       {applyingId === drive.id ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                       <span>Apply in 1-Click</span>
@@ -323,7 +323,7 @@ export default function PlacementDriveTab({ token, user }) {
                   ) : (
                     <button
                       disabled
-                      className="px-3.5 py-1.5 bg-slate-100 text-slate-400 text-xs font-bold uppercase rounded-xl cursor-not-allowed"
+                      className="px-3.5 py-1.5 bg-slate-100 text-slate-400 text-xs font-bold uppercase rounded-md cursor-not-allowed"
                     >
                       Ineligible
                     </button>

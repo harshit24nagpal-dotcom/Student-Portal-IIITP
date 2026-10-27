@@ -5,7 +5,7 @@ import {
   BookOpen, Users, Calendar, CheckCircle2, XCircle, 
   Save, Filter, AlertCircle, Sparkles, CheckSquare, XSquare, ShieldAlert,
   FileCheck, Download, Clock, AlertTriangle, User, RefreshCw, Send,
-  Layers, ChevronRight, Check, Award, BellRing, Megaphone, Info, Eye
+  Layers, ChevronRight, Check, Award, BellRing, Megaphone, Info, Eye, X
 } from 'lucide-react';
 
 export default function FacultyDashboard() {
@@ -395,7 +395,7 @@ export default function FacultyDashboard() {
   return (
     <div className="p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800 overflow-x-hidden">
       {/* Header: Customized Distinctly for Course Instructor vs Faculty Advisor */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="glass-card p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className={`px-2.5 py-0.5 text-[10px] font-black uppercase rounded tracking-wider border ${
@@ -421,13 +421,13 @@ export default function FacultyDashboard() {
         </div>
 
         {/* Tab Controls Tailored to Specific Role */}
-        <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-xl">
+        <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-md">
           {/* Tabs for Faculty Advisor */}
           {isAdvisor && (
             <>
               <button
                 onClick={() => setActiveTab('advisor_registration')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
                   activeTab === 'advisor_registration' ? 'bg-[#0c2340] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -437,7 +437,7 @@ export default function FacultyDashboard() {
 
               <button
                 onClick={() => setActiveTab('advisor_alerts')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
                   activeTab === 'advisor_alerts' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -450,7 +450,7 @@ export default function FacultyDashboard() {
           {/* Mark Attendance (Available to both: Primary for Instructor, Secondary for Advisor) */}
           <button
             onClick={() => setActiveTab('attendance')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'attendance' ? 'bg-[#1c398e] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -461,7 +461,7 @@ export default function FacultyDashboard() {
           {/* Course Syllabus Progress (Primary for Course Instructor) */}
           <button
             onClick={() => setActiveTab('syllabus')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'syllabus' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -472,7 +472,7 @@ export default function FacultyDashboard() {
           {/* Class / Batch Announcements */}
           <button
             onClick={() => setActiveTab('announcements')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'announcements' ? 'bg-indigo-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -484,22 +484,26 @@ export default function FacultyDashboard() {
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{successMessage}</span>
           </div>
-          <button onClick={() => setSuccessMessage('')} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold cursor-pointer">✕</button>
+          <button onClick={() => setSuccessMessage('')} className="text-emerald-700 hover:text-emerald-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
             <span>{errorMessage}</span>
           </div>
-          <button onClick={() => setErrorMessage('')} className="text-red-700 hover:text-red-900 text-xs font-bold cursor-pointer">✕</button>
+          <button onClick={() => setErrorMessage('')} className="text-red-700 hover:text-red-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
@@ -509,13 +513,13 @@ export default function FacultyDashboard() {
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           {/* Controls Bar */}
-          <div className="glass-card p-5 rounded-2xl border border-slate-200 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 shadow-sm">
+          <div className="glass-card p-5 rounded-md border border-slate-200 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 shadow-sm">
             <div>
               <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Select Section</label>
               <select
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
               >
                 <option value="Section A (CSE)">Section A (CSE - MIS 001 to 082)</option>
                 <option value="Section B (CSE)">Section B (CSE - MIS 083 to 150)</option>
@@ -528,7 +532,7 @@ export default function FacultyDashboard() {
               <select
                 value={selectedSubjectCode}
                 onChange={(e) => setSelectedSubjectCode(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
               >
                 {subjectsList.filter(s => s.section === selectedSection).map(s => (
                   <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
@@ -542,13 +546,13 @@ export default function FacultyDashboard() {
                 type="date"
                 value={attendanceDate}
                 onChange={(e) => setAttendanceDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-mono font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
               />
             </div>
           </div>
 
           {/* Student Roster Table */}
-          <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+          <div className="glass-card p-6 rounded-md border border-slate-200 bg-white space-y-4 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">{currentSubjectObj?.name} ({selectedSubjectCode})</h3>
@@ -556,8 +560,8 @@ export default function FacultyDashboard() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => setAllStatus('PRESENT')} className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-lg hover:bg-emerald-100 cursor-pointer">Mark All Present</button>
-                <button onClick={() => setAllStatus('ABSENT')} className="px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-lg hover:bg-red-100 cursor-pointer">Mark All Absent</button>
+                <button onClick={() => setAllStatus('PRESENT')} className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-md hover:bg-emerald-100 cursor-pointer">Mark All Present</button>
+                <button onClick={() => setAllStatus('ABSENT')} className="px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 text-xs font-semibold rounded-md hover:bg-red-100 cursor-pointer">Mark All Absent</button>
               </div>
             </div>
 
@@ -584,7 +588,7 @@ export default function FacultyDashboard() {
                         <td className="py-2.5 px-4 text-center">
                           <button
                             onClick={() => toggleStatus(s.id)}
-                            className={`px-3.5 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                            className={`px-3.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                               st === 'PRESENT'
                                 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
                                 : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
@@ -602,13 +606,13 @@ export default function FacultyDashboard() {
 
             <div className="pt-4 border-t border-slate-100 flex items-center justify-between flex-wrap gap-3">
               <span className="text-xs text-slate-500 flex items-center gap-1.5">
-                <span className="text-emerald-600 font-bold">✓ Auto-Export:</span> Attendance sheet automatically saves to your local computer upon submitting.
+                <span className="text-emerald-600 font-bold flex items-center gap-1"><Check className="w-3.5 h-3.5" /> Auto-Export:</span> Attendance sheet automatically saves to your local computer upon submitting.
               </span>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={downloadAttendanceSheetCSV}
-                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider border border-slate-200 flex items-center gap-2 cursor-pointer transition-all"
+                  className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-md text-xs uppercase tracking-wider border border-slate-200 flex items-center gap-2 cursor-pointer transition-all"
                   title="Export Attendance Sheet directly to local computer"
                 >
                   <Download className="w-4 h-4 text-slate-600" />
@@ -617,7 +621,7 @@ export default function FacultyDashboard() {
                 <button
                   onClick={handleSaveAttendance}
                   disabled={saving}
-                  className="px-5 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold rounded-md text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
                   {saving ? 'Saving Sheet...' : 'Submit & Save Attendance Sheet'}
@@ -633,7 +637,7 @@ export default function FacultyDashboard() {
          ========================================================================= */}
       {activeTab === 'syllabus' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-6 rounded-md border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[10px] font-black uppercase rounded tracking-wider border border-emerald-200">
@@ -656,9 +660,9 @@ export default function FacultyDashboard() {
                   {syllabusData?.completedLectures || 26} / {syllabusData?.totalLectures || 42} Lectures ({Math.round(((syllabusData?.completedLectures || 26) / (syllabusData?.totalLectures || 42)) * 100)}%)
                 </span>
               </div>
-              <div className="w-24 bg-slate-100 rounded-full h-2.5 overflow-hidden">
+              <div className="w-24 bg-slate-100 rounded h-2.5 overflow-hidden">
                 <div 
-                  className="bg-emerald-600 h-full rounded-full" 
+                  className="bg-emerald-600 h-full rounded" 
                   style={{ width: `${Math.round(((syllabusData?.completedLectures || 26) / (syllabusData?.totalLectures || 42)) * 100)}%` }} 
                 />
               </div>
@@ -674,7 +678,7 @@ export default function FacultyDashboard() {
               return (
                 <div 
                   key={u.id}
-                  className={`p-5 rounded-2xl border transition-all bg-white shadow-2xs space-y-2 ${
+                  className={`p-5 rounded-md border transition-all bg-white shadow-2xs space-y-2 ${
                     isComp ? 'border-emerald-200' : isInProg ? 'border-amber-200 bg-amber-50/20' : 'border-slate-200'
                   }`}
                 >
@@ -722,7 +726,7 @@ export default function FacultyDashboard() {
       {activeTab === 'announcements' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Post notice form */}
-          <div className="lg:col-span-1 p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+          <div className="lg:col-span-1 p-6 rounded-md border border-slate-200 bg-white space-y-4 shadow-sm">
             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               <Send className="w-4 h-4 text-[#1c398e]" />
               Publish Official Academic Notice
@@ -740,7 +744,7 @@ export default function FacultyDashboard() {
                   placeholder="e.g. LNO Mid-Semester Assignment 2 Uploaded"
                   value={announcementTitle}
                   onChange={(e) => setAnnouncementTitle(e.target.value)}
-                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-semibold"
+                  className="w-full p-2.5 border border-slate-300 rounded-md text-xs font-semibold"
                 />
               </div>
 
@@ -749,7 +753,7 @@ export default function FacultyDashboard() {
                 <select
                   value={announcementPriority}
                   onChange={(e) => setAnnouncementPriority(e.target.value)}
-                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-semibold"
+                  className="w-full p-2.5 border border-slate-300 rounded-md text-xs font-semibold"
                 >
                   <option value="NORMAL">NORMAL (Class Notice)</option>
                   <option value="HIGH">HIGH (Assignment / Deadline)</option>
@@ -764,7 +768,7 @@ export default function FacultyDashboard() {
                   placeholder="e.g. Due Oct 30"
                   value={announcementBadge}
                   onChange={(e) => setAnnouncementBadge(e.target.value)}
-                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs"
+                  className="w-full p-2.5 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
@@ -776,14 +780,14 @@ export default function FacultyDashboard() {
                   placeholder="Write clear notice details, submission links, or exam instructions for enrolled students..."
                   value={announcementContent}
                   onChange={(e) => setAnnouncementContent(e.target.value)}
-                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs"
+                  className="w-full p-2.5 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={postingAnnouncement}
-                className="w-full py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer"
+                className="w-full py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-md shadow-xs transition-all cursor-pointer"
               >
                 {postingAnnouncement ? 'Broadcasting...' : 'Broadcast Notice to Students'}
               </button>
@@ -798,7 +802,7 @@ export default function FacultyDashboard() {
 
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
               {classAnnouncements.map((a) => (
-                <div key={a.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                <div key={a.id} className="p-4 rounded-md border border-slate-200 bg-white space-y-1.5 shadow-2xs">
                   <div className="flex items-center justify-between text-xxs">
                     <div className="flex items-center gap-2">
                       <span className="px-2 py-0.5 bg-blue-50 text-blue-900 border border-blue-200 rounded font-black uppercase">
@@ -837,7 +841,7 @@ export default function FacultyDashboard() {
                   <div
                     key={reg.id}
                     onClick={() => setSelectedReg(reg)}
-                    className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                    className={`p-4 rounded-md border cursor-pointer transition-all ${
                       selectedReg?.id === reg.id
                         ? 'bg-blue-50/80 border-[#1c398e] ring-1 ring-[#1c398e]'
                         : 'bg-white border-slate-200 hover:bg-slate-50'
@@ -852,14 +856,14 @@ export default function FacultyDashboard() {
                 ))}
               </div>
             ) : (
-              <div className="p-8 text-center bg-white border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs">
+              <div className="p-8 text-center bg-white border border-dashed border-slate-200 rounded-md text-slate-500 text-xs">
                 No registrations currently pending Faculty Advisor approval.
               </div>
             )}
           </div>
 
           {selectedReg ? (
-            <div className="lg:col-span-2 glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-5 shadow-sm">
+            <div className="lg:col-span-2 glass-card p-6 rounded-md border border-slate-200 bg-white space-y-5 shadow-sm">
               <div className="border-b border-slate-100 pb-3">
                 <span className="text-[10px] text-slate-400 font-bold uppercase">ADVISOR REVIEW</span>
                 <h3 className="text-base font-bold text-slate-900">{selectedReg.student?.name}</h3>
@@ -870,7 +874,7 @@ export default function FacultyDashboard() {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700">Student Uploaded Proofs</h4>
                 <div className="grid grid-cols-2 gap-3">
                   {selectedReg.documents?.map(doc => (
-                    <div key={doc.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+                    <div key={doc.id} className="p-3 bg-slate-50 rounded-md border border-slate-200 text-xs">
                       <p className="font-bold text-[#1c398e] text-[10px]">{doc.documentType}</p>
                       <p className="text-slate-800 font-semibold truncate mt-0.5">{doc.documentName}</p>
                       <a href={getFileUrl(doc.filePath)} target="_blank" rel="noreferrer" className="mt-2 block text-center py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 rounded text-[10px] font-semibold uppercase">
@@ -887,21 +891,21 @@ export default function FacultyDashboard() {
                   value={advisorRemarks}
                   onChange={(e) => setAdvisorRemarks(e.target.value)}
                   placeholder="Enter remarks or approval notes..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 h-20 focus:outline-hidden focus:border-[#5367c8]"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-800 h-20 focus:outline-hidden focus:border-[#5367c8]"
                 />
 
                 <div className="flex gap-3">
                   <button
                     onClick={() => handleAdvisorAction('APPROVED')}
                     disabled={advisorLoading}
-                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer"
+                    className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-bold uppercase tracking-wider cursor-pointer"
                   >
                     Grant Final Approval
                   </button>
                   <button
                     onClick={() => handleAdvisorAction('RESUBMISSION_REQUIRED')}
                     disabled={advisorLoading}
-                    className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer"
+                    className="flex-1 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-md text-xs font-bold uppercase tracking-wider cursor-pointer"
                   >
                     Request Resubmission
                   </button>
@@ -909,7 +913,7 @@ export default function FacultyDashboard() {
               </div>
             </div>
           ) : (
-            <div className="lg:col-span-2 glass-card p-12 rounded-2xl border border-slate-200 bg-white text-center flex flex-col justify-center items-center shadow-sm">
+            <div className="lg:col-span-2 glass-card p-12 rounded-md border border-slate-200 bg-white text-center flex flex-col justify-center items-center shadow-sm">
               <FileCheck className="w-16 h-16 text-slate-300 mb-4" />
               <h3 className="text-lg font-bold text-slate-700">Select a registration from queue</h3>
             </div>
@@ -921,7 +925,7 @@ export default function FacultyDashboard() {
           TAB 5: ADVISEE ATTENDANCE SHORTAGE MONITORING (Advisor Feature)
          ========================================================================= */}
       {isAdvisor && activeTab === 'advisor_alerts' && (
-        <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+        <div className="glass-card p-6 rounded-md border border-slate-200 bg-white space-y-4 shadow-sm">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
               <h3 className="text-sm font-bold text-slate-900">Advisee Attendance Shortage Monitor</h3>

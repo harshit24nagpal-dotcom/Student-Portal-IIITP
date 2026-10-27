@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSocket } from '../context/SocketContext';
 import { 
   Heart, Flame, ShieldAlert, Activity, AlertCircle, HelpCircle, 
-  MapPin, Phone, User, Clock, AlertTriangle, Shield, CheckCircle,
+  MapPin, Phone, User, Clock, AlertTriangle, Shield, CheckCircle, Check,
   BookOpen, Building, Calendar, GraduationCap, Sparkles, Send, Award, 
   CheckCircle2, ChevronRight, FileCheck, CheckSquare, AlertOctagon,
   ChevronLeft, ChevronRight as ChevronRightIcon, ExternalLink, Mail, Hash, BookMarked, Download, PhoneCall
@@ -244,9 +244,9 @@ export default function StudentDashboard() {
     <div className="p-3 sm:p-6 pb-24 sm:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800 bg-slate-50 min-h-[calc(100vh-65px)] overflow-x-hidden">
       
       {/* 1-CLICK EMERGENCY ASSISTANCE & SPEED-DIAL BAR */}
-      <div className="p-3.5 sm:p-4 rounded-2xl border border-red-200 bg-linear-to-r from-red-50 via-white to-amber-50 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-3.5 sm:p-4 rounded-md border border-red-200 bg-linear-to-r from-red-50 via-white to-amber-50 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-xs shrink-0 animate-pulse">
+          <div className="w-9 h-9 rounded-md bg-red-600 text-white flex items-center justify-center shadow-xs shrink-0 animate-pulse">
             <ShieldAlert className="w-5 h-5" />
           </div>
           <div>
@@ -268,7 +268,7 @@ export default function StudentDashboard() {
         <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <a
             href="tel:9826381867"
-            className="flex-1 sm:flex-none px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+            className="flex-1 sm:flex-none px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
             title="Call Campus Security QRT"
           >
             <Phone className="w-3.5 h-3.5" />
@@ -277,7 +277,7 @@ export default function StudentDashboard() {
 
           <a
             href="tel:9826381867"
-            className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+            className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
             title="Call Campus Ambulance"
           >
             <PhoneCall className="w-3.5 h-3.5" />
@@ -286,7 +286,7 @@ export default function StudentDashboard() {
 
           <button
             onClick={() => setIsSosOpen(true)}
-            className="flex-1 sm:flex-none px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-800"
+            className="flex-1 sm:flex-none px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-800"
           >
             <AlertOctagon className="w-3.5 h-3.5 text-red-400" />
             <span>Open SOS Console</span>
@@ -295,7 +295,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Top Greeting Header */}
-      <div className="p-4 sm:p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-4 sm:p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-blue-50 border border-blue-200 text-[#0c2340] text-[10px] font-black uppercase rounded tracking-wider">
@@ -315,17 +315,18 @@ export default function StudentDashboard() {
 
         {/* Quick Overall Metrics Tag */}
         <div className="flex items-center gap-3">
-          <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-right">
+          <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-md text-right">
             <span className="text-[10px] text-slate-500 font-bold uppercase block">Current Attendance</span>
-            <span className={`text-lg font-black font-mono ${overallPct >= 75 ? 'text-emerald-700' : 'text-red-600'}`}>
-              {overallPct}% {overallPct >= 75 ? '✓' : '⚠️'}
+            <span className={`text-lg font-black font-mono flex items-center justify-end gap-1.5 ${overallPct >= 75 ? 'text-emerald-700' : 'text-red-600'}`}>
+              {overallPct}%
+              {overallPct >= 75 ? <Check className="w-4 h-4 text-emerald-600 inline" /> : <AlertTriangle className="w-4 h-4 text-red-600 inline" />}
             </span>
           </div>
         </div>
       </div>
 
       {/* PRIMARY DIVISION SWITCHER: 3 PILLARS */}
-      <div className="p-1.5 rounded-2xl bg-white border border-slate-200 shadow-2xs grid grid-cols-1 sm:grid-cols-3 gap-2">
+      <div className="p-1 rounded-md bg-slate-100 border border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-1.5">
         <button
           onClick={() => {
             setActivePortalDivision('academic');
@@ -333,14 +334,14 @@ export default function StudentDashboard() {
               setPortalTab('placement');
             }
           }}
-          className={`py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`py-2 px-4 rounded-md text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activePortalDivision === 'academic'
-              ? 'bg-[#0c2340] text-white shadow-sm ring-2 ring-blue-900/20'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-[#0c2340] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
           }`}
         >
           <GraduationCap className="w-4 h-4" />
-          <span>🎓 Academic Portal</span>
+          <span>Academic Portal</span>
         </button>
 
         <button
@@ -350,14 +351,14 @@ export default function StudentDashboard() {
               setPortalTab('roommate');
             }
           }}
-          className={`py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`py-2 px-4 rounded-md text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activePortalDivision === 'hostel'
-              ? 'bg-[#1c398e] text-white shadow-sm ring-2 ring-blue-800/20'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-[#1c398e] text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
           }`}
         >
           <Building className="w-4 h-4" />
-          <span>🏢 Hostel Management</span>
+          <span>Hostel Management</span>
         </button>
 
         <button
@@ -367,14 +368,14 @@ export default function StudentDashboard() {
               setPortalTab('lostfound');
             }
           }}
-          className={`py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          className={`py-2 px-4 rounded-md text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activePortalDivision === 'campus'
-              ? 'bg-purple-900 text-white shadow-sm ring-2 ring-purple-900/20'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ? 'bg-purple-900 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
           }`}
         >
           <ShieldAlert className="w-4 h-4" />
-          <span>🏛️ Campus Life & Grievances</span>
+          <span>Campus Life & Grievances</span>
         </button>
       </div>
 
@@ -385,7 +386,7 @@ export default function StudentDashboard() {
             <>
               <button
                 onClick={() => setPortalTab('profile')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'profile'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -397,7 +398,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('placement')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'placement'
                     ? 'bg-blue-700 text-white shadow-sm ring-2 ring-blue-300'
                     : 'bg-blue-50 text-blue-900 hover:bg-blue-100 border border-blue-200'
@@ -405,14 +406,14 @@ export default function StudentDashboard() {
               >
                 <Briefcase className="w-4 h-4 text-blue-600" />
                 <span>Placement CRM</span>
-                <span className="px-1.5 py-0.5 bg-amber-400 text-amber-950 font-black text-[9px] rounded-full uppercase">
+                <span className="px-1.5 py-0.5 bg-amber-400 text-amber-950 font-black text-[9px] rounded uppercase">
                   DRIVES
                 </span>
               </button>
 
               <button
                 onClick={() => setPortalTab('announcements_acad')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'announcements_acad'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -424,7 +425,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('attendance')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'attendance'
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -436,7 +437,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('registration')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'registration'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -448,7 +449,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('nodues')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'nodues'
                     ? 'bg-amber-600 text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -460,7 +461,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('academics')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'academics'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -472,7 +473,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('facilities')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'facilities'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -488,7 +489,7 @@ export default function StudentDashboard() {
             <>
               <button
                 onClick={() => setPortalTab('roommate')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-black uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'roommate'
                     ? 'bg-indigo-700 text-white shadow-sm ring-2 ring-indigo-300'
                     : 'bg-indigo-50 text-indigo-900 hover:bg-indigo-100 border border-indigo-200'
@@ -496,14 +497,14 @@ export default function StudentDashboard() {
               >
                 <Bed className="w-4 h-4 text-indigo-600" />
                 <span>Roommate Matching & Bed Allotment</span>
-                <span className="px-1.5 py-0.5 bg-indigo-200 text-indigo-950 font-black text-[9px] rounded-full uppercase">
+                <span className="px-1.5 py-0.5 bg-indigo-200 text-indigo-950 font-black text-[9px] rounded uppercase">
                   AI MATCH
                 </span>
               </button>
 
               <button
                 onClick={() => setPortalTab('leaves')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'leaves'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -515,7 +516,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('mess')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'mess'
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -527,7 +528,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('tickets')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'tickets'
                     ? 'bg-amber-600 text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -539,7 +540,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('announcements_hostel')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'announcements_hostel'
                     ? 'bg-[#1c398e] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -555,7 +556,7 @@ export default function StudentDashboard() {
             <>
               <button
                 onClick={() => setPortalTab('lostfound')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'lostfound'
                     ? 'bg-purple-700 text-white shadow-sm ring-2 ring-purple-300'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -567,7 +568,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('complaints')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'complaints'
                     ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-300'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -579,7 +580,7 @@ export default function StudentDashboard() {
 
               <button
                 onClick={() => setPortalTab('contacts')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
+                className={`px-3.5 py-2 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer ${
                   portalTab === 'contacts'
                     ? 'bg-[#0c2340] text-white shadow-sm'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50'
@@ -600,7 +601,7 @@ export default function StudentDashboard() {
         <div className="space-y-6">
           
           {/* Main Comprehensive Profile Card */}
-          <div className="p-6 sm:p-8 rounded-3xl border border-slate-200 bg-white shadow-sm space-y-6">
+          <div className="p-6 sm:p-8 rounded-md border border-slate-200 bg-white shadow-sm space-y-6">
             
             {/* Header with College Emblem */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -619,8 +620,9 @@ export default function StudentDashboard() {
                   </p>
                 </div>
               </div>
-              <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-black rounded-xl uppercase self-start sm:self-center">
-                ACTIVE & VERIFIED STUDENT ✓
+              <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-black rounded uppercase self-start sm:self-center flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-700" />
+                <span>ACTIVE & VERIFIED STUDENT</span>
               </span>
             </div>
 
@@ -628,8 +630,8 @@ export default function StudentDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
               {/* Left: Avatar & Key Badges */}
-              <div className="md:col-span-1 p-6 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center justify-center text-center space-y-3">
-                <div className="w-24 h-24 rounded-full bg-[#0c2340] text-white font-black text-3xl flex items-center justify-center shadow-md">
+              <div className="md:col-span-1 p-6 bg-slate-50 border border-slate-200 rounded-md flex flex-col items-center justify-center text-center space-y-3">
+                <div className="w-24 h-24 rounded bg-[#0c2340] text-white font-black text-3xl flex items-center justify-center shadow-md">
                   {user?.name ? user.name.split(' ').map(n => n[0]).join('') : 'HN'}
                 </div>
                 <div>
@@ -646,44 +648,44 @@ export default function StudentDashboard() {
               {/* Center & Right: Detailed Academic Data */}
               <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">FULL NAME</span>
                   <p className="text-sm font-bold text-slate-900">{user?.name || 'Harshit Nagpal'}</p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">MIS / ROLL NUMBER</span>
                   <p className="text-sm font-mono font-bold text-[#0c2340]">{user?.userId || '112415079'}</p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">DEGREE & PROGRAMME</span>
                   <p className="text-sm font-bold text-slate-900">{user?.programme || 'Bachelor of Technology (B.Tech)'}</p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">COURSE / BRANCH</span>
                   <p className="text-sm font-bold text-[#0c2340]">
                     {user?.email?.includes('@ece.') ? 'Electronics & Communication Engineering (ECE)' : 'Computer Science & Engineering (CSE)'}
                   </p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">INSTITUTIONAL EMAIL</span>
                   <p className="text-xs font-mono font-semibold text-slate-700 break-all">{user?.email}</p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">PRIMARY PHONE NUMBER</span>
                   <p className="text-xs font-mono font-semibold text-slate-700">{user?.contactNumber || '+91 99887 76655'}</p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ENROLLED SECTION</span>
                   <p className="text-xs font-bold text-slate-800">{user?.section || 'Section A (CSE - MIS 001 to 082)'}</p>
                 </div>
 
-                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-xl space-y-1">
+                <div className="p-4 bg-slate-50/70 border border-slate-200 rounded-md space-y-1">
                   <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HOSTEL RESIDENCE</span>
                   <p className="text-xs font-bold text-slate-800">{user?.hostelBlock || 'Vindhyachal Boys Hostel (BH-1)'}</p>
                 </div>
@@ -701,7 +703,7 @@ export default function StudentDashboard() {
                 
                 <div 
                   onClick={() => { setActivePortalDivision('academic'); setPortalTab('placement'); }}
-                  className="p-4 bg-blue-50/60 border border-blue-200 hover:border-blue-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-blue-50"
+                  className="p-4 bg-blue-50/60 border border-blue-200 hover:border-blue-500 rounded-md shadow-xs transition-all cursor-pointer group hover:bg-blue-50"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-blue-900 group-hover:text-blue-700">Placement CRM</span>
@@ -713,7 +715,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('hostel'); setPortalTab('roommate'); }}
-                  className="p-4 bg-indigo-50/60 border border-indigo-200 hover:border-indigo-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-indigo-50"
+                  className="p-4 bg-indigo-50/60 border border-indigo-200 hover:border-indigo-500 rounded-md shadow-xs transition-all cursor-pointer group hover:bg-indigo-50"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-indigo-900 group-hover:text-indigo-700">Roommate & Bed Allotment</span>
@@ -725,7 +727,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('academic'); setPortalTab('announcements_acad'); }}
-                  className="p-4 bg-purple-50/60 border border-purple-200 hover:border-purple-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-purple-50"
+                  className="p-4 bg-purple-50/60 border border-purple-200 hover:border-purple-500 rounded-md shadow-xs transition-all cursor-pointer group hover:bg-purple-50"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-purple-900 group-hover:text-purple-700">Campus Circulars</span>
@@ -737,7 +739,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('campus'); setPortalTab('lostfound'); }}
-                  className="p-4 bg-amber-50/60 border border-amber-200 hover:border-amber-500 rounded-2xl shadow-xs transition-all cursor-pointer group hover:bg-amber-50"
+                  className="p-4 bg-amber-50/60 border border-amber-200 hover:border-amber-500 rounded-md shadow-xs transition-all cursor-pointer group hover:bg-amber-50"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black text-amber-900 group-hover:text-amber-700">Lost & Found Hub</span>
@@ -749,7 +751,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('academic'); setPortalTab('attendance'); }}
-                  className="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                  className="p-4 bg-white border border-slate-200 hover:border-emerald-500 rounded-md shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 group-hover:text-emerald-700">Attendance Calendar</span>
@@ -760,7 +762,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('academic'); setPortalTab('registration'); }}
-                  className="p-4 bg-white border border-slate-200 hover:border-blue-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                  className="p-4 bg-white border border-slate-200 hover:border-blue-500 rounded-md shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 group-hover:text-blue-700">Semester Registration</span>
@@ -771,7 +773,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('academic'); setPortalTab('nodues'); }}
-                  className="p-4 bg-white border border-slate-200 hover:border-amber-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                  className="p-4 bg-white border border-slate-200 hover:border-amber-500 rounded-md shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 group-hover:text-amber-700">No-Dues Clearance</span>
@@ -782,7 +784,7 @@ export default function StudentDashboard() {
 
                 <div 
                   onClick={() => { setActivePortalDivision('campus'); setPortalTab('contacts'); }}
-                  className="p-4 bg-white border border-slate-200 hover:border-red-500 rounded-2xl shadow-xs transition-all cursor-pointer group"
+                  className="p-4 bg-white border border-slate-200 hover:border-red-500 rounded-md shadow-xs transition-all cursor-pointer group"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 group-hover:text-red-700">Emergency Contacts</span>
@@ -806,7 +808,7 @@ export default function StudentDashboard() {
         <div className="space-y-6">
           
           {/* Top Overview Meter */}
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="p-6 rounded-md border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-black uppercase rounded tracking-wider">
@@ -823,7 +825,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Total Percentage Stats */}
-            <div className="flex items-center gap-4 bg-slate-50 p-4 border border-slate-200 rounded-2xl shrink-0 flex-wrap">
+            <div className="flex items-center gap-4 bg-slate-50 p-4 border border-slate-200 rounded-md shrink-0 flex-wrap">
               <div className="text-center">
                 <span className="text-[10px] text-slate-500 font-bold uppercase block">Overall Percentage</span>
                 <span className={`text-2xl font-black font-mono ${overallPct >= 75 ? 'text-emerald-700' : 'text-red-600'}`}>
@@ -833,19 +835,29 @@ export default function StudentDashboard() {
               <div className="h-10 w-px bg-slate-200"></div>
               <div>
                 <span className="text-[10px] text-slate-500 font-bold uppercase block">Exam Eligibility</span>
-                <span className={`inline-block px-2.5 py-1 text-[10px] font-black rounded uppercase ${
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-black rounded uppercase ${
                   !hasShortage 
                     ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
                     : 'bg-red-50 text-red-700 border border-red-200'
                 }`}>
-                  {!hasShortage ? 'ELIGIBLE ✓' : 'SHORTAGE ALERT ⚠️'}
+                  {!hasShortage ? (
+                    <>
+                      <Check className="w-3 h-3 text-emerald-700" />
+                      <span>ELIGIBLE</span>
+                    </>
+                  ) : (
+                    <>
+                      <AlertTriangle className="w-3 h-3 text-red-600" />
+                      <span>SHORTAGE ALERT</span>
+                    </>
+                  )}
                 </span>
               </div>
               <div className="h-10 w-px bg-slate-200 hidden sm:block"></div>
               <button
                 type="button"
                 onClick={downloadStudentAttendanceCSV}
-                className="px-3.5 py-2 bg-white hover:bg-slate-100 text-[#1c398e] border border-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                className="px-3.5 py-2 bg-white hover:bg-slate-100 text-[#1c398e] border border-slate-200 rounded-md text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
                 title="Download complete attendance report to your computer"
               >
                 <Download className="w-3.5 h-3.5 text-[#1c398e]" />
@@ -858,7 +870,7 @@ export default function StudentDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             {/* Left: Monthly Calendar Component */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="lg:col-span-2 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
               
               {/* Calendar Header with Month Selector */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -872,13 +884,13 @@ export default function StudentDashboard() {
                 <div className="flex items-center gap-1.5">
                   <button 
                     onClick={handlePrevMonth}
-                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors cursor-pointer"
+                    className="p-1.5 hover:bg-slate-100 rounded-md text-slate-600 transition-colors cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button 
                     onClick={handleNextMonth}
-                    className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-600 transition-colors cursor-pointer"
+                    className="p-1.5 hover:bg-slate-100 rounded-md text-slate-600 transition-colors cursor-pointer"
                   >
                     <ChevronRightIcon className="w-4 h-4" />
                   </button>
@@ -900,7 +912,7 @@ export default function StudentDashboard() {
               <div className="grid grid-cols-7 gap-1.5">
                 {/* Empty cells before month start */}
                 {Array.from({ length: firstDayOfMonth }).map((_, i) => (
-                  <div key={`empty-${i}`} className="h-14 bg-slate-50/40 rounded-xl border border-transparent"></div>
+                  <div key={`empty-${i}`} className="h-14 bg-slate-50/40 rounded-md border border-transparent"></div>
                 ))}
 
                 {/* Days of current month */}
@@ -921,7 +933,7 @@ export default function StudentDashboard() {
                     <div
                       key={fullDateStr}
                       onClick={() => setSelectedCalendarDate(fullDateStr)}
-                      className={`h-14 p-1.5 rounded-xl border flex flex-col justify-between transition-all cursor-pointer select-none ${
+                      className={`h-14 p-1.5 rounded-md border flex flex-col justify-between transition-all cursor-pointer select-none ${
                         isSelected 
                           ? 'border-[#0c2340] ring-2 ring-[#0c2340]/20 bg-blue-50/30' 
                           : 'border-slate-200 hover:border-slate-300 bg-white'
@@ -973,7 +985,7 @@ export default function StudentDashboard() {
             </div>
 
             {/* Right: Selected Date Class Timeline */}
-            <div className="lg:col-span-1 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="lg:col-span-1 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
               <div className="border-b border-slate-100 pb-3">
                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">DATE DETAILS</span>
                 <h3 className="text-base font-black text-slate-900">{selectedCalendarDate}</h3>
@@ -987,7 +999,7 @@ export default function StudentDashboard() {
                   {selectedDateLectures.map((lec) => (
                     <div 
                       key={lec.id} 
-                      className={`p-3.5 rounded-xl border text-xs space-y-1.5 ${
+                      className={`p-3.5 rounded-md border text-xs space-y-1.5 ${
                         lec.status === 'PRESENT' 
                           ? 'bg-emerald-50/40 border-emerald-200' 
                           : 'bg-red-50/40 border-red-200'
@@ -1008,7 +1020,7 @@ export default function StudentDashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs">
+                <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-md text-slate-500 text-xs">
                   No classes conducted on this date.
                 </div>
               )}
@@ -1028,7 +1040,7 @@ export default function StudentDashboard() {
                 return (
                   <div 
                     key={subject.subjectCode} 
-                    className={`p-5 rounded-2xl border transition-all space-y-4 bg-white shadow-sm ${
+                    className={`p-5 rounded-md border transition-all space-y-4 bg-white shadow-sm ${
                       isShortage 
                         ? 'border-red-300 ring-2 ring-red-500/10' 
                         : 'border-slate-200 hover:border-slate-300'
@@ -1056,9 +1068,9 @@ export default function StudentDashboard() {
                         <span>Attended: {subject.attendedClasses} / {subject.totalClasses} Lectures</span>
                         <span>Target: 75%</span>
                       </div>
-                      <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+                      <div className="w-full h-2 bg-slate-100 rounded overflow-hidden border border-slate-200">
                         <div 
-                          className={`h-full rounded-full transition-all duration-500 ${
+                          className={`h-full rounded transition-all duration-500 ${
                             isShortage ? 'bg-red-500' : 'bg-emerald-500'
                           }`}
                           style={{ width: `${Math.min(subject.percentage, 100)}%` }}
@@ -1109,7 +1121,7 @@ export default function StudentDashboard() {
       {activePortalDivision === 'academic' && portalTab === 'academics' && (
         <div className="space-y-6">
           {/* Top: Dynamic Weekly Timetable Engine */}
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+          <div className="p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
@@ -1131,7 +1143,7 @@ export default function StudentDashboard() {
                     <button
                       key={day}
                       onClick={() => setSelectedTimetableDay(day)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                      className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                         selectedTimetableDay === day
                           ? 'bg-[#0c2340] text-white shadow-xs'
                           : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -1152,7 +1164,7 @@ export default function StudentDashboard() {
 
               if (slots.length === 0) {
                 return (
-                  <div className="p-8 text-center text-slate-400 text-xs italic bg-slate-50 rounded-xl border border-slate-200">
+                  <div className="p-8 text-center text-slate-400 text-xs italic bg-slate-50 rounded-md border border-slate-200">
                     No lectures scheduled for {targetDay}. Enjoy your academic study & lab hours!
                   </div>
                 );
@@ -1161,7 +1173,7 @@ export default function StudentDashboard() {
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {slots.map((slot) => (
-                    <div key={slot.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 transition-all shadow-2xs space-y-2">
+                    <div key={slot.id} className="p-4 bg-slate-50 border border-slate-200 rounded-md hover:border-slate-300 transition-all shadow-2xs space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold font-mono rounded">
                           {slot.timeSlot}
@@ -1183,7 +1195,7 @@ export default function StudentDashboard() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left 2 Cols: Course Syllabus Progress Tracker */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="lg:col-span-2 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div>
                   <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
@@ -1202,7 +1214,7 @@ export default function StudentDashboard() {
                         setSelectedSyllabusCode(code);
                         fetchStudentSyllabus(code);
                       }}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
+                      className={`px-3 py-1 rounded-md text-xs font-bold uppercase transition-all cursor-pointer ${
                         selectedSyllabusCode === code
                           ? 'bg-emerald-700 text-white shadow-xs'
                           : 'bg-slate-100 text-slate-600 hover:text-slate-900'
@@ -1216,7 +1228,7 @@ export default function StudentDashboard() {
 
               {studentSyllabus && (
                 <div className="space-y-4">
-                  <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-xl flex items-center justify-between gap-4">
+                  <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-md flex items-center justify-between gap-4">
                     <div>
                       <h4 className="font-bold text-slate-900 text-sm">{studentSyllabus.title} ({studentSyllabus.code})</h4>
                       <p className="text-xxs text-slate-500">Instructor: {studentSyllabus.instructor} • Credits: {studentSyllabus.credits}</p>
@@ -1235,7 +1247,7 @@ export default function StudentDashboard() {
                       const isInProg = u.status === 'IN_PROGRESS';
 
                       return (
-                        <div key={u.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                        <div key={u.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-md space-y-1">
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-slate-900">{u.unitNumber}: {u.title}</span>
@@ -1264,7 +1276,7 @@ export default function StudentDashboard() {
 
             {/* Right 1 Col: Live Academic Circulars */}
             <div className="space-y-4">
-              <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+              <div className="p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                   <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                     <Megaphone className="w-4 h-4 text-blue-600" />
@@ -1283,7 +1295,7 @@ export default function StudentDashboard() {
                     <p className="text-xs text-slate-400 italic">No circulars posted yet.</p>
                   ) : (
                     academicCirculars.slice(0, 3).map((item) => (
-                      <div key={item.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1 hover:border-slate-300 transition-all">
+                      <div key={item.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-md space-y-1 hover:border-slate-300 transition-all">
                         <div className="flex items-center justify-between text-xxs">
                           <span className="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded font-black uppercase">
                             {item.priority}
@@ -1307,7 +1319,7 @@ export default function StudentDashboard() {
       {/* ========================================================================= */}
       {activePortalDivision === 'academic' && portalTab === 'contacts' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+          <div className="p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
@@ -1326,10 +1338,10 @@ export default function StudentDashboard() {
                 return (
                   <div 
                     key={contact.id} 
-                    className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors shadow-xs"
+                    className="p-4 bg-slate-50 border border-slate-200 rounded-md flex flex-col justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors shadow-xs"
                   >
                     <div>
-                      <span className="inline-block text-[9px] text-[#0c2340] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg mb-1.5">
+                      <span className="inline-block text-[9px] text-[#0c2340] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md mb-1.5">
                         {contact.department.split('(')[0]}
                       </span>
                       <h4 className="text-sm font-bold text-slate-900 leading-snug">{contact.name}</h4>
@@ -1349,7 +1361,7 @@ export default function StudentDashboard() {
                       <span className="font-mono text-xs font-bold text-slate-800">{contact.number}</span>
                       <a
                         href={`tel:${contact.number.split('/')[0].trim()}`}
-                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-xl shadow-xs flex items-center gap-1.5 transition-transform active:scale-95"
+                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-md shadow-xs flex items-center gap-1.5 transition-transform active:scale-95"
                         title="Call Line"
                       >
                         <Phone className="w-3.5 h-3.5" />
@@ -1371,14 +1383,14 @@ export default function StudentDashboard() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Booking Form */}
-            <div className="lg:col-span-1 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="lg:col-span-1 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
               <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                 <Building className="w-4 h-4 text-blue-600" />
                 Reserve Campus Infrastructure
               </h3>
 
               {bookingSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-bold">
+                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-bold">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                   Facility Slot Reserved Successfully!
                 </div>
@@ -1390,7 +1402,7 @@ export default function StudentDashboard() {
                   <select
                     value={selectedFacility}
                     onChange={(e) => setSelectedFacility(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
                   >
                     <option value="AI/ML Computing Lab">AI/ML High Performance GPU Lab</option>
                     <option value="Robotics & IoT Innovation Hub">Robotics & IoT Innovation Hub</option>
@@ -1407,7 +1419,7 @@ export default function StudentDashboard() {
                     required
                     value={bookingDate}
                     onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
                   />
                 </div>
 
@@ -1416,7 +1428,7 @@ export default function StudentDashboard() {
                   <select
                     value={bookingTime}
                     onChange={(e) => setBookingTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:border-blue-600"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
                   >
                     <option value="">Choose Time Slot</option>
                     <option value="09:00 AM - 11:00 AM">09:00 AM - 11:00 AM</option>
@@ -1428,7 +1440,7 @@ export default function StudentDashboard() {
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1a365d] text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow cursor-pointer transition-colors"
+                  className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1a365d] text-white font-extrabold rounded-md text-xs uppercase tracking-wider shadow cursor-pointer transition-colors"
                 >
                   Submit Booking Request
                 </button>
@@ -1436,11 +1448,11 @@ export default function StudentDashboard() {
             </div>
 
             {/* Campus Facilities List */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="lg:col-span-2 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
               <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">Campus Infrastructure Directory</h3>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
                   <div className="flex justify-between items-center">
                     <h4 className="font-bold text-slate-900">AI/ML GPU Computing Lab</h4>
                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-black rounded uppercase">AVAILABLE</span>
@@ -1449,7 +1461,7 @@ export default function StudentDashboard() {
                   <p className="text-[10px] text-blue-800 font-bold">Location: Academic Block 2, Floor 3</p>
                 </div>
 
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
                   <div className="flex justify-between items-center">
                     <h4 className="font-bold text-slate-900">Robotics & IoT Innovation Hub</h4>
                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-black rounded uppercase">AVAILABLE</span>
@@ -1458,7 +1470,7 @@ export default function StudentDashboard() {
                   <p className="text-[10px] text-blue-800 font-bold">Location: Academic Block 1, Ground Floor</p>
                 </div>
 
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
                   <div className="flex justify-between items-center">
                     <h4 className="font-bold text-slate-900">Main Seminar Hall</h4>
                     <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[9px] font-black rounded uppercase">BOOKED TODAY</span>
@@ -1467,7 +1479,7 @@ export default function StudentDashboard() {
                   <p className="text-[10px] text-blue-800 font-bold">Location: Admin Complex, Wing B</p>
                 </div>
 
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
                   <div className="flex justify-between items-center">
                     <h4 className="font-bold text-slate-900">VLSI & Microelectronics Lab</h4>
                     <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-black rounded uppercase">AVAILABLE</span>
@@ -1538,7 +1550,7 @@ export default function StudentDashboard() {
       {/* Global Emergency Contacts accessible from anywhere */}
       {(portalTab === 'contacts' || (activePortalDivision === 'campus' && portalTab === 'contacts')) && (
         <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+          <div className="p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
@@ -1557,10 +1569,10 @@ export default function StudentDashboard() {
                 return (
                   <div 
                     key={contact.id} 
-                    className="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors shadow-xs"
+                    className="p-4 bg-slate-50 border border-slate-200 rounded-md flex flex-col justify-between gap-3 hover:border-slate-300 hover:bg-slate-100/60 transition-colors shadow-xs"
                   >
                     <div>
-                      <span className="inline-block text-[9px] text-[#0c2340] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-lg mb-1.5">
+                      <span className="inline-block text-[9px] text-[#0c2340] font-black uppercase tracking-wider bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md mb-1.5">
                         {contact.department.split('(')[0]}
                       </span>
                       <h4 className="text-sm font-bold text-slate-900 leading-snug">{contact.name}</h4>
@@ -1580,7 +1592,7 @@ export default function StudentDashboard() {
                       <span className="font-mono text-xs font-bold text-slate-800">{contact.number}</span>
                       <a
                         href={`tel:${contact.number.split('/')[0].trim()}`}
-                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-xl shadow-xs flex items-center gap-1.5 transition-transform active:scale-95"
+                        className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase rounded-md shadow-xs flex items-center gap-1.5 transition-transform active:scale-95"
                         title="Call Line"
                       >
                         <Phone className="w-3.5 h-3.5" />
@@ -1599,7 +1611,7 @@ export default function StudentDashboard() {
       <div className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-between gap-2 shadow-[0_-4px_25px_rgba(0,0,0,0.12)]">
         <button
           onClick={() => setIsSosOpen(true)}
-          className="flex-1 py-2.5 bg-red-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all animate-pulse cursor-pointer"
+          className="flex-1 py-2.5 bg-red-600 text-white font-black text-xs uppercase tracking-wider rounded-md shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all animate-pulse cursor-pointer"
         >
           <ShieldAlert className="w-4 h-4" />
           <span>SOS ALERT</span>
@@ -1607,7 +1619,7 @@ export default function StudentDashboard() {
 
         <a
           href="tel:9826381867"
-          className="flex-1 py-2.5 bg-emerald-600 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+          className="flex-1 py-2.5 bg-emerald-600 text-white font-black text-xs uppercase tracking-wider rounded-md shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
         >
           <Phone className="w-4 h-4" />
           <span>CALL SECURITY</span>
@@ -1615,7 +1627,7 @@ export default function StudentDashboard() {
 
         <a
           href="tel:9826381867"
-          className="px-3.5 py-2.5 bg-[#0c2340] text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer"
+          className="px-3.5 py-2.5 bg-[#0c2340] text-white font-black text-xs uppercase tracking-wider rounded-md shadow-sm flex items-center justify-center gap-1 active:scale-95 transition-all cursor-pointer"
           title="Campus Ambulance"
         >
           <PhoneCall className="w-4 h-4 text-emerald-400" />

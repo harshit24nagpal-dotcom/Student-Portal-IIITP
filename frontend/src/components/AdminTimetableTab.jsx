@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { API_URL } from '../config/api';
 import { 
   Calendar, Clock, Plus, Trash2, Edit2, CheckCircle2, 
-  AlertCircle, RefreshCw, BookOpen, MapPin, User, Layers
+  AlertCircle, RefreshCw, BookOpen, MapPin, User, Layers, X
 } from 'lucide-react';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -143,7 +143,7 @@ export default function AdminTimetableTab() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+      <div className="p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-blue-50 text-blue-900 text-[10px] font-black uppercase rounded tracking-wider border border-blue-200">
@@ -164,14 +164,14 @@ export default function AdminTimetableTab() {
         <div className="flex items-center gap-3">
           <button
             onClick={fetchTimetable}
-            className="p-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-slate-600 transition-colors cursor-pointer"
+            className="p-2 border border-slate-200 hover:bg-slate-50 rounded-md text-slate-600 transition-colors cursor-pointer"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={handleOpenCreate}
-            className="px-4 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+            className="px-4 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-md shadow-xs flex items-center gap-2 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Add Lecture Slot
@@ -181,33 +181,37 @@ export default function AdminTimetableTab() {
 
       {/* Notifications */}
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{message}</span>
           </div>
-          <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold cursor-pointer">✕</button>
+          <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 text-xs font-bold cursor-pointer">✕</button>
+          <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {/* Section & Day Selector */}
-      <div className="p-4 rounded-2xl border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+      <div className="p-4 rounded-md border border-slate-200 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
         <div className="flex items-center gap-2">
           <label className="text-xs font-bold text-slate-600 uppercase">Section:</label>
           <select
             value={selectedSection}
             onChange={(e) => setSelectedSection(e.target.value)}
-            className="p-2 border border-slate-300 rounded-xl text-xs font-bold bg-white text-slate-800"
+            className="p-2 border border-slate-300 rounded-md text-xs font-bold bg-white text-slate-800"
           >
             <option value="Section A (CSE)">Section A (CSE - MIS 001 to 082)</option>
             <option value="Section B (CSE)">Section B (CSE - MIS 083 to 164)</option>
@@ -218,7 +222,7 @@ export default function AdminTimetableTab() {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setSelectedDay('ALL')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
               selectedDay === 'ALL'
                 ? 'bg-[#0c2340] text-white shadow-xs'
                 : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -230,7 +234,7 @@ export default function AdminTimetableTab() {
             <button
               key={d}
               onClick={() => setSelectedDay(d)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                 selectedDay === d
                   ? 'bg-[#0c2340] text-white shadow-xs'
                   : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -248,7 +252,7 @@ export default function AdminTimetableTab() {
           const daySlots = slotsByDay[day] || [];
 
           return (
-            <div key={day} className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-2xs">
+            <div key={day} className="rounded-md border border-slate-200 bg-white overflow-hidden shadow-2xs">
               <div className="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#0c2340]" />
@@ -266,7 +270,7 @@ export default function AdminTimetableTab() {
                   {daySlots.map(slot => (
                     <div key={slot.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 transition-colors">
                       <div className="flex items-start sm:items-center gap-3">
-                        <div className="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-xs font-bold font-mono shrink-0 flex items-center gap-1.5">
+                        <div className="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-md text-blue-900 text-xs font-bold font-mono shrink-0 flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5 text-blue-700" />
                           <span>{slot.timeSlot}</span>
                         </div>
@@ -291,14 +295,14 @@ export default function AdminTimetableTab() {
                       <div className="flex items-center gap-1.5 self-end sm:self-center">
                         <button
                           onClick={() => handleOpenEdit(slot)}
-                          className="p-1.5 border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg text-xs transition-colors cursor-pointer"
+                          className="p-1.5 border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-md text-xs transition-colors cursor-pointer"
                           title="Edit Slot"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDelete(slot.id)}
-                          className="p-1.5 border border-red-200 hover:bg-red-50 text-red-600 rounded-lg text-xs transition-colors cursor-pointer"
+                          className="p-1.5 border border-red-200 hover:bg-red-50 text-red-600 rounded-md text-xs transition-colors cursor-pointer"
                           title="Delete Slot"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -318,7 +322,7 @@ export default function AdminTimetableTab() {
          ========================================================================= */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-md max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900">
@@ -326,7 +330,9 @@ export default function AdminTimetableTab() {
                 </h3>
                 <p className="text-xxs text-slate-500">Configure lecture period for {form.section}</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-3 text-xs">
@@ -336,7 +342,7 @@ export default function AdminTimetableTab() {
                   <select
                     value={form.day}
                     onChange={(e) => setForm({...form, day: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-semibold"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs font-semibold"
                   >
                     {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
@@ -350,7 +356,7 @@ export default function AdminTimetableTab() {
                     placeholder="e.g. 09:30 AM - 10:30 AM"
                     value={form.timeSlot}
                     onChange={(e) => setForm({...form, timeSlot: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono"
                   />
                 </div>
               </div>
@@ -364,7 +370,7 @@ export default function AdminTimetableTab() {
                     placeholder="e.g. LNO"
                     value={form.subjectCode}
                     onChange={(e) => setForm({...form, subjectCode: e.target.value.toUpperCase()})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono uppercase"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono uppercase"
                   />
                 </div>
                 <div className="col-span-2">
@@ -375,7 +381,7 @@ export default function AdminTimetableTab() {
                     placeholder="e.g. LH-102 or Computer Lab 3"
                     value={form.room}
                     onChange={(e) => setForm({...form, room: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs"
                   />
                 </div>
               </div>
@@ -388,7 +394,7 @@ export default function AdminTimetableTab() {
                   placeholder="e.g. Linear and Non-Linear Optimization"
                   value={form.subjectName}
                   onChange={(e) => setForm({...form, subjectName: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
@@ -400,7 +406,7 @@ export default function AdminTimetableTab() {
                   placeholder="e.g. Ms. Anagha Khiste"
                   value={form.facultyName}
                   onChange={(e) => setForm({...form, facultyName: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
@@ -408,14 +414,14 @@ export default function AdminTimetableTab() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-lg cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-md cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-lg shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-md shadow-xs cursor-pointer"
                 >
                   {saving ? 'Saving...' : editingSlot ? 'Save Changes' : 'Add Slot'}
                 </button>

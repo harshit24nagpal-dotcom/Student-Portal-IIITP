@@ -19,7 +19,7 @@ function MainLayout() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 font-sans text-slate-800 gap-3.5">
-        <div className="p-3.5 bg-white border border-slate-200 rounded-2xl shadow-sm animate-pulse text-[#1c398e]">
+        <div className="p-3.5 bg-white border border-slate-200 rounded-md shadow-sm animate-pulse text-[#1c398e]">
           <Shield className="w-8 h-8 animate-spin text-[#5367c8]" />
         </div>
         <p className="text-xs uppercase font-semibold tracking-wider text-slate-500">

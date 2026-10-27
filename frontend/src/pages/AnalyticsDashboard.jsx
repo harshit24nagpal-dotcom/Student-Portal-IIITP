@@ -5,7 +5,7 @@ import {
   PieChart, Pie, Cell, Legend, LineChart, Line 
 } from 'recharts';
 import { 
-  Activity, AlertTriangle, ShieldAlert, Award, Clock, TrendingUp, MapPin 
+  Activity, AlertTriangle, ShieldAlert, Award, Clock, TrendingUp, MapPin, Star
 } from 'lucide-react';
 
 const COLORS = ['#ef4444', '#f97316', '#a855f7', '#f59e0b', '#ec4899', '#64748b'];
@@ -53,7 +53,7 @@ export default function AnalyticsDashboard() {
       {/* 1. Aggregation Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Emergencies */}
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm relative overflow-hidden">
+        <div className="p-5 rounded-md border border-slate-200 bg-white shadow-sm relative overflow-hidden">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">TOTAL SOS ALERTS</p>
           <div className="flex items-baseline gap-2 mt-2">
             <h4 className="text-3xl font-black text-slate-900">{summary.totalRequests}</h4>
@@ -62,7 +62,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Avg Response Time */}
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="p-5 rounded-md border border-slate-200 bg-white shadow-sm">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AVG RESPONSE TIME</p>
           <div className="flex items-baseline gap-2 mt-2">
             <h4 className="text-3xl font-black text-emerald-700">
@@ -73,7 +73,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Escalated Count */}
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="p-5 rounded-md border border-slate-200 bg-white shadow-sm">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">ESCALATED INCIDENTS</p>
           <div className="flex items-baseline gap-2 mt-2">
             <h4 className="text-3xl font-black text-amber-600">{summary.escalatedRequests}</h4>
@@ -82,7 +82,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Efficiency index */}
-        <div className="p-5 rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="p-5 rounded-md border border-slate-200 bg-white shadow-sm">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">RESOLVED RATIO</p>
           <div className="flex items-baseline gap-2 mt-2">
             <h4 className="text-3xl font-black text-[#0c2340]">
@@ -99,7 +99,7 @@ export default function AnalyticsDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Category Breakdown (Pie) */}
-        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[350px]">
+        <div className="lg:col-span-1 p-5 rounded-md border border-slate-200 bg-white shadow-sm flex flex-col h-[350px]">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
             <ShieldAlert className="w-4 h-4 text-red-600" />
             SOS INCIDENT BY CATEGORY
@@ -138,7 +138,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Peak reporting hours (Bar) */}
-        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[350px]">
+        <div className="lg:col-span-2 p-5 rounded-md border border-slate-200 bg-white shadow-sm flex flex-col h-[350px]">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
             <TrendingUp className="w-4 h-4 text-blue-600" />
             PEAK ALERTS BY HOUR OF DAY
@@ -161,7 +161,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Hotspots Section (horizontal bar) */}
-        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[320px]">
+        <div className="lg:col-span-1 p-5 rounded-md border border-slate-200 bg-white shadow-sm flex flex-col h-[320px]">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
             <MapPin className="w-4 h-4 text-amber-600" />
             CAMPUS EMERGENCY HOTSPOTS
@@ -193,7 +193,7 @@ export default function AnalyticsDashboard() {
         </div>
 
         {/* Responder performance (Leaderboard Table) */}
-        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col h-[320px] overflow-hidden">
+        <div className="lg:col-span-2 p-5 rounded-md border border-slate-200 bg-white shadow-sm flex flex-col h-[320px] overflow-hidden">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-4 flex items-center gap-1.5">
             <Award className="w-4 h-4 text-emerald-600" />
             RESPONDER PERFORMANCE BOARD
@@ -222,7 +222,10 @@ export default function AnalyticsDashboard() {
                       {resp.avgResponseMinutes} mins
                     </td>
                     <td className="py-2.5 text-right font-black text-amber-600">
-                      ★ {resp.rating}
+                      <span className="flex items-center justify-end gap-1">
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                        <span>{resp.rating}</span>
+                      </span>
                     </td>
                   </tr>
                 ))}

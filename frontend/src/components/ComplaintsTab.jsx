@@ -96,9 +96,9 @@ export default function ComplaintsTab({ token, user }) {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-5 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-red-100 text-red-700 rounded-2xl">
+          <div className="p-3 bg-red-100 text-red-700 rounded-md">
             <AlertOctagon className="w-6 h-6" />
           </div>
           <div>
@@ -112,7 +112,7 @@ export default function ComplaintsTab({ token, user }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-1.5">
+          <span className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-md text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <EyeOff className="w-3.5 h-3.5 text-slate-500" />
             <span>Anonymous Filing Supported</span>
           </span>
@@ -120,14 +120,14 @@ export default function ComplaintsTab({ token, user }) {
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
           {error}
         </div>
@@ -135,7 +135,7 @@ export default function ComplaintsTab({ token, user }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form: File Complaint */}
-        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="lg:col-span-1 p-5 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
             <MessageSquare className="w-4 h-4 text-[#1c398e]" />
             <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
@@ -151,7 +151,7 @@ export default function ComplaintsTab({ token, user }) {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               >
                 <option value="MESS_FOOD_QUALITY">Mess Food Quality & Hygiene</option>
                 <option value="HOSTEL_MAINTENANCE">Hostel Living Conditions & Facilities</option>
@@ -172,7 +172,7 @@ export default function ComplaintsTab({ token, user }) {
                 placeholder="Brief summary of the issue..."
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -186,12 +186,12 @@ export default function ComplaintsTab({ token, user }) {
                 placeholder="Provide specific dates, timings, locations, and details so authorities can investigate..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               />
             </div>
 
             {/* Anonymous Toggle */}
-            <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div className="p-3 bg-slate-50 border border-slate-200 rounded-md">
               <label className="flex items-center justify-between cursor-pointer">
                 <div>
                   <span className="text-xs font-bold text-slate-800 block">
@@ -213,7 +213,7 @@ export default function ComplaintsTab({ token, user }) {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1c398e] text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1c398e] text-white text-xs font-bold uppercase rounded-md tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
             >
               {submitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               <span>Submit Formal Grievance</span>
@@ -222,7 +222,7 @@ export default function ComplaintsTab({ token, user }) {
         </div>
 
         {/* Complaints List */}
-        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="lg:col-span-2 p-5 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#1c398e]" />
@@ -253,12 +253,12 @@ export default function ComplaintsTab({ token, user }) {
               {complaints.map((c) => (
                 <div
                   key={c.id}
-                  className="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all space-y-2.5"
+                  className="p-4 rounded-md border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-all space-y-2.5"
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full border ${getStatusBadge(c.status)}`}>
+                        <span className={`px-2.5 py-0.5 text-[10px] font-bold uppercase rounded border ${getStatusBadge(c.status)}`}>
                           {c.status.replace('_', ' ')}
                         </span>
                         <span className="text-xs font-bold text-slate-900">
@@ -289,7 +289,7 @@ export default function ComplaintsTab({ token, user }) {
                   </div>
 
                   {c.adminRemarks && (
-                    <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-xs space-y-1">
+                    <div className="p-3 rounded-md bg-blue-50/70 border border-blue-200 text-xs space-y-1">
                       <div className="flex items-center justify-between text-blue-900 font-bold">
                         <span>Official Committee Response:</span>
                         {c.resolvedAt && (

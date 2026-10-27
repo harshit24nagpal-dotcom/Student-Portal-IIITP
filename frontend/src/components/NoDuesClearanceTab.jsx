@@ -6,7 +6,7 @@ import {
   Download, QrCode, ShieldCheck, Printer, RefreshCw, FileText,
   Cpu, BookOpen, Building2, Landmark, CreditCard, ChevronDown, 
   ChevronUp, Check, ArrowRight, UserCheck, Banknote, AlertTriangle, 
-  HelpCircle, Sparkles, School, Layers, IndianRupee, ShieldAlert
+  HelpCircle, Sparkles, School, Layers, IndianRupee, ShieldAlert, X
 } from 'lucide-react';
 
 // Institutional 5 Sectors Definition
@@ -255,7 +255,7 @@ export default function NoDuesClearanceTab() {
     return (
       <div className="space-y-6">
         {/* Institutional Inactivity Notice Card */}
-        <div className="glass-card rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <div className="glass-card rounded-md border border-slate-200 bg-white shadow-sm overflow-hidden">
           <div className="bg-linear-to-r from-slate-900 via-[#0c2340] to-slate-800 p-6 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
@@ -279,7 +279,7 @@ export default function NoDuesClearanceTab() {
               <button
                 onClick={handleToggleDemoStanding}
                 disabled={togglingDemo}
-                className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-xl shadow-md flex items-center gap-2 transition-all cursor-pointer"
+                className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs uppercase tracking-wider rounded-md shadow-md flex items-center gap-2 transition-all cursor-pointer"
               >
                 <Sparkles className="w-4 h-4 text-slate-900" />
                 {togglingDemo ? 'Switching Profile...' : 'Simulate Final-Year View (Panel Demo)'}
@@ -289,9 +289,9 @@ export default function NoDuesClearanceTab() {
 
           <div className="p-6 space-y-6">
             {/* Student Standing Profile Banner */}
-            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-md flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#0c2340] text-amber-400 font-bold flex items-center justify-center text-sm shadow-xs">
+                <div className="w-10 h-10 rounded bg-[#0c2340] text-amber-400 font-bold flex items-center justify-center text-sm shadow-xs">
                   {student?.name?.charAt(0) || 'S'}
                 </div>
                 <div>
@@ -302,14 +302,14 @@ export default function NoDuesClearanceTab() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="px-3 py-1 bg-blue-100 text-blue-900 font-bold rounded-lg text-xs">
+                <span className="px-3 py-1 bg-blue-100 text-blue-900 font-bold rounded-md text-xs">
                   Current Standing: {student?.academicYearLabel || 'Semester 3 • 2nd Year'}
                 </span>
               </div>
             </div>
 
             {/* Explanation: Why No-Dues is Inactive for Continuing Students */}
-            <div className="border border-amber-200 bg-amber-50/60 rounded-xl p-5 space-y-3">
+            <div className="border border-amber-200 bg-amber-50/60 rounded-md p-5 space-y-3">
               <h4 className="text-xs font-black uppercase tracking-wider text-amber-900 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-600" />
                 Why is No-Dues Clearance Not Applicable to Your Current Semester?
@@ -318,11 +318,11 @@ export default function NoDuesClearanceTab() {
                 In accordance with <strong>Indian Institute of Information Technology, Pune Academic Regulations (Clause 14.2)</strong>, formal No-Dues clearance is mandatory <em>only</em> at the conclusion of your final degree semester (Semester 8 for 4-Year B.Tech) prior to Convocation and Degree Conferment.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                <div className="p-3 bg-white rounded-lg border border-amber-200/70 text-xxs text-slate-600 space-y-1">
+                <div className="p-3 bg-white rounded-md border border-amber-200/70 text-xxs text-slate-600 space-y-1">
                   <span className="font-bold text-slate-900 block text-xs">1. Active Campus Entitlements Remain Active</span>
                   Continuing students actively borrow library books, utilize electronics and computing hardware stores, and reside in Institute hostels. These facilities cannot be surrendered while coursework is underway.
                 </div>
-                <div className="p-3 bg-white rounded-lg border border-amber-200/70 text-xxs text-slate-600 space-y-1">
+                <div className="p-3 bg-white rounded-md border border-amber-200/70 text-xxs text-slate-600 space-y-1">
                   <span className="font-bold text-slate-900 block text-xs">2. Caution Deposit (₹10,000) Held in Escrow</span>
                   The institutional security deposit paid at admission remains safeguarded in the Institute accounts treasury to secure campus equipment until your final graduating exit.
                 </div>
@@ -336,7 +336,7 @@ export default function NoDuesClearanceTab() {
                 Institutional Degree Milestone Roadmap
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1">
+                <div className="p-3.5 rounded-md border border-emerald-200 bg-emerald-50/50 space-y-1">
                   <div className="flex items-center justify-between text-xxs font-bold text-emerald-800">
                     <span>YEAR 1 (SEM 1-2)</span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
@@ -345,7 +345,7 @@ export default function NoDuesClearanceTab() {
                   <p className="text-[10px] text-slate-500">Core courses & campus orientation. (Completed)</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl border-2 border-blue-500 bg-blue-50/50 space-y-1 shadow-xs">
+                <div className="p-3.5 rounded-md border-2 border-blue-500 bg-blue-50/50 space-y-1 shadow-xs">
                   <div className="flex items-center justify-between text-xxs font-bold text-blue-800">
                     <span>YEAR 2 (SEM 3-4)</span>
                     <span className="px-1.5 py-0.5 bg-blue-600 text-white rounded text-[9px] font-black">CURRENT</span>
@@ -354,7 +354,7 @@ export default function NoDuesClearanceTab() {
                   <p className="text-[10px] text-slate-600">Active library & lab privileges in progress.</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1 opacity-75">
+                <div className="p-3.5 rounded-md border border-slate-200 bg-slate-50 space-y-1 opacity-75">
                   <div className="flex items-center justify-between text-xxs font-bold text-slate-500">
                     <span>YEAR 3 (SEM 5-6)</span>
                     <Clock className="w-4 h-4 text-slate-400" />
@@ -363,7 +363,7 @@ export default function NoDuesClearanceTab() {
                   <p className="text-[10px] text-slate-500">Summer industry projects & pre-placement prep.</p>
                 </div>
 
-                <div className="p-3.5 rounded-xl border border-amber-300 bg-amber-50/40 space-y-1">
+                <div className="p-3.5 rounded-md border border-amber-300 bg-amber-50/40 space-y-1">
                   <div className="flex items-center justify-between text-xxs font-bold text-amber-800">
                     <span>YEAR 4 (SEM 7-8)</span>
                     <GraduationCap className="w-4 h-4 text-amber-600" />
@@ -375,7 +375,7 @@ export default function NoDuesClearanceTab() {
             </div>
 
             {/* Panel Demonstration Callout */}
-            <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-md border border-slate-200 bg-slate-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-0.5">
                 <span className="text-[10px] font-black uppercase text-[#0c2340] tracking-wider block">
                   Evaluation Panel Notice
@@ -387,7 +387,7 @@ export default function NoDuesClearanceTab() {
               <button
                 onClick={handleToggleDemoStanding}
                 disabled={togglingDemo}
-                className="px-4 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer whitespace-nowrap"
+                className="px-4 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-md transition-all cursor-pointer whitespace-nowrap"
               >
                 {togglingDemo ? 'Activating...' : 'Switch to Graduating Batch (Sem 8)'}
               </button>
@@ -404,7 +404,7 @@ export default function NoDuesClearanceTab() {
   return (
     <div className="space-y-6">
       {/* Top Banner: Graduating Final Year Protocol */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="glass-card p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase rounded tracking-wider border border-emerald-300">
@@ -428,7 +428,7 @@ export default function NoDuesClearanceTab() {
             onClick={handleToggleDemoStanding}
             disabled={togglingDemo}
             title="Switch back to Continuing Student view (Semester 3)"
-            className="px-3 py-1.5 text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 text-[11px] font-bold uppercase rounded-lg transition-colors cursor-pointer"
+            className="px-3 py-1.5 text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 text-[11px] font-bold uppercase rounded-md transition-colors cursor-pointer"
           >
             {togglingDemo ? '...' : 'Toggle to Sem 3 (Demo)'}
           </button>
@@ -436,7 +436,7 @@ export default function NoDuesClearanceTab() {
           {isComplete && (
             <button
               onClick={() => setShowCertModal(true)}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase rounded-xl tracking-wider shadow-sm flex items-center gap-2 transition-colors cursor-pointer"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase rounded-md tracking-wider shadow-sm flex items-center gap-2 transition-colors cursor-pointer"
             >
               <GraduationCap className="w-4 h-4" />
               View & Download Certificate
@@ -447,29 +447,33 @@ export default function NoDuesClearanceTab() {
 
       {/* Notifications */}
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{message}</span>
           </div>
-          <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold">✕</button>
+          <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 text-xs font-bold">✕</button>
+          <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {/* 4 Executive Metric Cards (Progress, Caution Deposit, Dues, Net Refund) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Clearance Progress */}
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-xs space-y-2">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
               Clearance Progress
@@ -480,7 +484,7 @@ export default function NoDuesClearanceTab() {
             <span className="text-2xl font-black text-slate-900">{approvedDepts}</span>
             <span className="text-xs text-slate-500 font-bold">/ {totalDepts} Departments</span>
           </div>
-          <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-slate-100 rounded h-2 overflow-hidden">
             <div 
               className={`h-full transition-all duration-500 ${isComplete ? 'bg-emerald-500' : 'bg-[#0c2340]'}`}
               style={{ width: `${Math.round((approvedDepts / (totalDepts || 1)) * 100)}%` }}
@@ -492,7 +496,7 @@ export default function NoDuesClearanceTab() {
         </div>
 
         {/* Card 2: Initial Caution Deposit */}
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-xs space-y-2">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
               Caution Money Deposit
@@ -508,7 +512,7 @@ export default function NoDuesClearanceTab() {
         </div>
 
         {/* Card 3: Outstanding Departmental Dues */}
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-xs space-y-2">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
               Outstanding Dues
@@ -526,7 +530,7 @@ export default function NoDuesClearanceTab() {
         </div>
 
         {/* Card 4: Net Refund Disbursable */}
-        <div className="p-4 rounded-xl border-2 border-emerald-400 bg-emerald-50/40 shadow-xs space-y-2">
+        <div className="p-4 rounded-md border-2 border-emerald-400 bg-emerald-50/40 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider">
               Net Refund Disbursable
@@ -543,7 +547,7 @@ export default function NoDuesClearanceTab() {
       </div>
 
       {/* NEFT Bank Account Details for Caution Money Refund (Collapsible / Editable) */}
-      <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="p-4 rounded-md border border-slate-200 bg-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <CreditCard className="w-4 h-4 text-[#0c2340]" />
@@ -558,7 +562,7 @@ export default function NoDuesClearanceTab() {
 
         <button
           onClick={() => setShowBankDetailsForm(!showBankDetailsForm)}
-          className="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold uppercase rounded-lg transition-colors cursor-pointer whitespace-nowrap self-start md:self-center"
+          className="px-3.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold uppercase rounded-md transition-colors cursor-pointer whitespace-nowrap self-start md:self-center"
         >
           {showBankDetailsForm ? 'Hide Form' : 'Update NEFT Bank Details'}
         </button>
@@ -566,7 +570,7 @@ export default function NoDuesClearanceTab() {
 
       {/* Refund Bank Details Edit Form */}
       {showBankDetailsForm && (
-        <form onSubmit={handleApplyNoDues} className="p-5 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-xs">
+        <form onSubmit={handleApplyNoDues} className="p-5 rounded-md border border-slate-200 bg-white space-y-4 shadow-xs">
           <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 border-b border-slate-200 pb-2">
             Caution Money Refund Direct Bank Details (NEFT / RTGS)
           </h4>
@@ -577,7 +581,7 @@ export default function NoDuesClearanceTab() {
                 type="text" 
                 value={bankForm.accountHolderName} 
                 onChange={e => setBankForm({...bankForm, accountHolderName: e.target.value})}
-                className="w-full p-2 border border-slate-300 rounded-lg text-xs" 
+                className="w-full p-2 border border-slate-300 rounded-md text-xs" 
                 required 
               />
             </div>
@@ -587,7 +591,7 @@ export default function NoDuesClearanceTab() {
                 type="text" 
                 value={bankForm.bankName} 
                 onChange={e => setBankForm({...bankForm, bankName: e.target.value})}
-                className="w-full p-2 border border-slate-300 rounded-lg text-xs" 
+                className="w-full p-2 border border-slate-300 rounded-md text-xs" 
                 required 
               />
             </div>
@@ -598,7 +602,7 @@ export default function NoDuesClearanceTab() {
                 value={bankForm.accountNumber} 
                 placeholder="e.g. 309812498234"
                 onChange={e => setBankForm({...bankForm, accountNumber: e.target.value})}
-                className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono" 
+                className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono" 
                 required 
               />
             </div>
@@ -609,7 +613,7 @@ export default function NoDuesClearanceTab() {
                 value={bankForm.ifscCode} 
                 placeholder="e.g. SBIN0012345"
                 onChange={e => setBankForm({...bankForm, ifscCode: e.target.value.toUpperCase()})}
-                className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono uppercase" 
+                className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono uppercase" 
                 required 
               />
             </div>
@@ -620,7 +624,7 @@ export default function NoDuesClearanceTab() {
               type="text" 
               value={bankForm.futureAddress} 
               onChange={e => setBankForm({...bankForm, futureAddress: e.target.value})}
-              className="w-full p-2 border border-slate-300 rounded-lg text-xs" 
+              className="w-full p-2 border border-slate-300 rounded-md text-xs" 
               required 
             />
           </div>
@@ -628,14 +632,14 @@ export default function NoDuesClearanceTab() {
             <button
               type="button"
               onClick={() => setShowBankDetailsForm(false)}
-              className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-lg"
+              className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-md"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={applying}
-              className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-lg shadow-xs"
+              className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-md shadow-xs"
             >
               {applying ? 'Saving Details...' : 'Save & Confirm Refund Details'}
             </button>
@@ -645,7 +649,7 @@ export default function NoDuesClearanceTab() {
 
       {/* Start Application prompt if not applied yet */}
       {!application && (
-        <div className="glass-card p-8 rounded-2xl border border-slate-200 bg-white text-center max-w-xl mx-auto space-y-4 shadow-sm">
+        <div className="glass-card p-8 rounded-md border border-slate-200 bg-white text-center max-w-xl mx-auto space-y-4 shadow-sm">
           <GraduationCap className="w-16 h-16 text-[#0c2340] mx-auto" />
           <h3 className="text-lg font-bold text-slate-900">Graduation Clearance Protocol Ready</h3>
           <p className="text-xs text-slate-500 leading-relaxed">
@@ -654,7 +658,7 @@ export default function NoDuesClearanceTab() {
           <button
             onClick={handleApplyNoDues}
             disabled={applying}
-            className="px-6 py-3 bg-[#0c2340] hover:bg-slate-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer"
+            className="px-6 py-3 bg-[#0c2340] hover:bg-slate-900 text-white font-bold rounded-md text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer"
           >
             {applying ? 'Initiating Application...' : 'Initiate 15-Department Clearance Protocol'}
           </button>
@@ -668,7 +672,7 @@ export default function NoDuesClearanceTab() {
             <div className="flex items-center gap-1.5 flex-nowrap">
               <button
                 onClick={() => setSelectedSector('ALL')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap cursor-pointer ${
                   selectedSector === 'ALL'
                     ? 'bg-[#0c2340] text-white shadow-xs'
                     : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -686,7 +690,7 @@ export default function NoDuesClearanceTab() {
                   <button
                     key={sec.id}
                     onClick={() => setSelectedSector(sec.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
                       selectedSector === sec.id
                         ? 'bg-[#0c2340] text-white shadow-xs'
                         : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
@@ -718,11 +722,11 @@ export default function NoDuesClearanceTab() {
               const SectorIcon = sec.icon;
 
               return (
-                <div key={sec.id} className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+                <div key={sec.id} className="rounded-md border border-slate-200 bg-white overflow-hidden shadow-xs">
                   {/* Sector Header Banner */}
                   <div className="p-4 bg-slate-50/80 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#0c2340] shadow-2xs">
+                      <div className="w-10 h-10 rounded-md bg-white border border-slate-200 flex items-center justify-center text-[#0c2340] shadow-2xs">
                         <SectorIcon className="w-5 h-5" />
                       </div>
                       <div>
@@ -738,11 +742,11 @@ export default function NoDuesClearanceTab() {
 
                     <div className="flex items-center gap-3 self-end sm:self-center">
                       {secDues > 0 && (
-                        <span className="px-2.5 py-1 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-lg font-mono">
+                        <span className="px-2.5 py-1 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-md font-mono">
                           Dues: ₹{secDues}
                         </span>
                       )}
-                      <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 border ${
+                      <span className={`px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 border ${
                         isSecComplete 
                           ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
                           : 'bg-amber-50 text-amber-800 border-amber-200'
@@ -764,7 +768,7 @@ export default function NoDuesClearanceTab() {
                       return (
                         <div 
                           key={c.id} 
-                          className={`p-4 rounded-xl border transition-all bg-white flex flex-col justify-between ${
+                          className={`p-4 rounded-md border transition-all bg-white flex flex-col justify-between ${
                             isApp 
                               ? 'border-emerald-200 shadow-2xs' 
                               : isRej 
@@ -826,7 +830,7 @@ export default function NoDuesClearanceTab() {
                                   setSettleModalItem(c);
                                   setPaymentMethod('UPI');
                                 }}
-                                className="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xxs uppercase tracking-wider rounded-lg shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                className="w-full py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xxs uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                               >
                                 <CreditCard className="w-3.5 h-3.5" />
                                 1-Click Pay ₹{c.amountDue} Online
@@ -849,10 +853,10 @@ export default function NoDuesClearanceTab() {
          ========================================================================= */}
       {settleModalItem && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-white rounded-md max-w-md w-full p-6 space-y-5 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-md bg-red-50 text-red-600 flex items-center justify-center">
                   <CreditCard className="w-4 h-4" />
                 </div>
                 <div>
@@ -862,14 +866,14 @@ export default function NoDuesClearanceTab() {
               </div>
               <button 
                 onClick={() => setSettleModalItem(null)}
-                className="text-slate-400 hover:text-slate-600 text-sm font-bold cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Itemized Dues Breakdown */}
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-2 text-xs">
+            <div className="p-3 bg-slate-50 rounded-md border border-slate-200 space-y-2 text-xs">
               <div className="flex justify-between text-slate-600">
                 <span>Department / In-charge:</span>
                 <strong className="text-slate-900">{settleModalItem.department?.name}</strong>
@@ -893,7 +897,7 @@ export default function NoDuesClearanceTab() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('UPI')}
-                  className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                  className={`p-2.5 rounded-md border text-center font-bold transition-all cursor-pointer ${
                     paymentMethod === 'UPI' 
                       ? 'border-[#0c2340] bg-[#0c2340] text-white shadow-xs' 
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -906,7 +910,7 @@ export default function NoDuesClearanceTab() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('NETBANKING')}
-                  className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                  className={`p-2.5 rounded-md border text-center font-bold transition-all cursor-pointer ${
                     paymentMethod === 'NETBANKING' 
                       ? 'border-[#0c2340] bg-[#0c2340] text-white shadow-xs' 
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -919,7 +923,7 @@ export default function NoDuesClearanceTab() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('CAUTION_OFFSET')}
-                  className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${
+                  className={`p-2.5 rounded-md border text-center font-bold transition-all cursor-pointer ${
                     paymentMethod === 'CAUTION_OFFSET' 
                       ? 'border-[#0c2340] bg-[#0c2340] text-white shadow-xs' 
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -931,7 +935,7 @@ export default function NoDuesClearanceTab() {
               </div>
             </div>
 
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xxs text-emerald-800 space-y-1">
+            <div className="p-3 bg-emerald-50 rounded-md border border-emerald-200 text-xxs text-emerald-800 space-y-1">
               <span className="font-bold block text-xs flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Instant Department Sign-off
               </span>
@@ -945,7 +949,7 @@ export default function NoDuesClearanceTab() {
               <button
                 type="button"
                 onClick={() => setSettleModalItem(null)}
-                className="px-4 py-2 text-xs font-bold uppercase rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
+                className="px-4 py-2 text-xs font-bold uppercase rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -953,7 +957,7 @@ export default function NoDuesClearanceTab() {
                 type="button"
                 onClick={handleSettleDues}
                 disabled={settling}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg shadow-xs flex items-center gap-1.5 cursor-pointer"
+                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-md shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
                 {settling ? (
                   <>
@@ -977,7 +981,7 @@ export default function NoDuesClearanceTab() {
          ========================================================================= */}
       {showCertModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-slate-900 rounded-2xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl text-slate-900">
+          <div className="bg-white border-2 border-slate-900 rounded-md max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl text-slate-900">
             {/* IIIT Pune Official Header */}
             <div className="text-center border-b-2 border-slate-900 pb-4 space-y-1">
               <div className="flex items-center justify-center gap-2 mb-1">
@@ -1034,7 +1038,7 @@ export default function NoDuesClearanceTab() {
             </div>
 
             {/* Caution Money Reconciliation Summary */}
-            <div className="p-3.5 bg-slate-50 border border-slate-300 rounded-lg text-xs space-y-1">
+            <div className="p-3.5 bg-slate-50 border border-slate-300 rounded-md text-xs space-y-1">
               <div className="flex justify-between">
                 <span>Initial Institutional Caution Money Deposit:</span>
                 <span className="font-mono font-bold">₹{cautionDeposit.toLocaleString('en-IN')}</span>
@@ -1064,8 +1068,9 @@ export default function NoDuesClearanceTab() {
               </div>
 
               <div className="text-right space-y-6">
-                <div className="font-mono text-[10px] text-emerald-700 font-bold">
-                  ✓ Digitally Signed & Authenticated
+                <div className="font-mono text-[10px] text-emerald-700 font-bold flex items-center justify-end gap-1">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Digitally Signed & Authenticated</span>
                 </div>
                 <div>
                   <p className="font-black text-slate-900 border-t border-slate-800 pt-1 uppercase">
@@ -1082,14 +1087,14 @@ export default function NoDuesClearanceTab() {
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200">
               <button
                 onClick={() => window.print()}
-                className="px-4 py-2 bg-slate-950 hover:bg-black text-white font-bold rounded-lg text-xs uppercase flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-slate-950 hover:bg-black text-white font-bold rounded-md text-xs uppercase flex items-center gap-1.5 cursor-pointer"
               >
                 <Printer className="w-3.5 h-3.5" />
                 Print Certificate
               </button>
               <button
                 onClick={() => setShowCertModal(false)}
-                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-lg text-xs uppercase cursor-pointer"
+                className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold rounded-md text-xs uppercase cursor-pointer"
               >
                 Close Window
               </button>

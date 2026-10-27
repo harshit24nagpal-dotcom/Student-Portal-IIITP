@@ -50,9 +50,9 @@ export default function AnnouncementsTab({ token, portalType = 'ACADEMIC' }) {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3.5">
-          <div className={`p-3 rounded-2xl ${portalType === 'ACADEMIC' ? 'bg-blue-100 text-[#1c398e]' : 'bg-amber-100 text-amber-800'}`}>
+          <div className={`p-3 rounded-md ${portalType === 'ACADEMIC' ? 'bg-blue-100 text-[#1c398e]' : 'bg-amber-100 text-amber-800'}`}>
             <Megaphone className="w-6 h-6" />
           </div>
           <div>
@@ -79,7 +79,7 @@ export default function AnnouncementsTab({ token, portalType = 'ACADEMIC' }) {
 
         <button
           onClick={fetchAnnouncements}
-          className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer self-start md:self-auto"
+          className="px-3.5 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold rounded-md flex items-center gap-1.5 transition-colors cursor-pointer self-start md:self-auto"
         >
           <RefreshCw className="w-3.5 h-3.5 text-[#5367c8]" />
           <span>Refresh Notices</span>
@@ -88,8 +88,8 @@ export default function AnnouncementsTab({ token, portalType = 'ACADEMIC' }) {
 
       {/* Featured / Highlight Notice for Navratri & Mess */}
       {portalType === 'ACADEMIC' ? (
-        <div className="p-5 rounded-2xl border border-amber-300 bg-linear-to-r from-amber-50 to-orange-50/40 shadow-xs flex items-start gap-4">
-          <div className="p-2.5 bg-amber-100 text-amber-800 rounded-xl mt-0.5">
+        <div className="p-5 rounded-md border border-amber-300 bg-linear-to-r from-amber-50 to-orange-50/40 shadow-xs flex items-start gap-4">
+          <div className="p-2.5 bg-amber-100 text-amber-800 rounded-md mt-0.5">
             <Sparkles className="w-5 h-5 text-amber-600 animate-spin" />
           </div>
           <div className="space-y-1">
@@ -108,8 +108,8 @@ export default function AnnouncementsTab({ token, portalType = 'ACADEMIC' }) {
           </div>
         </div>
       ) : (
-        <div className="p-5 rounded-2xl border border-red-300 bg-linear-to-r from-red-50 to-amber-50/40 shadow-xs flex items-start gap-4">
-          <div className="p-2.5 bg-red-100 text-red-700 rounded-xl mt-0.5">
+        <div className="p-5 rounded-md border border-red-300 bg-linear-to-r from-red-50 to-amber-50/40 shadow-xs flex items-start gap-4">
+          <div className="p-2.5 bg-red-100 text-red-700 rounded-md mt-0.5">
             <Clock className="w-5 h-5 text-red-600 animate-pulse" />
           </div>
           <div className="space-y-1">
@@ -137,7 +137,7 @@ export default function AnnouncementsTab({ token, portalType = 'ACADEMIC' }) {
           Loading circular notices...
         </div>
       ) : filtered.length === 0 ? (
-        <div className="p-12 text-center bg-white border border-slate-200 rounded-2xl text-slate-500 text-xs">
+        <div className="p-12 text-center bg-white border border-slate-200 rounded-md text-slate-500 text-xs">
           No announcements found for this section.
         </div>
       ) : (
@@ -145,15 +145,15 @@ export default function AnnouncementsTab({ token, portalType = 'ACADEMIC' }) {
           {filtered.map((item) => (
             <div
               key={item.id}
-              className="p-5 rounded-2xl border border-slate-200 bg-white shadow-2xs hover:shadow-sm transition-all space-y-2.5"
+              className="p-5 rounded-md border border-slate-200 bg-white shadow-2xs hover:shadow-sm transition-all space-y-2.5"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={`px-2.5 py-0.5 text-[9px] font-black uppercase rounded-full border ${getPriorityStyle(item.priority)}`}>
+                  <span className={`px-2.5 py-0.5 text-[9px] font-black uppercase rounded border ${getPriorityStyle(item.priority)}`}>
                     {item.priority}
                   </span>
                   {item.badgeText && (
-                    <span className="px-2.5 py-0.5 bg-purple-50 text-purple-800 border border-purple-200 text-[9px] font-bold rounded-full">
+                    <span className="px-2.5 py-0.5 bg-purple-50 text-purple-800 border border-purple-200 text-[9px] font-bold rounded">
                       {item.badgeText}
                     </span>
                   )}

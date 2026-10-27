@@ -73,7 +73,7 @@ export default function ClearanceOfficerDashboard() {
 
       const resData = await res.json();
       if (res.ok) {
-        setMessage(`Clearance marked ${status}! ${resData.isFullyApproved ? '🎉 Student achieved 100% full 15-department clearance and Certificate was generated!' : ''}`);
+        setMessage(`Clearance marked ${status}! ${resData.isFullyApproved ? 'Student achieved 100% full 15-department clearance and Certificate was generated!' : ''}`);
         setRemarks('');
         fetchClearances();
       } else {
@@ -107,7 +107,7 @@ export default function ClearanceOfficerDashboard() {
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6 font-sans text-slate-800">
       {/* Top Banner */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="glass-card p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-bold uppercase rounded tracking-wider border border-emerald-200">
@@ -129,7 +129,7 @@ export default function ClearanceOfficerDashboard() {
           <select
             value={selectedDeptId}
             onChange={(e) => setSelectedDeptId(e.target.value)}
-            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
+            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
           >
             <option value="">All 15 IIIT Pune Departments</option>
             {DEPARTMENTS.map(d => (
@@ -141,14 +141,14 @@ export default function ClearanceOfficerDashboard() {
 
       {/* Notifications */}
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold animate-pulse">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-semibold animate-pulse">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <AlertTriangle className="w-4 h-4 text-red-600" />
           {error}
         </div>
@@ -176,7 +176,7 @@ export default function ClearanceOfficerDashboard() {
                   <div
                     key={item.id}
                     onClick={() => setSelectedItem(item)}
-                    className={`p-4 rounded-xl border cursor-pointer transition-all ${
+                    className={`p-4 rounded-md border cursor-pointer transition-all ${
                       isSel 
                         ? 'bg-blue-50/80 border-[#1c398e] ring-1 ring-[#1c398e]' 
                         : 'bg-white border-slate-200 hover:bg-slate-50'
@@ -205,7 +205,7 @@ export default function ClearanceOfficerDashboard() {
               })}
             </div>
           ) : (
-            <div className="p-8 text-center bg-white border border-dashed border-slate-200 rounded-xl text-slate-500 text-xs">
+            <div className="p-8 text-center bg-white border border-dashed border-slate-200 rounded-md text-slate-500 text-xs">
               No pending applications found for the selected department.
             </div>
           )}
@@ -213,7 +213,7 @@ export default function ClearanceOfficerDashboard() {
 
         {/* Action Panel */}
         {selectedItem ? (
-          <div className="lg:col-span-2 glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-5 shadow-sm">
+          <div className="lg:col-span-2 glass-card p-6 rounded-md border border-slate-200 bg-white space-y-5 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[10px] text-slate-400 font-bold uppercase">GRADUATION CLEARANCE DOSSIER</span>
@@ -236,7 +236,7 @@ export default function ClearanceOfficerDashboard() {
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
                 >
                   <option value="APPROVED">APPROVED (No Dues Outstanding)</option>
                   <option value="REJECTED">REJECTED (Dues Pending / Missing Materials)</option>
@@ -254,7 +254,7 @@ export default function ClearanceOfficerDashboard() {
                   value={amountDue}
                   onChange={(e) => setAmountDue(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-md text-xs font-mono font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
                 />
                 <p className="text-[10px] text-slate-500 mt-1">
                   Enter 0 if all dues are clear. If book loss or lab breakage fees are due, enter the exact amount.
@@ -269,14 +269,14 @@ export default function ClearanceOfficerDashboard() {
                   value={remarks}
                   onChange={(e) => setRemarks(e.target.value)}
                   placeholder="Enter remarks regarding equipment return, library books clearance, or fee receipts..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:border-[#5367c8] h-24"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-md text-xs text-slate-800 focus:outline-none focus:border-[#5367c8] h-24"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={actionLoading}
-                className="w-full py-2.5 sm:py-3 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full py-2.5 sm:py-3 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-md text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
                 <CheckSquare className="w-4 h-4" />
                 {actionLoading ? 'Saving Decision...' : 'Save & Publish Department Clearance Decision'}
@@ -284,7 +284,7 @@ export default function ClearanceOfficerDashboard() {
             </form>
           </div>
         ) : (
-          <div className="lg:col-span-2 glass-card p-12 rounded-2xl border border-slate-200 bg-white text-center flex flex-col justify-center items-center shadow-sm">
+          <div className="lg:col-span-2 glass-card p-12 rounded-md border border-slate-200 bg-white text-center flex flex-col justify-center items-center shadow-sm">
             <GraduationCap className="w-16 h-16 text-slate-300 mb-4" />
             <h3 className="text-lg font-bold text-slate-800">Select a graduating candidate</h3>
             <p className="text-slate-500 text-xs mt-2 max-w-sm">

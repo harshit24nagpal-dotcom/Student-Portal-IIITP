@@ -4,7 +4,7 @@ import { API_URL } from '../config/api';
 import { 
   Briefcase, Users, Plus, CheckCircle2, Clock, Calendar, 
   ExternalLink, Search, Filter, RefreshCw, AlertCircle, Award, 
-  ChevronRight, Building2, UserCheck, ShieldCheck, Mail, Phone
+  ChevronRight, Building2, UserCheck, ShieldCheck, Mail, Phone, X
 } from 'lucide-react';
 
 export default function AdminPlacementTab() {
@@ -165,7 +165,7 @@ export default function AdminPlacementTab() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+      <div className="p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-blue-50 text-blue-900 text-[10px] font-black uppercase rounded tracking-wider border border-blue-200">
@@ -186,14 +186,14 @@ export default function AdminPlacementTab() {
         <div className="flex items-center gap-3">
           <button
             onClick={fetchData}
-            className="p-2 border border-slate-200 hover:bg-slate-50 rounded-xl text-slate-600 transition-colors cursor-pointer"
+            className="p-2 border border-slate-200 hover:bg-slate-50 rounded-md text-slate-600 transition-colors cursor-pointer"
             title="Refresh Data"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+            className="px-4 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-md shadow-xs flex items-center gap-2 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Post New Placement Drive
@@ -203,52 +203,56 @@ export default function AdminPlacementTab() {
 
       {/* Notifications */}
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{message}</span>
           </div>
-          <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold cursor-pointer">✕</button>
+          <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center justify-between gap-2 font-semibold">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 text-xs font-bold cursor-pointer">✕</button>
+          <button onClick={() => setError('')} className="text-red-700 hover:text-red-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
       {/* 5 Metric Summary Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-2xs space-y-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Drives</span>
           <p className="text-2xl font-black text-slate-900">{stats?.activeDrives ?? drives.length}</p>
           <span className="text-xxs text-slate-500">Corporate partners</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-2xs space-y-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Student Applications</span>
           <p className="text-2xl font-black text-blue-700">{stats?.totalApplications ?? applications.length}</p>
           <span className="text-xxs text-slate-500">Candidates registered</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-2xs space-y-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Shortlisted for OA</span>
           <p className="text-2xl font-black text-amber-600">{stats?.shortlistedCount ?? applications.filter(a => a.status === 'SHORTLISTED').length}</p>
           <span className="text-xxs text-slate-500">Passed CGPA screening</span>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-200 bg-white shadow-2xs space-y-1">
+        <div className="p-4 rounded-md border border-slate-200 bg-white shadow-2xs space-y-1">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Interviews Active</span>
           <p className="text-2xl font-black text-purple-600">{stats?.interviewCount ?? applications.filter(a => a.status === 'INTERVIEW_SCHEDULED').length}</p>
           <span className="text-xxs text-slate-500">Slots confirmed</span>
         </div>
 
-        <div className="p-4 rounded-xl border-2 border-emerald-300 bg-emerald-50/40 shadow-2xs space-y-1 col-span-2 sm:col-span-1">
+        <div className="p-4 rounded-md border-2 border-emerald-300 bg-emerald-50/40 shadow-2xs space-y-1 col-span-2 sm:col-span-1">
           <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">Offers Extended</span>
           <p className="text-2xl font-black text-emerald-800">{stats?.offeredCount ?? applications.filter(a => ['OFFERED', 'SELECTED'].includes(a.status)).length}</p>
           <span className="text-xxs text-emerald-900 font-semibold">Job parchments</span>
@@ -256,7 +260,7 @@ export default function AdminPlacementTab() {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
+      <div className="p-4 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-2xs">
         <div className="flex items-center gap-2 flex-grow max-w-md">
           <div className="relative w-full">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -265,7 +269,7 @@ export default function AdminPlacementTab() {
               placeholder="Search candidate by name, MIS or company..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-xl text-xs focus:outline-hidden focus:border-[#0c2340]"
+              className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-md text-xs focus:outline-hidden focus:border-[#0c2340]"
             />
           </div>
         </div>
@@ -275,7 +279,7 @@ export default function AdminPlacementTab() {
           <select
             value={selectedDriveFilter}
             onChange={(e) => setSelectedDriveFilter(e.target.value)}
-            className="p-2 border border-slate-200 rounded-xl text-xs font-semibold bg-white text-slate-700"
+            className="p-2 border border-slate-200 rounded-md text-xs font-semibold bg-white text-slate-700"
           >
             <option value="ALL">All Companies ({drives.length})</option>
             {drives.map(d => (
@@ -287,7 +291,7 @@ export default function AdminPlacementTab() {
           <select
             value={selectedStatusFilter}
             onChange={(e) => setSelectedStatusFilter(e.target.value)}
-            className="p-2 border border-slate-200 rounded-xl text-xs font-semibold bg-white text-slate-700"
+            className="p-2 border border-slate-200 rounded-md text-xs font-semibold bg-white text-slate-700"
           >
             <option value="ALL">All Statuses</option>
             <option value="APPLIED">Applied (Pending)</option>
@@ -300,7 +304,7 @@ export default function AdminPlacementTab() {
       </div>
 
       {/* Student Applications Table */}
-      <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+      <div className="rounded-md border border-slate-200 bg-white overflow-hidden shadow-xs">
         <div className="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
             <Users className="w-4 h-4 text-[#0c2340]" />
@@ -395,7 +399,7 @@ export default function AdminPlacementTab() {
                               remarks: app.remarks || ''
                             });
                           }}
-                          className="px-3 py-1.5 bg-[#0c2340] hover:bg-slate-900 text-white rounded-lg text-xxs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap"
+                          className="px-3 py-1.5 bg-[#0c2340] hover:bg-slate-900 text-white rounded-md text-xxs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap"
                         >
                           Update Status
                         </button>
@@ -414,7 +418,7 @@ export default function AdminPlacementTab() {
          ========================================================================= */}
       {selectedAppForStatus && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-md max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-slate-900">Update Candidate Placement Status</h3>
@@ -422,7 +426,9 @@ export default function AdminPlacementTab() {
                   {selectedAppForStatus.student?.name} • {selectedAppForStatus.drive?.companyName} ({selectedAppForStatus.drive?.role})
                 </p>
               </div>
-              <button onClick={() => setSelectedAppForStatus(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+              <button onClick={() => setSelectedAppForStatus(null)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <form onSubmit={handleUpdateStatus} className="space-y-3 text-xs">
@@ -431,7 +437,7 @@ export default function AdminPlacementTab() {
                 <select
                   value={statusForm.status}
                   onChange={(e) => setStatusForm({...statusForm, status: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs font-semibold"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs font-semibold"
                 >
                   <option value="APPLIED">APPLIED (Initial Submission)</option>
                   <option value="SHORTLISTED">SHORTLISTED (OA Cleared)</option>
@@ -448,7 +454,7 @@ export default function AdminPlacementTab() {
                   placeholder="e.g. 2026-10-30 at 14:00 IST (Technical Round)"
                   value={statusForm.interviewSlot}
                   onChange={(e) => setStatusForm({...statusForm, interviewSlot: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
@@ -459,7 +465,7 @@ export default function AdminPlacementTab() {
                   placeholder="e.g. https://meet.google.com/abc-defg-hij"
                   value={statusForm.interviewLink}
                   onChange={(e) => setStatusForm({...statusForm, interviewLink: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono"
                 />
               </div>
 
@@ -470,7 +476,7 @@ export default function AdminPlacementTab() {
                   placeholder="Instructions for the candidate regarding system design portfolio or dress code..."
                   value={statusForm.remarks}
                   onChange={(e) => setStatusForm({...statusForm, remarks: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
@@ -478,14 +484,14 @@ export default function AdminPlacementTab() {
                 <button
                   type="button"
                   onClick={() => setSelectedAppForStatus(null)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-lg cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-md cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={updatingStatus}
-                  className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-lg shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-md shadow-xs cursor-pointer"
                 >
                   {updatingStatus ? 'Updating & Notifying...' : 'Save & Dispatch Notice'}
                 </button>
@@ -500,13 +506,15 @@ export default function AdminPlacementTab() {
          ========================================================================= */}
       {showCreateModal && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-md max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 space-y-4 shadow-2xl border border-slate-200">
             <div className="flex items-center justify-between border-b border-slate-200 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900">Post New Campus Placement Drive</h3>
                 <p className="text-xxs text-slate-500">Initiate institutional recruitment drive for eligible B.Tech batches</p>
               </div>
-              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
+              <button onClick={() => setShowCreateModal(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             <form onSubmit={handleCreateDrive} className="space-y-3 text-xs">
@@ -519,7 +527,7 @@ export default function AdminPlacementTab() {
                     placeholder="e.g. Google, Microsoft, NVIDIA, Amazon"
                     value={newDrive.companyName}
                     onChange={(e) => setNewDrive({...newDrive, companyName: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs"
                   />
                 </div>
                 <div>
@@ -530,7 +538,7 @@ export default function AdminPlacementTab() {
                     placeholder="e.g. Software Development Engineer (SDE-1)"
                     value={newDrive.role}
                     onChange={(e) => setNewDrive({...newDrive, role: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs"
                   />
                 </div>
               </div>
@@ -541,7 +549,7 @@ export default function AdminPlacementTab() {
                   <select
                     value={newDrive.type}
                     onChange={(e) => setNewDrive({...newDrive, type: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-semibold"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs font-semibold"
                   >
                     <option value="FULL_TIME">FULL TIME</option>
                     <option value="INTERNSHIP">INTERNSHIP (Summer)</option>
@@ -556,7 +564,7 @@ export default function AdminPlacementTab() {
                     placeholder="e.g. ₹28.5 LPA or ₹1.2 Lakh/mo"
                     value={newDrive.ctc}
                     onChange={(e) => setNewDrive({...newDrive, ctc: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono"
                   />
                 </div>
                 <div>
@@ -566,7 +574,7 @@ export default function AdminPlacementTab() {
                     placeholder="e.g. Pune / Bengaluru"
                     value={newDrive.location}
                     onChange={(e) => setNewDrive({...newDrive, location: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs"
                   />
                 </div>
               </div>
@@ -581,7 +589,7 @@ export default function AdminPlacementTab() {
                     max="10.0"
                     value={newDrive.minCgpa}
                     onChange={(e) => setNewDrive({...newDrive, minCgpa: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs font-mono"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs font-mono"
                   />
                 </div>
                 <div>
@@ -590,7 +598,7 @@ export default function AdminPlacementTab() {
                     type="text"
                     value={newDrive.allowedBranches}
                     onChange={(e) => setNewDrive({...newDrive, allowedBranches: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs"
                   />
                 </div>
                 <div>
@@ -599,7 +607,7 @@ export default function AdminPlacementTab() {
                     type="date"
                     value={newDrive.deadline}
                     onChange={(e) => setNewDrive({...newDrive, deadline: e.target.value})}
-                    className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                    className="w-full p-2 border border-slate-300 rounded-md text-xs"
                   />
                 </div>
               </div>
@@ -610,7 +618,7 @@ export default function AdminPlacementTab() {
                   type="text"
                   value={newDrive.selectionRounds}
                   onChange={(e) => setNewDrive({...newDrive, selectionRounds: e.target.value})}
-                  className="w-full p-2 border border-slate-300 rounded-lg text-xs"
+                  className="w-full p-2 border border-slate-300 rounded-md text-xs"
                 />
               </div>
 
@@ -618,14 +626,14 @@ export default function AdminPlacementTab() {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-lg cursor-pointer"
+                  className="px-4 py-2 border border-slate-300 text-slate-700 font-bold text-xs uppercase rounded-md cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={creatingDrive}
-                  className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-lg shadow-xs cursor-pointer"
+                  className="px-5 py-2 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase rounded-md shadow-xs cursor-pointer"
                 >
                   {creatingDrive ? 'Publishing Drive...' : 'Publish Corporate Drive'}
                 </button>

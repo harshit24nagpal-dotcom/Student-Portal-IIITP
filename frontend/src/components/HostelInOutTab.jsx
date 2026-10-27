@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   LogOut, LogIn, Clock, MapPin, CheckCircle2, AlertCircle, 
-  Shield, UserCheck, ArrowRight, ShieldCheck, Sparkles, RefreshCw
+  Shield, UserCheck, ArrowRight, ShieldCheck, Sparkles, RefreshCw, Lock
 } from 'lucide-react';
 
 export default function HostelInOutTab({ token, user }) {
@@ -98,14 +98,14 @@ export default function HostelInOutTab({ token, user }) {
   return (
     <div className="space-y-6">
       {/* Current Gate Status Card */}
-      <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-5 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3.5">
-          <div className={`p-3 rounded-2xl ${isCurrentlyOut ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+          <div className={`p-3 rounded-md ${isCurrentlyOut ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
             {isCurrentlyOut ? <LogOut className="w-6 h-6 animate-pulse" /> : <ShieldCheck className="w-6 h-6" />}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className={`px-2.5 py-0.5 text-[10px] font-black uppercase rounded-full tracking-wider border ${
+              <span className={`px-2.5 py-0.5 text-[10px] font-black uppercase rounded tracking-wider border ${
                 isCurrentlyOut ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
               }`}>
                 {isCurrentlyOut ? 'Status: OUTSIDE CAMPUS' : 'Status: INSIDE CAMPUS'}
@@ -130,7 +130,7 @@ export default function HostelInOutTab({ token, user }) {
         {isCurrentlyOut && (
           <button
             onClick={() => handleMarkReturn(latestLog.id)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold uppercase rounded-md tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all"
           >
             <LogIn className="w-4 h-4" />
             <span>Mark Returned to Campus</span>
@@ -139,14 +139,14 @@ export default function HostelInOutTab({ token, user }) {
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
           {error}
         </div>
@@ -154,7 +154,7 @@ export default function HostelInOutTab({ token, user }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form: Generate Digital Gate Pass */}
-        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="lg:col-span-1 p-5 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
             <Shield className="w-4 h-4 text-[#1c398e]" />
             <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
@@ -171,7 +171,7 @@ export default function HostelInOutTab({ token, user }) {
                 <button
                   type="button"
                   onClick={() => setDirection('OUT')}
-                  className={`py-2 text-xs font-bold rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  className={`py-2 text-xs font-bold rounded-md border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     direction === 'OUT'
                       ? 'bg-amber-500 text-white border-amber-600 shadow-xs'
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -183,7 +183,7 @@ export default function HostelInOutTab({ token, user }) {
                 <button
                   type="button"
                   onClick={() => setDirection('IN')}
-                  className={`py-2 text-xs font-bold rounded-xl border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  className={`py-2 text-xs font-bold rounded-md border flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                     direction === 'IN'
                       ? 'bg-emerald-600 text-white border-emerald-700 shadow-xs'
                       : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -205,7 +205,7 @@ export default function HostelInOutTab({ token, user }) {
                 placeholder="e.g. Hinjawadi Phase 1 Market, Library, Clinic"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c398e]"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c398e]"
               />
             </div>
 
@@ -218,7 +218,7 @@ export default function HostelInOutTab({ token, user }) {
                 placeholder="e.g. Stationary, Groceries, Meeting family"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c398e]"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c398e]"
               />
             </div>
 
@@ -229,7 +229,7 @@ export default function HostelInOutTab({ token, user }) {
               <select
                 value={gateNumber}
                 onChange={(e) => setGateNumber(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c398e]"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1c398e]"
               >
                 <option value="Gate 1 - Main Entrance">Gate 1 - Main Entrance</option>
                 <option value="Gate 2 - East Gate (Academic Walkway)">Gate 2 - East Gate</option>
@@ -240,22 +240,22 @@ export default function HostelInOutTab({ token, user }) {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1c398e] text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1c398e] text-white text-xs font-bold uppercase rounded-md tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
             >
               {submitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
               <span>Authorize & Log Pass</span>
             </button>
           </form>
 
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-[11px] text-slate-500 space-y-1">
-            <p className="font-semibold text-slate-700">🔒 Official IIITP Gate Rules:</p>
+          <div className="p-3 bg-slate-50 rounded-md border border-slate-100 text-[11px] text-slate-500 space-y-1">
+            <p className="font-semibold text-slate-700 flex items-center gap-1.5"><Lock className="w-3.5 h-3.5 text-slate-600" /> Official IIITP Gate Rules:</p>
             <p>• Normal hostel curfew is 10:00 PM for all campus residents.</p>
             <p>• Entries after 10:00 PM require Warden approval or biometric log.</p>
           </div>
         </div>
 
         {/* History: Student In / Out Movement Log */}
-        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="lg:col-span-2 p-5 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#1c398e]" />
@@ -288,10 +288,10 @@ export default function HostelInOutTab({ token, user }) {
                 return (
                   <div
                     key={log.id}
-                    className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/60 hover:bg-slate-50 flex items-center justify-between transition-colors"
+                    className="p-3.5 rounded-md border border-slate-100 bg-slate-50/60 hover:bg-slate-50 flex items-center justify-between transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-xl mt-0.5 ${isOut ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
+                      <div className={`p-2 rounded-md mt-0.5 ${isOut ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
                         {isOut ? <LogOut className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
                       </div>
                       <div>
@@ -318,7 +318,7 @@ export default function HostelInOutTab({ token, user }) {
                     </div>
 
                     <div className="text-right">
-                      <span className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full ${
+                      <span className={`inline-block px-2.5 py-0.5 text-[10px] font-bold uppercase rounded ${
                         log.status === 'OUT' 
                           ? 'bg-amber-100 text-amber-800 border border-amber-200' 
                           : 'bg-slate-100 text-slate-600'

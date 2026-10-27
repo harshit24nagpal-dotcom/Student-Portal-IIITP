@@ -149,9 +149,9 @@ export default function HostelTicketingTab({ token, user }) {
   return (
     <div className="space-y-6">
       {/* Banner */}
-      <div className="p-5 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="p-5 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-amber-100 text-amber-800 rounded-2xl">
+          <div className="p-3 bg-amber-100 text-amber-800 rounded-md">
             <Wrench className="w-6 h-6" />
           </div>
           <div>
@@ -165,7 +165,7 @@ export default function HostelTicketingTab({ token, user }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <span className="px-3 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-md text-xs font-bold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Proof of Resolution Required</span>
           </span>
@@ -173,14 +173,14 @@ export default function HostelTicketingTab({ token, user }) {
       </div>
 
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" />
           {error}
         </div>
@@ -188,7 +188,7 @@ export default function HostelTicketingTab({ token, user }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Form: Raise New Problem Ticket */}
-        <div className="lg:col-span-1 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="lg:col-span-1 p-5 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
             <Wrench className="w-4 h-4 text-[#1c398e]" />
             <h4 className="text-xs font-black uppercase tracking-wider text-slate-800">
@@ -207,7 +207,7 @@ export default function HostelTicketingTab({ token, user }) {
                   required
                   value={hostelBlock}
                   onChange={(e) => setHostelBlock(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
                 />
               </div>
               <div>
@@ -219,7 +219,7 @@ export default function HostelTicketingTab({ token, user }) {
                   required
                   value={roomNumber}
                   onChange={(e) => setRoomNumber(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export default function HostelTicketingTab({ token, user }) {
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               >
                 <option value="PLUMBING">Plumbing & Water Supply</option>
                 <option value="ELECTRICAL">Electrical, Fan & Lighting</option>
@@ -253,7 +253,7 @@ export default function HostelTicketingTab({ token, user }) {
                 placeholder="e.g. Geyser tripping switch in room 204"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -267,7 +267,7 @@ export default function HostelTicketingTab({ token, user }) {
                 placeholder="Explain the problem clearly so the technician brings correct spare parts..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               />
             </div>
 
@@ -278,18 +278,18 @@ export default function HostelTicketingTab({ token, user }) {
               </label>
 
               {beforePhoto ? (
-                <div className="relative group rounded-xl overflow-hidden border border-slate-200">
+                <div className="relative group rounded-md overflow-hidden border border-slate-200">
                   <img src={getFileUrl(beforePhoto)} alt="Problem Before Fix" className="w-full h-28 object-cover" />
                   <button
                     type="button"
                     onClick={() => setBeforePhoto('')}
-                    className="absolute top-2 right-2 px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg text-[10px] font-bold shadow cursor-pointer"
+                    className="absolute top-2 right-2 px-2 py-1 bg-red-600 hover:bg-red-700 text-white rounded-md text-[10px] font-bold shadow cursor-pointer"
                   >
                     Remove Photo
                   </button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 hover:border-[#1c398e] bg-slate-50 hover:bg-white rounded-xl cursor-pointer transition-all text-center">
+                <label className="flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-200 hover:border-[#1c398e] bg-slate-50 hover:bg-white rounded-md cursor-pointer transition-all text-center">
                   <Camera className="w-5 h-5 text-slate-400 mb-1" />
                   <span className="text-xs font-bold text-slate-700">
                     {uploadingPhoto ? 'Uploading Photo...' : 'Click to Upload Problem Photo'}
@@ -312,7 +312,7 @@ export default function HostelTicketingTab({ token, user }) {
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
-                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-md focus:bg-white focus:outline-none"
               >
                 <option value="LOW">Low (Can take 2-3 days)</option>
                 <option value="MEDIUM">Medium (Within 24 hours)</option>
@@ -324,7 +324,7 @@ export default function HostelTicketingTab({ token, user }) {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1c398e] text-white text-xs font-bold uppercase rounded-xl tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1c398e] text-white text-xs font-bold uppercase rounded-md tracking-wider shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
             >
               {submitting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               <span>Register Problem Ticket</span>
@@ -333,7 +333,7 @@ export default function HostelTicketingTab({ token, user }) {
         </div>
 
         {/* Tickets List with Proof of Resolution */}
-        <div className="lg:col-span-2 p-5 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+        <div className="lg:col-span-2 p-5 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-[#1c398e]" />
@@ -348,7 +348,7 @@ export default function HostelTicketingTab({ token, user }) {
                 <button
                   key={status}
                   onClick={() => setStatusFilter(status)}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
                     statusFilter === status
                       ? 'bg-[#0c2340] text-white'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -377,7 +377,7 @@ export default function HostelTicketingTab({ token, user }) {
                 return (
                   <div
                     key={t.id}
-                    className={`p-4 rounded-xl border transition-all space-y-3 ${
+                    className={`p-4 rounded-md border transition-all space-y-3 ${
                       isResolved
                         ? 'bg-emerald-50/20 border-emerald-200'
                         : 'bg-white border-slate-200 hover:border-slate-300'
@@ -386,7 +386,7 @@ export default function HostelTicketingTab({ token, user }) {
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className={`px-2.5 py-0.5 text-[9px] font-bold uppercase rounded-full border ${getStatusBadge(t.status)}`}>
+                          <span className={`px-2.5 py-0.5 text-[9px] font-bold uppercase rounded border ${getStatusBadge(t.status)}`}>
                             {t.status.replace('_', ' ')}
                           </span>
                           <span className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded border ${getPriorityBadge(t.priority)}`}>
@@ -417,7 +417,7 @@ export default function HostelTicketingTab({ token, user }) {
                     {/* Problem Photo before resolution */}
                     {!isResolved && t.beforePhoto && (
                       <div className="pt-2 border-t border-slate-100 flex items-center gap-3">
-                        <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-slate-200 hover:opacity-90 transition-opacity shrink-0">
+                        <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-md border border-slate-200 hover:opacity-90 transition-opacity shrink-0">
                           <img src={getFileUrl(t.beforePhoto)} alt="Problem Before Fix" className="w-24 h-18 object-cover" />
                         </a>
                         <div className="text-xs space-y-0.5">
@@ -431,14 +431,15 @@ export default function HostelTicketingTab({ token, user }) {
 
                     {/* ⭐ PROOF OF RESOLUTION SECTION ⭐ */}
                     {isResolved && (
-                      <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-xl space-y-2.5">
+                      <div className="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-md space-y-2.5">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-1.5 text-emerald-800 text-xs font-black uppercase tracking-wider">
                             <ShieldCheck className="w-4 h-4 text-emerald-600" />
                             <span>Official Proof of Resolution</span>
                           </div>
-                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200">
-                            Verified ✓
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200 inline-flex items-center gap-1">
+                            <Check className="w-3 h-3 text-emerald-600" />
+                            <span>Verified</span>
                           </span>
                         </div>
 
@@ -450,12 +451,12 @@ export default function HostelTicketingTab({ token, user }) {
                                 <span className="text-[9px] font-black uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded border border-amber-300 block text-center">
                                   Before Fix (Problem)
                                 </span>
-                                <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-slate-200 hover:opacity-90 transition-opacity">
+                                <a href={getFileUrl(t.beforePhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-md border border-slate-200 hover:opacity-90 transition-opacity">
                                   <img src={getFileUrl(t.beforePhoto)} alt="Problem Before Fix" className="w-full h-28 object-cover" />
                                 </a>
                               </div>
                             ) : (
-                              <div className="h-28 rounded-xl border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 text-center p-2">
+                              <div className="h-28 rounded-md border border-dashed border-slate-200 bg-slate-50 flex items-center justify-center text-[10px] text-slate-400 text-center p-2">
                                 No before photo attached
                               </div>
                             )}
@@ -463,21 +464,21 @@ export default function HostelTicketingTab({ token, user }) {
                             {t.afterPhoto ? (
                               <div className="space-y-1">
                                 <span className="text-[9px] font-black uppercase text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-300 block text-center">
-                                  After Completion (Resolved ✓)
+                                  After Completion (Resolved)
                                 </span>
-                                <a href={getFileUrl(t.afterPhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-xl border border-emerald-300 hover:opacity-90 transition-opacity shadow-xs">
+                                <a href={getFileUrl(t.afterPhoto)} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-md border border-emerald-300 hover:opacity-90 transition-opacity shadow-xs">
                                   <img src={getFileUrl(t.afterPhoto)} alt="Resolved After Fix" className="w-full h-28 object-cover" />
                                 </a>
                               </div>
                             ) : (
-                              <div className="h-28 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/50 flex items-center justify-center text-[10px] text-emerald-700 text-center p-2">
+                              <div className="h-28 rounded-md border border-dashed border-emerald-200 bg-emerald-50/50 flex items-center justify-center text-[10px] text-emerald-700 text-center p-2">
                                 Physical resolution confirmed on-site
                               </div>
                             )}
                           </div>
                         )}
 
-                        <div className="text-xs text-slate-700 bg-white/80 p-2.5 rounded-lg border border-emerald-100">
+                        <div className="text-xs text-slate-700 bg-white/80 p-2.5 rounded-md border border-emerald-100">
                           <p className="font-semibold text-emerald-950">Work Done / Action Taken:</p>
                           <p className="text-slate-700 mt-0.5">
                             {t.proofOfResolution || 'Standard maintenance completed and tested on-site.'}

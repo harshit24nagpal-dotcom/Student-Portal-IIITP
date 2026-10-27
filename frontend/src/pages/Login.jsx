@@ -154,7 +154,7 @@ export default function Login() {
       <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-900/60 to-slate-950/80 backdrop-blur-[2px] pointer-events-none"></div>
 
       {/* 3. Centered Elevated Institutional Login Card */}
-      <div className="relative z-10 w-full max-w-[500px] bg-white/95 backdrop-blur-md rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-white/90 p-6 sm:p-8 my-4 transition-all">
+      <div className="relative z-10 w-full max-w-[500px] bg-white/95 backdrop-blur-md rounded-md shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] border border-white/90 p-6 sm:p-8 my-4 transition-all">
         
         {/* Official IIIT Pune Emblem & Header */}
         <div className="text-center">
@@ -165,7 +165,7 @@ export default function Login() {
               className="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-md transition-transform hover:scale-105 duration-300"
             />
           </div>
-          <span className="px-3 py-1 bg-blue-50 border border-blue-200 text-[#0c2340] text-[10px] font-black uppercase rounded-full tracking-wider inline-block mb-1">
+          <span className="px-3 py-1 bg-blue-50 border border-blue-200 text-[#0c2340] text-[10px] font-black uppercase rounded tracking-wider inline-block mb-1">
             Official Institutional Campus Connect
           </span>
           <h1 className="text-lg sm:text-xl font-black text-[#0c2340] tracking-tight leading-tight">
@@ -193,7 +193,7 @@ export default function Login() {
 
         {/* Error Alert Banner */}
         {error && (
-          <div className="mb-3.5 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-start gap-2 font-medium animate-in fade-in">
+          <div className="mb-3.5 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-md flex items-start gap-2 font-medium animate-in fade-in">
             <AlertTriangle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -215,7 +215,7 @@ export default function Login() {
                   value={identifier}
                   onChange={(e) => { setIdentifier(e.target.value); setAutoFilledRole(null); }}
                   placeholder="e.g. 112415079 or 112415079@cse.iiitp.ac.in"
-                  className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10 transition-all font-medium"
+                  className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-md text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10 transition-all font-medium"
                 />
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setAutoFilledRole(null); }}
                   placeholder="Enter your password (e.g. 112415079)"
-                  className="w-full pl-3.5 pr-10 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10 transition-all font-medium"
+                  className="w-full pl-3.5 pr-10 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-md text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10 transition-all font-medium"
                 />
                 <button
                   type="button"
@@ -251,7 +251,7 @@ export default function Login() {
             </div>
 
             {/* Default Password Reminder Hint */}
-            <div className="p-2.5 bg-blue-50/70 border border-blue-200/80 rounded-xl flex items-center gap-2 text-xxs sm:text-[11px] text-blue-900">
+            <div className="p-2.5 bg-blue-50/70 border border-blue-200/80 rounded-md flex items-center gap-2 text-xxs sm:text-[11px] text-blue-900">
               <span className="font-black text-blue-700 uppercase shrink-0">STUDENT AUTH:</span>
               <p className="font-semibold text-slate-700">
                 Default password for students is your 9-digit MIS Number (e.g., <span className="font-mono font-bold text-[#0c2340]">112415079</span>).
@@ -282,7 +282,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 sm:py-3 bg-[#0c2340] hover:bg-[#16355d] active:scale-[0.99] text-white font-extrabold rounded-xl text-xs sm:text-sm tracking-wider uppercase shadow-md shadow-blue-950/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 mt-1"
+              className="w-full py-2.5 sm:py-3 bg-[#0c2340] hover:bg-[#16355d] active:scale-[0.99] text-white font-extrabold rounded-md text-xs sm:text-sm tracking-wider uppercase shadow-md shadow-blue-950/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60 mt-1"
             >
               <span>{loading ? 'AUTHENTICATING SESSION...' : 'SIGN IN TO PORTAL'}</span>
               <ArrowRight className="w-4 h-4" />
@@ -299,7 +299,7 @@ export default function Login() {
                 value={regName}
                 onChange={(e) => setRegName(e.target.value)}
                 placeholder="e.g. Harshit Nagpal"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
@@ -311,7 +311,7 @@ export default function Login() {
                 value={regEmail}
                 onChange={(e) => setRegEmail(e.target.value)}
                 placeholder="e.g. 112415079@cse.iiitp.ac.in"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
@@ -322,7 +322,7 @@ export default function Login() {
                 value={regContact}
                 onChange={(e) => setRegContact(e.target.value)}
                 placeholder="+91 9988776655"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
@@ -334,14 +334,14 @@ export default function Login() {
                 value={regPassword}
                 onChange={(e) => setRegPassword(e.target.value)}
                 placeholder="Choose password (or use MIS number)"
-                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
+                className="w-full px-3.5 py-2.5 bg-[#f8fafc] border border-slate-200 rounded-md text-slate-800 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-[#0c2340] focus:ring-2 focus:ring-[#0c2340]/10"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#16355d] text-white font-extrabold rounded-xl text-xs tracking-wider uppercase shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-2.5 bg-[#0c2340] hover:bg-[#16355d] text-white font-extrabold rounded-md text-xs tracking-wider uppercase shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               {loading ? 'REGISTERING ACCOUNT...' : 'COMPLETE REGISTRATION'}
             </button>
@@ -364,7 +364,7 @@ export default function Login() {
               return (
                 <div
                   key={acc.role}
-                  className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                  className={`p-2.5 rounded-md border transition-all cursor-pointer ${
                     isSelected
                       ? 'bg-blue-50 border-blue-500 ring-1 ring-blue-500/30'
                       : 'bg-slate-50/80 border-slate-200 hover:border-slate-300 hover:bg-slate-100/60'

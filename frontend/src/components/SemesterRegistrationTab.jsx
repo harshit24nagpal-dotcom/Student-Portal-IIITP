@@ -152,7 +152,7 @@ export default function SemesterRegistrationTab() {
   return (
     <div className="space-y-6">
       {/* Top Semester Info Card */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
+      <div className="glass-card p-6 rounded-md border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 bg-blue-50 text-[#1c398e] text-[10px] font-bold uppercase rounded tracking-wider border border-blue-200">
@@ -169,7 +169,7 @@ export default function SemesterRegistrationTab() {
         </div>
 
         {registration && (
-          <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-right">
+          <div className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-md text-right">
             <span className="text-[10px] text-slate-500 uppercase font-bold block">Current Verification Status</span>
             <span className={`text-xs font-bold uppercase px-2.5 py-0.5 rounded border mt-0.5 inline-block ${
               registration.status === 'APPROVED' 
@@ -185,7 +185,7 @@ export default function SemesterRegistrationTab() {
       </div>
 
       {/* Workflow Progress Timeline */}
-      <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+      <div className="glass-card p-6 rounded-md border border-slate-200 bg-white space-y-4 shadow-sm">
         <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
           <FileCheck className="w-4 h-4 text-[#5367c8]" />
           Verification Workflow Timeline
@@ -197,7 +197,7 @@ export default function SemesterRegistrationTab() {
             return (
               <div 
                 key={step.key}
-                className={`p-4 rounded-xl border relative transition-all ${
+                className={`p-4 rounded-md border relative transition-all ${
                   state === 'completed'
                     ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
                     : state === 'current'
@@ -224,24 +224,24 @@ export default function SemesterRegistrationTab() {
 
       {/* Notifications */}
       {message && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold animate-pulse">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-semibold animate-pulse">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           {message}
         </div>
       )}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-md flex items-center gap-2 font-semibold">
           <AlertTriangle className="w-4 h-4 text-red-600" />
           {error}
         </div>
       )}
 
       {/* Roommate Matching & Room Allotment During Registration */}
-      <div className="p-5 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-2xl space-y-3 shadow-2xs">
+      <div className="p-5 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-md space-y-3 shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-purple-100 text-purple-700 rounded-xl shrink-0">
+            <div className="p-2.5 bg-purple-100 text-purple-700 rounded-md shrink-0">
               <Bed className="w-5 h-5" />
             </div>
             <div>
@@ -262,9 +262,10 @@ export default function SemesterRegistrationTab() {
           <button
             type="button"
             onClick={() => setShowRoommateSection(!showRoommateSection)}
-            className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold uppercase rounded-xl transition-all cursor-pointer self-start sm:self-auto shrink-0 shadow-2xs"
+            className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold uppercase rounded-md transition-all cursor-pointer self-start sm:self-auto shrink-0 shadow-2xs flex items-center gap-1.5"
           >
-            {showRoommateSection ? 'Collapse Allotment' : '🛏️ Match & Pick Room'}
+            <Bed className="w-3.5 h-3.5" />
+            <span>{showRoommateSection ? 'Collapse Allotment' : 'Match & Pick Room'}</span>
           </button>
         </div>
 
@@ -278,7 +279,7 @@ export default function SemesterRegistrationTab() {
       {/* Main Form & Status Display Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Document Upload Form */}
-        <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+        <div className="glass-card p-6 rounded-md border border-slate-200 bg-white space-y-4 shadow-sm">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
             <Upload className="w-4 h-4 text-[#5367c8]" />
             {registration ? 'Update / Resubmit Registration Documents' : 'Submit Mandatory Registration Proofs'}
@@ -286,7 +287,7 @@ export default function SemesterRegistrationTab() {
 
           <form onSubmit={handleSubmitRegistration} className="space-y-4 text-xs">
             {/* Document 1: ERP Registration Proof */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <div className="p-4 bg-slate-50 rounded-md border border-slate-200 space-y-2">
               <div className="flex items-center justify-between">
                 <label className="font-bold text-slate-800 block text-xs">
                   1. ERP Semester Registration Proof <span className="text-red-500">*</span>
@@ -297,7 +298,7 @@ export default function SemesterRegistrationTab() {
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg"
                 onChange={(e) => setErpFile(e.target.files[0])}
-                className="w-full text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#1c398e] file:text-white hover:file:bg-[#152c70] cursor-pointer"
+                className="w-full text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#1c398e] file:text-white hover:file:bg-[#152c70] cursor-pointer"
               />
               <p className="text-[10px] text-slate-500">
                 Official screenshot or PDF receipt generated from the IIIT Pune ERP Portal.
@@ -305,7 +306,7 @@ export default function SemesterRegistrationTab() {
             </div>
 
             {/* Document 2: Semester Fee Payment Receipt */}
-            <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+            <div className="p-4 bg-slate-50 rounded-md border border-slate-200 space-y-2">
               <div className="flex items-center justify-between">
                 <label className="font-bold text-slate-800 block text-xs">
                   2. Semester Tuition & Hostel Fee Receipt <span className="text-red-500">*</span>
@@ -316,7 +317,7 @@ export default function SemesterRegistrationTab() {
                 type="file"
                 accept=".pdf,.png,.jpg,.jpeg"
                 onChange={(e) => setFeeFile(e.target.files[0])}
-                className="w-full text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-[#1c398e] file:text-white hover:file:bg-[#152c70] cursor-pointer"
+                className="w-full text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#1c398e] file:text-white hover:file:bg-[#152c70] cursor-pointer"
               />
               <p className="text-[10px] text-slate-500">
                 Official bank payment counterfoil or online SBI Collect fee transaction receipt.
@@ -326,7 +327,7 @@ export default function SemesterRegistrationTab() {
             <button
               type="submit"
               disabled={uploading || (registration?.status === 'APPROVED')}
-              className="w-full py-2.5 sm:py-3 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
+              className="w-full py-2.5 sm:py-3 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-md text-xs uppercase tracking-wider shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer"
             >
               <Upload className="w-4 h-4" />
               {uploading ? 'Uploading & Transmitting Documents...' : registration ? 'Resubmit Updated Documents' : 'Submit For Warden & Advisor Verification'}
@@ -335,7 +336,7 @@ export default function SemesterRegistrationTab() {
         </div>
 
         {/* Existing Submitted Documents & Verification Remarks Card */}
-        <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+        <div className="glass-card p-6 rounded-md border border-slate-200 bg-white space-y-4 shadow-sm">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
             <FileText className="w-4 h-4 text-emerald-600" />
             Uploaded Documents & Official Reviewer Remarks
@@ -344,7 +345,7 @@ export default function SemesterRegistrationTab() {
           {registration?.documents && registration.documents.length > 0 ? (
             <div className="space-y-3">
               {registration.documents.map((doc) => (
-                <div key={doc.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center justify-between text-xs">
+                <div key={doc.id} className="p-3 bg-slate-50 rounded-md border border-slate-200 flex items-center justify-between text-xs">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-[#5367c8]" />
@@ -359,7 +360,7 @@ export default function SemesterRegistrationTab() {
                     href={getFileUrl(doc.filePath)} 
                     target="_blank" 
                     rel="noreferrer"
-                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[10px] font-bold uppercase flex items-center gap-1 transition-colors"
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-md text-[10px] font-bold uppercase flex items-center gap-1 transition-colors"
                   >
                     <Download className="w-3 h-3" />
                     View Doc
@@ -368,7 +369,7 @@ export default function SemesterRegistrationTab() {
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500 text-xs">
+            <div className="p-8 text-center bg-slate-50 rounded-md border border-dashed border-slate-200 text-slate-500 text-xs">
               No registration documents uploaded yet. Please use the form on the left to submit your ERP proof and fee receipt.
             </div>
           )}
@@ -378,7 +379,7 @@ export default function SemesterRegistrationTab() {
             <div className="border-t border-slate-100 pt-4 space-y-3">
               <h5 className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Official Verifier Feedbacks</h5>
               {registration.verifications.map((v) => (
-                <div key={v.id} className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+                <div key={v.id} className="p-3 bg-slate-50 rounded-md border border-slate-200 text-xs space-y-1">
                   <div className="flex items-center justify-between text-[10px]">
                     <span className="font-bold text-[#1c398e] uppercase">{v.verifierRole.replace(/_/g, ' ')}</span>
                     <span className="text-slate-400 font-mono">{new Date(v.timestamp).toLocaleString()}</span>
