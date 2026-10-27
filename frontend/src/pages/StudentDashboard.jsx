@@ -243,53 +243,53 @@ export default function StudentDashboard() {
   return (
     <div className="p-3 sm:p-6 pb-24 sm:pb-8 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800 bg-slate-50 min-h-[calc(100vh-65px)] overflow-x-hidden">
       
-      {/* 1-CLICK EMERGENCY ASSISTANCE & SPEED-DIAL BAR */}
-      <div className="p-3.5 sm:p-4 rounded-md border border-red-200 bg-linear-to-r from-red-50 via-white to-amber-50 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-md bg-red-600 text-white flex items-center justify-center shadow-xs shrink-0 animate-pulse">
-            <ShieldAlert className="w-5 h-5" />
+      {/* CAMPUS EMERGENCY & DISPATCH CONTROL STRIP */}
+      <div className="p-3 sm:px-4 sm:py-3 rounded-md border border-slate-200 bg-white shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-md bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+            <ShieldAlert className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-black uppercase text-red-700 tracking-wider">
-                24x7 CAMPUS EMERGENCY SOS & DIRECT SPEED-DIAL
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Emergency & Security Dispatch
               </span>
-              <span className="hidden sm:inline-block px-1.5 py-0.2 bg-red-100 text-red-800 font-bold text-[8px] rounded uppercase">
-                1-Click Call
+              <span className="px-1.5 py-0.2 bg-red-50 text-red-700 font-bold text-[9px] rounded uppercase border border-red-200">
+                24x7 Active
               </span>
             </div>
-            <p className="text-xs font-black text-slate-900 leading-tight">
-              In danger or need immediate help? Trigger CAD Broadcast or call direct:
+            <p className="text-xs text-slate-500">
+              Control Desk: <a href="tel:9826381867" className="font-mono font-semibold text-slate-700 hover:text-red-700">+91 9826381867</a> • Medical: <a href="tel:9826381867" className="font-mono font-semibold text-slate-700 hover:text-emerald-700">+91 9826381867</a>
             </p>
           </div>
         </div>
 
-        {/* 1-Click Direct Phone Helpline Buttons */}
-        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+        {/* Action Controls */}
+        <div className="flex items-center gap-2">
           <a
             href="tel:9826381867"
-            className="flex-1 sm:flex-none px-3.5 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-black uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-            title="Call Campus Security QRT"
+            className="flex-1 sm:flex-none px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold rounded-md border border-slate-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            title="Call Campus Security"
           >
-            <Phone className="w-3.5 h-3.5" />
+            <Phone className="w-3.5 h-3.5 text-slate-500" />
             <span>Call Security</span>
           </a>
 
           <a
             href="tel:9826381867"
-            className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+            className="flex-1 sm:flex-none px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 hover:text-slate-900 text-xs font-semibold rounded-md border border-slate-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
             title="Call Campus Ambulance"
           >
-            <PhoneCall className="w-3.5 h-3.5" />
+            <PhoneCall className="w-3.5 h-3.5 text-slate-500" />
             <span>Ambulance</span>
           </a>
 
           <button
             onClick={() => setIsSosOpen(true)}
-            className="flex-1 sm:flex-none px-3.5 py-2 bg-slate-900 hover:bg-black text-white text-xs font-black uppercase tracking-wider rounded-md shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer border border-slate-800"
+            className="flex-1 sm:flex-none px-3.5 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase rounded-md flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
           >
-            <AlertOctagon className="w-3.5 h-3.5 text-red-400" />
-            <span>Open SOS Console</span>
+            <AlertOctagon className="w-3.5 h-3.5" />
+            <span>SOS Console</span>
           </button>
         </div>
       </div>
@@ -308,9 +308,6 @@ export default function StudentDashboard() {
           <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 mt-1 tracking-tight">
             Good {new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, {user?.name || 'Student'}!
           </h2>
-          <p className="text-xs text-slate-500 mt-0.5 font-medium">
-            Indian Institute of Information Technology Pune • Academic Year 2026-27
-          </p>
         </div>
 
         {/* Quick Overall Metrics Tag */}
