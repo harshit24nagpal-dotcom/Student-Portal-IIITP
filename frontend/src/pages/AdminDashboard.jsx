@@ -12,7 +12,10 @@ import AnalyticsDashboard from './AnalyticsDashboard';
 import HostelTicketingTab from '../components/HostelTicketingTab';
 import ComplaintsTab from '../components/ComplaintsTab';
 import LostAndFoundTab from '../components/LostAndFoundTab';
-import { Wrench, MessageSquare, Tag } from 'lucide-react';
+import AdminPlacementTab from '../components/AdminPlacementTab';
+import AdminAnnouncementsTab from '../components/AdminAnnouncementsTab';
+import AdminTimetableTab from '../components/AdminTimetableTab';
+import { Wrench, MessageSquare, Tag, Briefcase, Megaphone, Calendar } from 'lucide-react';
 import { API_URL } from '../config/api';
 
 const CATEGORIES_COLOR = {
@@ -525,6 +528,51 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               >
                 <Tag className="w-4 h-4 text-purple-600" />
                 <span>Lost & Found</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Academic & Career Command Section */}
+          <div className="space-y-1">
+            <p className="hidden lg:block px-6 text-xxs font-extrabold uppercase tracking-wider text-slate-400">
+              ACADEMIC & CAREER COMMAND
+            </p>
+
+            <div className="flex flex-row lg:flex-col px-3 gap-1 overflow-x-auto whitespace-nowrap lg:whitespace-normal scrollbar-none">
+              <button
+                onClick={() => setActiveTab('placements')}
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
+                  activeTab === 'placements' 
+                    ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                }`}
+              >
+                <Briefcase className="w-4 h-4 text-blue-600" />
+                <span>T&P Placements</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('announcements')}
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
+                  activeTab === 'announcements' 
+                    ? 'bg-indigo-50 text-indigo-900 border border-indigo-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                }`}
+              >
+                <Megaphone className="w-4 h-4 text-indigo-600" />
+                <span>Announcements</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('timetable')}
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
+                  activeTab === 'timetable' 
+                    ? 'bg-cyan-50 text-cyan-900 border border-cyan-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                }`}
+              >
+                <Calendar className="w-4 h-4 text-cyan-600" />
+                <span>Timetable Engine</span>
               </button>
             </div>
           </div>
@@ -1361,6 +1409,48 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               </button>
             </div>
             <AnalyticsDashboard />
+          </div>
+        )}
+
+        {/* Tab 7: Hostel Maintenance Tickets */}
+        {activeTab === 'hostel_tickets' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <HostelTicketingTab />
+          </div>
+        )}
+
+        {/* Tab 8: Institutional Grievances & Complaints */}
+        {activeTab === 'complaints' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <ComplaintsTab />
+          </div>
+        )}
+
+        {/* Tab 9: Campus Lost & Found Registry */}
+        {activeTab === 'lostfound' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <LostAndFoundTab />
+          </div>
+        )}
+
+        {/* Tab 10: Training & Placement (T&P) Master Command */}
+        {activeTab === 'placements' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <AdminPlacementTab />
+          </div>
+        )}
+
+        {/* Tab 11: Official Announcements & Circulars Governance */}
+        {activeTab === 'announcements' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <AdminAnnouncementsTab />
+          </div>
+        )}
+
+        {/* Tab 12: Lecture Timetable & Schedule Engine */}
+        {activeTab === 'timetable' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <AdminTimetableTab />
           </div>
         )}
 

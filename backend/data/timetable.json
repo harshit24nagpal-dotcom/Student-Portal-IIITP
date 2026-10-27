@@ -1,0 +1,152 @@
+[
+  {
+    "id": 1,
+    "day": "Monday",
+    "timeSlot": "09:30 AM - 10:30 AM",
+    "subjectCode": "LNO",
+    "subjectName": "Linear and Non-Linear Optimization",
+    "facultyName": "Ms. Anagha Khiste",
+    "room": "LH-102",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 2,
+    "day": "Monday",
+    "timeSlot": "11:30 AM - 12:30 PM",
+    "subjectCode": "ML",
+    "subjectName": "Machine Learning",
+    "facultyName": "Dr. Sunita Chaki",
+    "room": "LH-101",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 3,
+    "day": "Monday",
+    "timeSlot": "02:00 PM - 04:00 PM",
+    "subjectCode": "ADS",
+    "subjectName": "Advanced Data Structures (Lab)",
+    "facultyName": "Dr. Suraj Kumar",
+    "room": "Computer Lab 3",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 4,
+    "day": "Tuesday",
+    "timeSlot": "10:00 AM - 11:00 AM",
+    "subjectCode": "HCI",
+    "subjectName": "Human Computer Interaction",
+    "facultyName": "Dr. Shrikant Salve",
+    "room": "LH-103",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 5,
+    "day": "Tuesday",
+    "timeSlot": "11:30 AM - 12:30 PM",
+    "subjectCode": "SE",
+    "subjectName": "Software Engineering",
+    "facultyName": "Ms. Anupama Avan",
+    "room": "LH-102",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 6,
+    "day": "Tuesday",
+    "timeSlot": "02:30 PM - 03:30 PM",
+    "subjectCode": "CNS",
+    "subjectName": "Cryptography and Network Security",
+    "facultyName": "Dr. Shrirang Shukla",
+    "room": "LH-101",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 7,
+    "day": "Wednesday",
+    "timeSlot": "09:30 AM - 10:30 AM",
+    "subjectCode": "LNO",
+    "subjectName": "Linear and Non-Linear Optimization",
+    "facultyName": "Ms. Anagha Khiste",
+    "room": "LH-102",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 8,
+    "day": "Wednesday",
+    "timeSlot": "11:00 AM - 01:00 PM",
+    "subjectCode": "ML",
+    "subjectName": "Machine Learning (Lab)",
+    "facultyName": "Dr. Sunita Chaki",
+    "room": "Computer Lab 2",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 9,
+    "day": "Wednesday",
+    "timeSlot": "03:00 PM - 04:00 PM",
+    "subjectCode": "ADS",
+    "subjectName": "Advanced Data Structures",
+    "facultyName": "Dr. Suraj Kumar",
+    "room": "LH-101",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 10,
+    "day": "Thursday",
+    "timeSlot": "10:00 AM - 11:00 AM",
+    "subjectCode": "HCI",
+    "subjectName": "Human Computer Interaction",
+    "facultyName": "Dr. Shrikant Salve",
+    "room": "LH-103",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 11,
+    "day": "Thursday",
+    "timeSlot": "11:30 AM - 12:30 PM",
+    "subjectCode": "SE",
+    "subjectName": "Software Engineering",
+    "facultyName": "Ms. Anupama Avan",
+    "room": "LH-102",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 12,
+    "day": "Thursday",
+    "timeSlot": "02:00 PM - 04:00 PM",
+    "subjectCode": "CNS",
+    "subjectName": "Cryptography Lab",
+    "facultyName": "Dr. Shrirang Shukla",
+    "room": "Computer Lab 1",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 13,
+    "day": "Friday",
+    "timeSlot": "09:30 AM - 10:30 AM",
+    "subjectCode": "LNO",
+    "subjectName": "Optimization Tutorial & Problem Solving",
+    "facultyName": "Ms. Anagha Khiste",
+    "room": "LH-102",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 14,
+    "day": "Friday",
+    "timeSlot": "11:00 AM - 12:00 PM",
+    "subjectCode": "ML",
+    "subjectName": "Machine Learning",
+    "facultyName": "Dr. Sunita Chaki",
+    "room": "LH-101",
+    "section": "Section A (CSE)"
+  },
+  {
+    "id": 15,
+    "day": "Friday",
+    "timeSlot": "02:30 PM - 04:30 PM",
+    "subjectCode": "PROJ",
+    "subjectName": "Capstone Project & Mentorship Session",
+    "facultyName": "Faculty Mentors",
+    "room": "Seminar Hall A",
+    "section": "Section A (CSE)"
+  }
+]

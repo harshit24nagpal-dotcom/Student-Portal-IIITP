@@ -50,6 +50,28 @@ export default function Login() {
       color: 'amber'
     },
     {
+      role: 'FACULTY',
+      title: 'Course Instructor',
+      name: 'Ms. Anagha Khiste',
+      mis: 'EMP101',
+      dept: 'CSE Course Instructor (LNO)',
+      identifier: 'anagha.khiste@iiitp.ac.in',
+      password: 'faculty123',
+      badge: 'INSTRUCTOR',
+      color: 'cyan'
+    },
+    {
+      role: 'FACULTY_ADVISOR',
+      title: 'Academic Advisor',
+      name: 'Dr. Shrikant Salve',
+      mis: 'EMP102',
+      dept: 'CSE Faculty Advisor',
+      identifier: 'advisor.cse@iiitp.ac.in',
+      password: 'advisor123',
+      badge: 'ADVISOR',
+      color: 'emerald'
+    },
+    {
       role: 'HOSTEL_WARDEN',
       title: 'Hostel Administration',
       name: 'Prof. Ramesh Patil',
@@ -70,17 +92,6 @@ export default function Login() {
       password: 'admin123',
       badge: 'ADMIN',
       color: 'slate'
-    },
-    {
-      role: 'FACULTY_ADVISOR',
-      title: 'Academic Advisor',
-      name: 'Dr. Shrikant Salve',
-      mis: 'EMP102',
-      dept: 'CSE Faculty Advisor',
-      identifier: 'advisor.cse@iiitp.ac.in',
-      password: 'advisor123',
-      badge: 'FACULTY',
-      color: 'emerald'
     }
   ];
 
@@ -396,24 +407,31 @@ export default function Login() {
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('HOSTEL_WARDEN')}
+                onClick={() => handleAutofill(demoAccounts[2])}
+                className="px-2 py-0.5 bg-cyan-50 hover:bg-cyan-800 hover:text-white text-cyan-900 border border-cyan-300 rounded text-[10px] font-bold transition-all cursor-pointer"
+              >
+                Instructor
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAutofill(demoAccounts[3])}
+                className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-900 hover:text-white text-emerald-900 border border-emerald-200 rounded text-[10px] font-bold transition-all cursor-pointer"
+              >
+                Advisor
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAutofill(demoAccounts[4])}
                 className="px-2 py-0.5 bg-indigo-50 hover:bg-indigo-900 hover:text-white text-indigo-900 border border-indigo-200 rounded text-[10px] font-bold transition-all cursor-pointer"
               >
                 Warden
               </button>
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('ADMIN')}
+                onClick={() => handleAutofill(demoAccounts[5])}
                 className="px-2 py-0.5 bg-slate-100 hover:bg-slate-900 hover:text-white text-slate-900 border border-slate-300 rounded text-[10px] font-bold transition-all cursor-pointer"
               >
                 Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('FACULTY_ADVISOR')}
-                className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-900 hover:text-white text-emerald-900 border border-emerald-200 rounded text-[10px] font-bold transition-all cursor-pointer"
-              >
-                Advisor
               </button>
             </div>
           </div>

@@ -24,6 +24,7 @@ import lostfoundRouter from './routes/lostfound.js';
 import announcementsRouter from './routes/announcements.js';
 import placementRouter from './routes/placement.js';
 import roommateRouter from './routes/roommate.js';
+import academicsRouter from './routes/academics.js';
 
 // Import background services
 import { startEscalationService } from './services/escalation.js';
@@ -78,6 +79,7 @@ app.use('/api/lostfound', lostfoundRouter);
 app.use('/api/announcements', announcementsRouter);
 app.use('/api/placement', placementRouter);
 app.use('/api/roommate', roommateRouter);
+app.use('/api/academics', academicsRouter);
 
 // Basic health check endpoint
 app.get('/health', (req, res) => {

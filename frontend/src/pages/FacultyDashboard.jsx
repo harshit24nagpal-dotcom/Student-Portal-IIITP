@@ -4,12 +4,18 @@ import { API_URL, getFileUrl } from '../config/api';
 import { 
   BookOpen, Users, Calendar, CheckCircle2, XCircle, 
   Save, Filter, AlertCircle, Sparkles, CheckSquare, XSquare, ShieldAlert,
-  FileCheck, Download, Clock, AlertTriangle, User, RefreshCw
+  FileCheck, Download, Clock, AlertTriangle, User, RefreshCw, Send,
+  Layers, ChevronRight, Check, Award, BellRing, Megaphone, Info, Eye
 } from 'lucide-react';
 
 export default function FacultyDashboard() {
   const { user, token } = useAuth();
-  const [activeTab, setActiveTab] = useState('attendance'); // 'attendance' | 'advisor_registration' | 'advisor_alerts'
+  
+  // Differentiate Course Instructor vs Faculty Advisor
+  const isAdvisor = user?.role === 'FACULTY_ADVISOR' || user?.role === 'ADMIN';
+
+  // Initial tab based on role
+  const [activeTab, setActiveTab] = useState(isAdvisor ? 'advisor_registration' : 'attendance');
 
   // Attendance state
   const [subjectsList, setSubjectsList] = useState([]);
@@ -29,8 +35,20 @@ export default function FacultyDashboard() {
   const [advisorRemarks, setAdvisorRemarks] = useState('');
   const [advisorLoading, setAdvisorLoading] = useState(false);
 
-  // Advisee attendance state
+  // Advisee attendance metrics state
   const [adviseeMetrics, setAdviseeMetrics] = useState([]);
+
+  // Syllabus Tracker state
+  const [syllabusData, setSyllabusData] = useState(null);
+  const [loadingSyllabus, setLoadingSyllabus] = useState(false);
+
+  // Class Announcements state
+  const [classAnnouncements, setClassAnnouncements] = useState([]);
+  const [announcementTitle, setAnnouncementTitle] = useState('');
+  const [announcementContent, setAnnouncementContent] = useState('');
+  const [announcementPriority, setAnnouncementPriority] = useState('NORMAL');
+  const [announcementBadge, setAnnouncementBadge] = useState('');
+  const [postingAnnouncement, setPostingAnnouncement] = useState(false);
 
   // Fetch subjects
   useEffect(() => {
@@ -43,6 +61,7 @@ export default function FacultyDashboard() {
           setSubjectsList(data);
           const match = data.find(s => s.section === selectedSection);
           if (match) setSelectedSubjectCode(match.code);
+          else if (data.length > 0) setSelectedSubjectCode(data[0].code);
         }
       })
       .catch(err => console.error(err));
@@ -53,7 +72,30 @@ export default function FacultyDashboard() {
     if (match) setSelectedSubjectCode(match.code);
   }, [selectedSection, subjectsList]);
 
-  // Fetch roster
+  // Fetch syllabus when subject changes
+  const fetchSyllabus = async (code) => {
+    if (!code) return;
+    setLoadingSyllabus(true);
+    try {
+      const res = await fetch(`${API_URL}/academics/syllabus/${code}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (res.ok) setSyllabusData(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingSyllabus(false);
+    }
+  };
+
+  useEffect(() => {
+    if (token && selectedSubjectCode) {
+      fetchSyllabus(selectedSubjectCode);
+    }
+  }, [token, selectedSubjectCode]);
+
+  // Fetch student roster
   useEffect(() => {
     if (!selectedSection) return;
     setLoadingStudents(true);
@@ -115,12 +157,26 @@ export default function FacultyDashboard() {
       });
   };
 
+  // Fetch recent academic announcements
+  const fetchAnnouncements = () => {
+    fetch(`${API_URL}/announcements?portalType=ACADEMIC`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setClassAnnouncements(data);
+      });
+  };
+
   useEffect(() => {
     if (token) {
-      fetchAdvisorPending();
-      fetchAdviseeMetrics();
+      if (isAdvisor) {
+        fetchAdvisorPending();
+        fetchAdviseeMetrics();
+      }
+      fetchAnnouncements();
     }
-  }, [token, activeTab]);
+  }, [token, activeTab, isAdvisor]);
 
   const toggleStatus = (studentId) => {
     setAttendanceState(prev => ({
@@ -224,9 +280,8 @@ export default function FacultyDashboard() {
 
       const data = await res.json();
       if (res.ok) {
-        // Automatically save/download sheet to local computer
         downloadAttendanceSheetCSV();
-        setSuccessMessage(`Successfully saved attendance to database & saved sheet to your local computer!`);
+        setSuccessMessage(`Successfully saved attendance to database & downloaded roster sheet to your local computer!`);
       } else {
         setErrorMessage(data.error || 'Failed to save attendance');
       }
@@ -255,7 +310,7 @@ export default function FacultyDashboard() {
       });
 
       if (res.ok) {
-        setSuccessMessage(`Registration marked ${action}!`);
+        setSuccessMessage(`Registration for ${selectedReg.student?.name} marked ${action}!`);
         setAdvisorRemarks('');
         fetchAdvisorPending();
       }
@@ -266,31 +321,133 @@ export default function FacultyDashboard() {
     }
   };
 
+  // Toggle syllabus unit status
+  const handleToggleUnitStatus = async (unitId, currentStatus) => {
+    const nextStatus = currentStatus === 'COMPLETED' ? 'IN_PROGRESS' : currentStatus === 'IN_PROGRESS' ? 'UPCOMING' : 'COMPLETED';
+    try {
+      const res = await fetch(`${API_URL}/academics/syllabus/${selectedSubjectCode}/unit/${unitId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: nextStatus })
+      });
+      if (res.ok) {
+        setSuccessMessage(`Unit status updated to ${nextStatus}!`);
+        fetchSyllabus(selectedSubjectCode);
+      }
+    } catch (err) {
+      setErrorMessage('Failed to update syllabus unit status');
+    }
+  };
+
+  // Post class circular / announcement
+  const handlePostAnnouncement = async (e) => {
+    e.preventDefault();
+    if (!announcementTitle || !announcementContent) return;
+    setPostingAnnouncement(true);
+    setSuccessMessage('');
+    setErrorMessage('');
+
+    try {
+      const res = await fetch(`${API_URL}/announcements`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: announcementTitle,
+          content: announcementContent,
+          portalType: 'ACADEMIC',
+          category: 'CIRCULAR',
+          priority: announcementPriority,
+          badgeText: announcementBadge || `${selectedSubjectCode || 'Course'} Notice`
+        })
+      });
+
+      if (res.ok) {
+        setSuccessMessage('Official academic circular published! Students will receive it in their dashboard.');
+        setAnnouncementTitle('');
+        setAnnouncementContent('');
+        setAnnouncementBadge('');
+        fetchAnnouncements();
+      } else {
+        setErrorMessage('Failed to publish circular');
+      }
+    } catch (err) {
+      setErrorMessage('Network error publishing announcement');
+    } finally {
+      setPostingAnnouncement(false);
+    }
+  };
+
+  // Issue academic warning notice for low attendance
+  const handleIssueWarningNotice = (advisee) => {
+    setSuccessMessage(`Official Academic Attendance Warning Notice dispatched to ${advisee.name} (MIS: ${advisee.userId}) for low attendance (${advisee.percentage}%).`);
+  };
+
   const currentSubjectObj = subjectsList.find(s => s.code === selectedSubjectCode && s.section === selectedSection);
   const presentCount = Object.values(attendanceState).filter(s => s === 'PRESENT').length;
   const absentCount = Object.values(attendanceState).filter(s => s === 'ABSENT').length;
 
   return (
     <div className="p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800 overflow-x-hidden">
-      {/* Header */}
+      {/* Header: Customized Distinctly for Course Instructor vs Faculty Advisor */}
       <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 bg-blue-50 text-[#1c398e] text-[10px] font-bold uppercase rounded tracking-wider border border-blue-200">
-              FACULTY & ADVISOR PORTAL
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`px-2.5 py-0.5 text-[10px] font-black uppercase rounded tracking-wider border ${
+              isAdvisor 
+                ? 'bg-purple-50 text-purple-900 border-purple-200' 
+                : 'bg-blue-50 text-[#1c398e] border-blue-200'
+            }`}>
+              {isAdvisor ? 'FACULTY ADVISOR • BATCH MENTOR (CSE)' : 'COURSE INSTRUCTOR • CSE DEPARTMENT'}
             </span>
-            <span className="text-xxs text-slate-500 font-mono">
-              INSTRUCTOR: {user?.name}
+            <span className="text-xxs text-slate-500 font-mono font-bold">
+              FACULTY ID: {user?.userId || 'EMP102'}
             </span>
           </div>
-          <h2 className="text-2xl font-bold text-slate-900 mt-1">Faculty Academic Console</h2>
+
+          <h1 className="text-2xl font-black text-slate-900 mt-1">
+            {isAdvisor ? 'Faculty Advisor Command Center' : 'Course Instructor Console'}
+          </h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Attendance Management • Semester Registration Approvals • Advisee Shortage Monitoring
+            {isAdvisor 
+              ? 'Advisee Registration Approvals • Batch Attendance Shortage Governance • Student Mentorship'
+              : 'Subject Attendance Tracking • Course Syllabus & Milestones • Subject Announcements'}
           </p>
         </div>
 
-        {/* Tab Controls */}
+        {/* Tab Controls Tailored to Specific Role */}
         <div className="flex flex-wrap gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-xl">
+          {/* Tabs for Faculty Advisor */}
+          {isAdvisor && (
+            <>
+              <button
+                onClick={() => setActiveTab('advisor_registration')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+                  activeTab === 'advisor_registration' ? 'bg-[#0c2340] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <FileCheck className="w-3.5 h-3.5" />
+                <span>Advisee Registrations ({pendingAdvisorRegs.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveTab('advisor_alerts')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+                  activeTab === 'advisor_alerts' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>Advisee Attendance Alerts</span>
+              </button>
+            </>
+          )}
+
+          {/* Mark Attendance (Available to both: Primary for Instructor, Secondary for Advisor) */}
           <button
             onClick={() => setActiveTab('attendance')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
@@ -298,47 +455,57 @@ export default function FacultyDashboard() {
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5" />
-            <span>Mark Attendance</span>
+            <span>{isAdvisor ? 'Teach Subject (HCI)' : 'Mark Lecture Attendance'}</span>
           </button>
 
+          {/* Course Syllabus Progress (Primary for Course Instructor) */}
           <button
-            onClick={() => setActiveTab('advisor_registration')}
+            onClick={() => setActiveTab('syllabus')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeTab === 'advisor_registration' ? 'bg-[#5367c8] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'syllabus' ? 'bg-emerald-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <FileCheck className="w-3.5 h-3.5" />
-            <span>Advisor Registrations ({pendingAdvisorRegs.length})</span>
+            <BookOpen className="w-3.5 h-3.5" />
+            <span>Course Syllabus & Plan</span>
           </button>
 
+          {/* Class / Batch Announcements */}
           <button
-            onClick={() => setActiveTab('advisor_alerts')}
+            onClick={() => setActiveTab('announcements')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
-              activeTab === 'advisor_alerts' ? 'bg-amber-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+              activeTab === 'announcements' ? 'bg-indigo-700 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5" />
-            <span>Advisee Attendance Alerts</span>
+            <Megaphone className="w-3.5 h-3.5" />
+            <span>{isAdvisor ? 'Batch Circulars' : 'Class Announcements'}</span>
           </button>
         </div>
       </div>
 
       {/* Notifications */}
       {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 font-semibold animate-pulse">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          {successMessage}
+        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{successMessage}</span>
+          </div>
+          <button onClick={() => setSuccessMessage('')} className="text-emerald-700 hover:text-emerald-900 text-xs font-bold cursor-pointer">✕</button>
         </div>
       )}
 
       {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center gap-2 font-semibold">
-          <AlertCircle className="w-4 h-4 text-red-600" />
-          {errorMessage}
+        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-xs rounded-xl flex items-center justify-between gap-2 font-semibold">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+          <button onClick={() => setErrorMessage('')} className="text-red-700 hover:text-red-900 text-xs font-bold cursor-pointer">✕</button>
         </div>
       )}
 
-      {/* TAB 1: ATTENDANCE MARKING */}
+      {/* =========================================================================
+          TAB 1: LECTURE ATTENDANCE MARKING
+         ========================================================================= */}
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           {/* Controls Bar */}
@@ -348,7 +515,7 @@ export default function FacultyDashboard() {
               <select
                 value={selectedSection}
                 onChange={(e) => setSelectedSection(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
               >
                 <option value="Section A (CSE)">Section A (CSE - MIS 001 to 082)</option>
                 <option value="Section B (CSE)">Section B (CSE - MIS 083 to 150)</option>
@@ -361,7 +528,7 @@ export default function FacultyDashboard() {
               <select
                 value={selectedSubjectCode}
                 onChange={(e) => setSelectedSubjectCode(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
               >
                 {subjectsList.filter(s => s.section === selectedSection).map(s => (
                   <option key={s.code} value={s.code}>{s.code} - {s.name}</option>
@@ -375,7 +542,7 @@ export default function FacultyDashboard() {
                 type="date"
                 value={attendanceDate}
                 onChange={(e) => setAttendanceDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:outline-none focus:border-[#5367c8]"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-800 focus:outline-hidden focus:border-[#5367c8]"
               />
             </div>
           </div>
@@ -450,7 +617,7 @@ export default function FacultyDashboard() {
                 <button
                   onClick={handleSaveAttendance}
                   disabled={saving}
-                  className="px-5 py-2.5 bg-[#5367c8] hover:bg-[#475bc2] text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="px-5 py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-sm flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
                   {saving ? 'Saving Sheet...' : 'Submit & Save Attendance Sheet'}
@@ -461,8 +628,203 @@ export default function FacultyDashboard() {
         </div>
       )}
 
-      {/* TAB 2: FACULTY ADVISOR SEMESTER REGISTRATION APPROVALS */}
-      {activeTab === 'advisor_registration' && (
+      {/* =========================================================================
+          TAB 2: COURSE SYLLABUS & LECTURE MILESTONES (Instructor Feature)
+         ========================================================================= */}
+      {activeTab === 'syllabus' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-900 text-[10px] font-black uppercase rounded tracking-wider border border-emerald-200">
+                  CURRICULUM DELIVERY MONITOR
+                </span>
+                <span className="text-xxs text-slate-500 font-mono font-bold">
+                  {selectedSubjectCode || 'LNO'} • {syllabusData?.title || 'Course Plan'}
+                </span>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mt-1">Course Syllabus & Lecture Progress Tracker</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Instructor: {syllabusData?.instructor || user?.name} • Credits: {syllabusData?.credits || 4}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Lecture Delivery</span>
+                <span className="text-sm font-bold text-slate-900">
+                  {syllabusData?.completedLectures || 26} / {syllabusData?.totalLectures || 42} Lectures ({Math.round(((syllabusData?.completedLectures || 26) / (syllabusData?.totalLectures || 42)) * 100)}%)
+                </span>
+              </div>
+              <div className="w-24 bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div 
+                  className="bg-emerald-600 h-full rounded-full" 
+                  style={{ width: `${Math.round(((syllabusData?.completedLectures || 26) / (syllabusData?.totalLectures || 42)) * 100)}%` }} 
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Units breakdown */}
+          <div className="space-y-3">
+            {syllabusData?.units?.map((u) => {
+              const isComp = u.status === 'COMPLETED';
+              const isInProg = u.status === 'IN_PROGRESS';
+
+              return (
+                <div 
+                  key={u.id}
+                  className={`p-5 rounded-2xl border transition-all bg-white shadow-2xs space-y-2 ${
+                    isComp ? 'border-emerald-200' : isInProg ? 'border-amber-200 bg-amber-50/20' : 'border-slate-200'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-xs font-mono font-bold text-slate-500">{u.unitNumber}:</span>
+                      <h4 className="font-bold text-sm text-slate-900">{u.title}</h4>
+                      <span className="text-xxs text-slate-400 font-mono">({u.lectures} Lectures)</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase border ${
+                        isComp 
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                          : isInProg 
+                          ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                          : 'bg-slate-100 text-slate-600 border-slate-200'
+                      }`}>
+                        {u.status.replace(/_/g, ' ')}
+                      </span>
+
+                      <button
+                        onClick={() => handleToggleUnitStatus(u.id, u.status)}
+                        className="px-2.5 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-xxs font-bold uppercase tracking-wider text-slate-700 cursor-pointer"
+                        title="Cycle Unit Status"
+                      >
+                        Change Status
+                      </button>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-600 leading-relaxed pl-1">
+                    <strong>Topics Covered:</strong> {u.topics}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 3: CLASS & BATCH ANNOUNCEMENTS
+         ========================================================================= */}
+      {activeTab === 'announcements' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Post notice form */}
+          <div className="lg:col-span-1 p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <Send className="w-4 h-4 text-[#1c398e]" />
+              Publish Official Academic Notice
+            </h3>
+            <p className="text-xxs text-slate-500">
+              Dispatches announcement directly to student portal dashboards and notifications
+            </p>
+
+            <form onSubmit={handlePostAnnouncement} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-xxs font-bold text-slate-600 uppercase mb-1">Notice Headline</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. LNO Mid-Semester Assignment 2 Uploaded"
+                  value={announcementTitle}
+                  onChange={(e) => setAnnouncementTitle(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-semibold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xxs font-bold text-slate-600 uppercase mb-1">Priority</label>
+                <select
+                  value={announcementPriority}
+                  onChange={(e) => setAnnouncementPriority(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-semibold"
+                >
+                  <option value="NORMAL">NORMAL (Class Notice)</option>
+                  <option value="HIGH">HIGH (Assignment / Deadline)</option>
+                  <option value="URGENT">URGENT (Exam Alert)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xxs font-bold text-slate-600 uppercase mb-1">Optional Badge Tag</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Due Oct 30"
+                  value={announcementBadge}
+                  onChange={(e) => setAnnouncementBadge(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xxs font-bold text-slate-600 uppercase mb-1">Notice Content</label>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="Write clear notice details, submission links, or exam instructions for enrolled students..."
+                  value={announcementContent}
+                  onChange={(e) => setAnnouncementContent(e.target.value)}
+                  className="w-full p-2.5 border border-slate-300 rounded-xl text-xs"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={postingAnnouncement}
+                className="w-full py-2.5 bg-[#0c2340] hover:bg-slate-900 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                {postingAnnouncement ? 'Broadcasting...' : 'Broadcast Notice to Students'}
+              </button>
+            </form>
+          </div>
+
+          {/* List of recent circulars */}
+          <div className="lg:col-span-2 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">
+              Recent Academic Notices & Circulars ({classAnnouncements.length})
+            </h3>
+
+            <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+              {classAnnouncements.map((a) => (
+                <div key={a.id} className="p-4 rounded-xl border border-slate-200 bg-white space-y-1.5 shadow-2xs">
+                  <div className="flex items-center justify-between text-xxs">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 bg-blue-50 text-blue-900 border border-blue-200 rounded font-black uppercase">
+                        {a.priority}
+                      </span>
+                      {a.badgeText && (
+                        <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded font-bold">
+                          {a.badgeText}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-slate-400 font-mono">{a.date}</span>
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-xs sm:text-sm">{a.title}</h4>
+                  <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-line">{a.content}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB 4: FACULTY ADVISOR SEMESTER REGISTRATION APPROVALS
+         ========================================================================= */}
+      {isAdvisor && activeTab === 'advisor_registration' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 space-y-3">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 px-1">
@@ -525,7 +887,7 @@ export default function FacultyDashboard() {
                   value={advisorRemarks}
                   onChange={(e) => setAdvisorRemarks(e.target.value)}
                   placeholder="Enter remarks or approval notes..."
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 h-20 focus:outline-none focus:border-[#5367c8]"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 h-20 focus:outline-hidden focus:border-[#5367c8]"
                 />
 
                 <div className="flex gap-3">
@@ -555,8 +917,10 @@ export default function FacultyDashboard() {
         </div>
       )}
 
-      {/* TAB 3: ADVISEE ATTENDANCE SHORTAGE MONITORING */}
-      {activeTab === 'advisor_alerts' && (
+      {/* =========================================================================
+          TAB 5: ADVISEE ATTENDANCE SHORTAGE MONITORING (Advisor Feature)
+         ========================================================================= */}
+      {isAdvisor && activeTab === 'advisor_alerts' && (
         <div className="glass-card p-6 rounded-2xl border border-slate-200 bg-white space-y-4 shadow-sm">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
@@ -576,6 +940,7 @@ export default function FacultyDashboard() {
                   <th className="py-2.5 px-4">Attended</th>
                   <th className="py-2.5 px-4">Attendance %</th>
                   <th className="py-2.5 px-4">Shortage Level</th>
+                  <th className="py-2.5 px-4 text-right">Advisor Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -597,6 +962,16 @@ export default function FacultyDashboard() {
                       }`}>
                         {s.alertLevel}
                       </span>
+                    </td>
+                    <td className="py-2.5 px-4 text-right">
+                      {s.alertLevel !== 'NORMAL' && (
+                        <button
+                          onClick={() => handleIssueWarningNotice(s)}
+                          className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-xxs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap"
+                        >
+                          Issue Warning
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

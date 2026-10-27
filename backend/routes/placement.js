@@ -137,6 +137,67 @@ router.get('/my-applications', authenticateToken, async (req, res) => {
   }
 });
 
+// Admin / TPO: Get all student applications across drives
+router.get('/admin/all-applications', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
+  try {
+    const { driveId, status } = req.query;
+    const where = {};
+    if (driveId && driveId !== 'ALL') where.driveId = parseInt(driveId);
+    if (status && status !== 'ALL') where.status = status;
+
+    const applications = await prisma.placementApplication.findMany({
+      where,
+      include: {
+        drive: true,
+        student: {
+          select: {
+            id: true,
+            name: true,
+            userId: true,
+            email: true,
+            department: true,
+            programme: true,
+            batch: true,
+            semester: true,
+            cgpa: true,
+            activeBacklogs: true,
+            contactNumber: true
+          }
+        }
+      },
+      orderBy: { appliedAt: 'desc' }
+    });
+
+    res.json(applications);
+  } catch (error) {
+    console.error('Fetch All Applications Error:', error);
+    res.status(500).json({ error: 'Failed to fetch placement applications' });
+  }
+});
+
+// Admin / TPO: Placement CRM Statistics
+router.get('/admin/stats', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
+  try {
+    const totalDrives = await prisma.placementDrive.count();
+    const activeDrives = await prisma.placementDrive.count({ where: { status: 'ACTIVE' } });
+    const totalApplications = await prisma.placementApplication.count();
+    const shortlistedCount = await prisma.placementApplication.count({ where: { status: 'SHORTLISTED' } });
+    const interviewCount = await prisma.placementApplication.count({ where: { status: 'INTERVIEW_SCHEDULED' } });
+    const offeredCount = await prisma.placementApplication.count({ where: { status: { in: ['OFFERED', 'SELECTED'] } } });
+
+    res.json({
+      totalDrives,
+      activeDrives,
+      totalApplications,
+      shortlistedCount,
+      interviewCount,
+      offeredCount
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch placement statistics' });
+  }
+});
+
 // Create a new placement drive (TPO / Admin)
 router.post('/drives', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
   try {
@@ -203,6 +264,17 @@ router.put('/applications/:id/status', authenticateToken, authorizeRoles('ADMIN'
     res.json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update application status' });
+  }
+});
+
+// Delete a placement drive (Admin only)
+router.delete('/drives/:id', authenticateToken, authorizeRoles('ADMIN'), async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await prisma.placementDrive.delete({ where: { id } });
+    res.json({ message: 'Placement drive deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete placement drive' });
   }
 });
 

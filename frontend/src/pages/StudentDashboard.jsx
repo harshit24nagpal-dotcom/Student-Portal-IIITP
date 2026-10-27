@@ -98,6 +98,55 @@ export default function StudentDashboard() {
     }
   }, [token]);
 
+  // Dynamic Timetable & Course Syllabus state
+  const [studentTimetable, setStudentTimetable] = useState([]);
+  const [selectedTimetableDay, setSelectedTimetableDay] = useState('Today');
+  const [studentSyllabus, setStudentSyllabus] = useState(null);
+  const [selectedSyllabusCode, setSelectedSyllabusCode] = useState('LNO');
+  const [academicCirculars, setAcademicCirculars] = useState([]);
+
+  const fetchStudentTimetable = () => {
+    if (!token) return;
+    fetch(`${API_URL}/academics/timetable?section=${encodeURIComponent(user?.section || 'Section A (CSE)')}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setStudentTimetable(data);
+      })
+      .catch(console.error);
+  };
+
+  const fetchStudentSyllabus = (code) => {
+    if (!token) return;
+    fetch(`${API_URL}/academics/syllabus/${code || 'LNO'}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => setStudentSyllabus(data))
+      .catch(console.error);
+  };
+
+  const fetchAcademicCirculars = () => {
+    if (!token) return;
+    fetch(`${API_URL}/announcements?portalType=ACADEMIC`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setAcademicCirculars(data);
+      })
+      .catch(console.error);
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchStudentTimetable();
+      fetchStudentSyllabus(selectedSyllabusCode);
+      fetchAcademicCirculars();
+    }
+  }, [token, portalTab, selectedSyllabusCode]);
+
   // Overall Attendance calculation
   const totalAttended = attendanceData.summary.reduce((acc, curr) => acc + curr.attendedClasses, 0);
   const totalClasses = attendanceData.summary.reduce((acc, curr) => acc + curr.totalClasses, 0);
@@ -1059,85 +1108,193 @@ export default function StudentDashboard() {
       {/* ========================================================================= */}
       {activePortalDivision === 'academic' && portalTab === 'academics' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left: Official Circulars */}
-            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#0c2340]" />
-                  Academic Circulars & Examination Notices
+          {/* Top: Dynamic Weekly Timetable Engine */}
+          <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="text-base font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  Live Academic Lecture Schedule & Classroom Allotments
                 </h3>
-                <span className="text-[10px] text-slate-500 font-bold uppercase">Autumn Semester 2026</span>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Synchronized with IIIT Pune Academic Timetable Engine • {user?.section || 'Section A (CSE)'}
+                </p>
               </div>
 
-              <div className="space-y-3">
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 hover:border-slate-300 transition-all">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="px-2 py-0.5 bg-red-50 border border-red-200 text-red-700 text-[9px] font-black uppercase rounded">IMPORTANT</span>
-                    <span className="text-[10px] text-slate-500">Sept 1, 2026</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-slate-900">End-Semester Examination Schedule for Batch 2024-28</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    The detailed timetable for CSE and ECE B.Tech 3rd Semester end-semester examinations has been published. Mid-term evaluations conclude on Sept 15.
-                  </p>
-                </div>
+              {/* Day Selector */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {['Today', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((day) => {
+                  const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
+                  const isCurrent = day === 'Today' || day === todayName;
 
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 hover:border-slate-300 transition-all">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-800 text-[9px] font-black uppercase rounded">CIRCULAR</span>
-                    <span className="text-[10px] text-slate-500">Aug 28, 2026</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-slate-900">Elective Selection Portal Open for B.Tech CSE & ECE</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Students can submit their preference for 4th Semester Professional Electives (Machine Learning, Embedded Systems, VLSI Design, Cloud Architecture) via the academic portal.
-                  </p>
-                </div>
-
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 hover:border-slate-300 transition-all">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-800 text-[9px] font-black uppercase rounded">RESEARCH</span>
-                    <span className="text-[10px] text-slate-500">Aug 20, 2026</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-slate-900">Undergraduate Research Assistantship Call (UGRA)</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">
-                    Faculty led research labs at IIIT Pune invite applications from CSE & ECE students for monsoon research projects in Signal Processing and Distributed Computing.
-                  </p>
-                </div>
+                  return (
+                    <button
+                      key={day}
+                      onClick={() => setSelectedTimetableDay(day)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                        selectedTimetableDay === day
+                          ? 'bg-[#0c2340] text-white shadow-xs'
+                          : 'bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200'
+                      }`}
+                    >
+                      {day} {day === 'Today' && `(${todayName.slice(0, 3)})`}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right: Timetable */}
-            <div className="space-y-6">
+            {/* Timetable slots */}
+            {(() => {
+              const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
+              const targetDay = selectedTimetableDay === 'Today' ? todayName : selectedTimetableDay;
+              const slots = studentTimetable.filter(s => s.day.toLowerCase() === targetDay.toLowerCase());
+
+              if (slots.length === 0) {
+                return (
+                  <div className="p-8 text-center text-slate-400 text-xs italic bg-slate-50 rounded-xl border border-slate-200">
+                    No lectures scheduled for {targetDay}. Enjoy your academic study & lab hours!
+                  </div>
+                );
+              }
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {slots.map((slot) => (
+                    <div key={slot.id} className="p-4 bg-slate-50 border border-slate-200 rounded-xl hover:border-slate-300 transition-all shadow-2xs space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2 py-0.5 bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold font-mono rounded">
+                          {slot.timeSlot}
+                        </span>
+                        <span className="px-1.5 py-0.2 bg-white border border-slate-200 text-slate-700 text-[10px] font-mono font-bold rounded">
+                          {slot.room}
+                        </span>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-900 text-xs sm:text-sm leading-snug">{slot.subjectName}</h4>
+                        <p className="text-xxs text-slate-500 font-semibold mt-0.5">Instructor: {slot.facultyName}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left 2 Cols: Course Syllabus Progress Tracker */}
+            <div className="lg:col-span-2 p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-[#0c2340]" />
+                    Curriculum Syllabus & Lecture Delivery Tracker
+                  </h3>
+                  <p className="text-xxs text-slate-500">Live lecture progress maintained by assigned Course Instructors</p>
+                </div>
+
+                {/* Subject Selector Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {['LNO', 'ML', 'HCI'].map((code) => (
+                    <button
+                      key={code}
+                      onClick={() => {
+                        setSelectedSyllabusCode(code);
+                        fetchStudentSyllabus(code);
+                      }}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold uppercase transition-all cursor-pointer ${
+                        selectedSyllabusCode === code
+                          ? 'bg-emerald-700 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {code}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {studentSyllabus && (
+                <div className="space-y-4">
+                  <div className="p-4 bg-emerald-50/50 border border-emerald-200 rounded-xl flex items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-bold text-slate-900 text-sm">{studentSyllabus.title} ({studentSyllabus.code})</h4>
+                      <p className="text-xxs text-slate-500">Instructor: {studentSyllabus.instructor} • Credits: {studentSyllabus.credits}</p>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Syllabus Completion</span>
+                      <span className="text-sm font-black text-emerald-800 font-mono">
+                        {studentSyllabus.completedLectures} / {studentSyllabus.totalLectures} Lectures ({Math.round((studentSyllabus.completedLectures / studentSyllabus.totalLectures) * 100)}%)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5">
+                    {studentSyllabus.units?.map((u) => {
+                      const isComp = u.status === 'COMPLETED';
+                      const isInProg = u.status === 'IN_PROGRESS';
+
+                      return (
+                        <div key={u.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-slate-900">{u.unitNumber}: {u.title}</span>
+                              <span className="text-[10px] text-slate-400 font-mono">({u.lectures} Lectures)</span>
+                            </div>
+                            <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase border ${
+                              isComp 
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                                : isInProg 
+                                ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                                : 'bg-slate-100 text-slate-600 border-slate-200'
+                            }`}>
+                              {u.status.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                          <p className="text-xxs text-slate-600">
+                            <strong>Topics:</strong> {u.topics}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right 1 Col: Live Academic Circulars */}
+            <div className="space-y-4">
               <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-sm space-y-4">
-                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-blue-600" />
-                  Today's Lecture Timetable
-                </h3>
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                    <Megaphone className="w-4 h-4 text-blue-600" />
+                    Academic Circulars
+                  </h3>
+                  <button
+                    onClick={() => { setActivePortalDivision('academic'); setPortalTab('announcements_acad'); }}
+                    className="text-xxs text-blue-700 hover:underline font-bold"
+                  >
+                    View All →
+                  </button>
+                </div>
 
-                <div className="space-y-2.5 text-xs">
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-slate-900">Linear & Non-Linear Optimization</h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">LH-102 • Ms. Anagha Khiste</p>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-1 rounded">09:30 AM</span>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-slate-900">Machine Learning (ML)</h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">LH-101 • Dr. Sunita Chaki</p>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-1 rounded">11:30 AM</span>
-                  </div>
-
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
-                    <div>
-                      <h4 className="font-bold text-slate-900">Advanced Data Structures (ADS)</h4>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Computer Lab 3 • Dr. Suraj Kumar</p>
-                    </div>
-                    <span className="text-[10px] font-bold text-blue-800 bg-blue-50 border border-blue-200 px-2 py-1 rounded">02:00 PM</span>
-                  </div>
+                <div className="space-y-3">
+                  {academicCirculars.length === 0 ? (
+                    <p className="text-xs text-slate-400 italic">No circulars posted yet.</p>
+                  ) : (
+                    academicCirculars.slice(0, 3).map((item) => (
+                      <div key={item.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1 hover:border-slate-300 transition-all">
+                        <div className="flex items-center justify-between text-xxs">
+                          <span className="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded font-black uppercase">
+                            {item.priority}
+                          </span>
+                          <span className="text-slate-400 font-mono">{item.date}</span>
+                        </div>
+                        <h4 className="font-bold text-slate-900 text-xs leading-snug">{item.title}</h4>
+                        <p className="text-xxs text-slate-600 line-clamp-2">{item.content}</p>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>
