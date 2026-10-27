@@ -15,6 +15,7 @@ import LostAndFoundTab from '../components/LostAndFoundTab';
 import AdminPlacementTab from '../components/AdminPlacementTab';
 import AdminAnnouncementsTab from '../components/AdminAnnouncementsTab';
 import AdminTimetableTab from '../components/AdminTimetableTab';
+import InfrastructureReservationTab from '../components/InfrastructureReservationTab';
 import { Wrench, MessageSquare, Tag, Briefcase, Megaphone, Calendar } from 'lucide-react';
 import { API_URL } from '../config/api';
 
@@ -565,6 +566,17 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
               >
                 <Calendar className="w-4 h-4 text-cyan-600" />
                 <span>Timetable Engine</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('reservations')}
+                className={`w-auto lg:w-full shrink-0 lg:shrink text-left px-3.5 py-1.5 lg:py-2 rounded-md text-xs font-semibold uppercase tracking-wider flex items-center gap-2 transition-colors cursor-pointer ${
+                  activeTab === 'reservations' 
+                    ? 'bg-blue-50 text-blue-900 border border-blue-200 shadow-xs' 
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                }`}
+              >
+                <Building className="w-4 h-4 text-blue-600" />
+                <span>Facility Reservations</span>
               </button>
             </div>
           </div>
@@ -1455,6 +1467,13 @@ export default function AdminDashboard({ defaultTab = 'live' }) {
           </div>
         )}
 
+      
+        {/* Tab 13: Campus Facility Reservation & SAC Sanctions */}
+        {activeTab === 'reservations' && (
+          <div className="space-y-6 animate-in fade-in duration-200">
+            <InfrastructureReservationTab />
+          </div>
+        )}
       </div>
     </div>
   );

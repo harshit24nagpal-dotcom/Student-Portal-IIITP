@@ -174,6 +174,8 @@ router.post('/login', async (req, res) => {
       isPasswordValid = true;
     } else if (user.role === 'FACULTY' && (password === 'faculty123' || password === 'password')) {
       isPasswordValid = true;
+    } else if (user.role === 'PLACEMENT_OFFICER' && (password === 'tpo123' || password === 'placement123' || password === 'faculty123' || password === 'password')) {
+      isPasswordValid = true;
     } else if (user.role === 'CLEARANCE_OFFICER' && (password === 'officer123' || password === 'password')) {
       isPasswordValid = true;
     } else if (user.role === 'SECURITY' && (password === 'security123' || password === 'password')) {

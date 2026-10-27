@@ -19,6 +19,7 @@ import LostAndFoundTab from '../components/LostAndFoundTab';
 import AnnouncementsTab from '../components/AnnouncementsTab';
 import PlacementDriveTab from '../components/PlacementDriveTab';
 import RoommateAllotmentTab from '../components/RoommateAllotmentTab';
+import InfrastructureReservationTab from '../components/InfrastructureReservationTab';
 import { 
   LogOut, LogIn, Utensils, Wrench, MessageSquare, Tag, EyeOff, ShieldCheck,
   Briefcase, Megaphone, Bed, Sparkles as SparklesIcon
@@ -477,7 +478,7 @@ export default function StudentDashboard() {
                 }`}
               >
                 <Building className="w-4 h-4" />
-                <span>Campus Facilities</span>
+                <span>Campus Facility Reservation</span>
               </button>
             </>
           )}
@@ -1377,120 +1378,9 @@ export default function StudentDashboard() {
       {/* 7. CAMPUS FACILITY BOOKINGS                                               */}
       {/* ========================================================================= */}
       {activePortalDivision === 'academic' && portalTab === 'facilities' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Booking Form */}
-            <div className="lg:col-span-1 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
-                <Building className="w-4 h-4 text-blue-600" />
-                Reserve Campus Infrastructure
-              </h3>
-
-              {bookingSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-md flex items-center gap-2 font-bold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  Facility Slot Reserved Successfully!
-                </div>
-              )}
-
-              <form onSubmit={(e) => { e.preventDefault(); setBookingSuccess(true); setTimeout(() => setBookingSuccess(false), 4000); }} className="space-y-3.5 text-xs">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Select Facility / Lab</label>
-                  <select
-                    value={selectedFacility}
-                    onChange={(e) => setSelectedFacility(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
-                  >
-                    <option value="AI/ML Computing Lab">AI/ML High Performance GPU Lab</option>
-                    <option value="Robotics & IoT Innovation Hub">Robotics & IoT Innovation Hub</option>
-                    <option value="Auditorium & Seminar Hall">Main Auditorium & Seminar Hall</option>
-                    <option value="Indoor Badminton & Sports Complex">Indoor Badminton & Sports Complex</option>
-                    <option value="VLSI & Circuit Design Lab">VLSI & Circuit Design Lab</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Reservation Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={bookingDate}
-                    onChange={(e) => setBookingDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold uppercase text-slate-500 mb-1">Time Slot</label>
-                  <select
-                    value={bookingTime}
-                    onChange={(e) => setBookingTime(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-md text-slate-800 focus:outline-none focus:border-blue-600"
-                  >
-                    <option value="">Choose Time Slot</option>
-                    <option value="09:00 AM - 11:00 AM">09:00 AM - 11:00 AM</option>
-                    <option value="11:30 AM - 01:30 PM">11:30 AM - 01:30 PM</option>
-                    <option value="02:30 PM - 04:30 PM">02:30 PM - 04:30 PM</option>
-                    <option value="05:00 PM - 07:00 PM">05:00 PM - 07:00 PM</option>
-                  </select>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-2.5 bg-[#0c2340] hover:bg-[#1a365d] text-white font-extrabold rounded-md text-xs uppercase tracking-wider shadow cursor-pointer transition-colors"
-                >
-                  Submit Booking Request
-                </button>
-              </form>
-            </div>
-
-            {/* Campus Facilities List */}
-            <div className="lg:col-span-2 p-6 rounded-md border border-slate-200 bg-white shadow-sm space-y-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">Campus Infrastructure Directory</h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-slate-900">AI/ML GPU Computing Lab</h4>
-                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-black rounded uppercase">AVAILABLE</span>
-                  </div>
-                  <p className="text-[10px] text-slate-600">Equipped with 32 NVIDIA RTX Workstations for Deep Learning research.</p>
-                  <p className="text-[10px] text-blue-800 font-bold">Location: Academic Block 2, Floor 3</p>
-                </div>
-
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-slate-900">Robotics & IoT Innovation Hub</h4>
-                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-black rounded uppercase">AVAILABLE</span>
-                  </div>
-                  <p className="text-[10px] text-slate-600">Microcontroller programmer stations, 3D printers, and drone testing grids.</p>
-                  <p className="text-[10px] text-blue-800 font-bold">Location: Academic Block 1, Ground Floor</p>
-                </div>
-
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-slate-900">Main Seminar Hall</h4>
-                    <span className="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[9px] font-black rounded uppercase">BOOKED TODAY</span>
-                  </div>
-                  <p className="text-[10px] text-slate-600">300-seat acoustic auditorium with dual 4K laser projection.</p>
-                  <p className="text-[10px] text-blue-800 font-bold">Location: Admin Complex, Wing B</p>
-                </div>
-
-                <div className="p-4 bg-slate-50 border border-slate-200 rounded-md space-y-2">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-bold text-slate-900">VLSI & Microelectronics Lab</h4>
-                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[9px] font-black rounded uppercase">AVAILABLE</span>
-                  </div>
-                  <p className="text-[10px] text-slate-600">Cadence & Synopsys EDA Tool suites for ECE hardware synthesis.</p>
-                  <p className="text-[10px] text-blue-800 font-bold">Location: ECE Block, Floor 2</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <InfrastructureReservationTab />
       )}
-      {/* ========================================================================= */}
-      {/* ========================================================================= */}
+
       {/* TARGETED PLACEMENT CRM TAB                                               */}
       {/* ========================================================================= */}
       {activePortalDivision === 'academic' && portalTab === 'placement' && (

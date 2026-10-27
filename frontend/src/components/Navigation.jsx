@@ -29,6 +29,7 @@ export default function Navigation({ activeTab, setActiveTab }) {
       case 'ADMIN': return 'bg-red-50 text-red-700 border-red-200';
       case 'SECURITY': return 'bg-orange-50 text-orange-700 border-orange-200';
       case 'RESPONDER': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'PLACEMENT_OFFICER': return 'bg-cyan-50 text-cyan-800 border-cyan-200';
       case 'FACULTY': return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'FACULTY_ADVISOR': return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'HOSTEL_WARDEN': return 'bg-amber-50 text-amber-800 border-amber-200';
@@ -89,15 +90,15 @@ export default function Navigation({ activeTab, setActiveTab }) {
                   onClick={() => handleQuickSwitch('FACULTY')}
                   className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center justify-between cursor-pointer"
                 >
-                  <span>Faculty Instructor</span>
-                  {user.role === 'FACULTY' && <Check className="w-3.5 h-3.5 text-amber-600" />}
+                  <span>Faculty (Teaching & Advisory)</span>
+                  {(user.role === 'FACULTY' || user.role === 'FACULTY_ADVISOR') && <Check className="w-3.5 h-3.5 text-amber-600" />}
                 </button>
                 <button
-                  onClick={() => handleQuickSwitch('FACULTY_ADVISOR')}
+                  onClick={() => handleQuickSwitch('PLACEMENT_OFFICER')}
                   className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900 flex items-center justify-between cursor-pointer"
                 >
-                  <span>Faculty Advisor</span>
-                  {user.role === 'FACULTY_ADVISOR' && <Check className="w-3.5 h-3.5 text-purple-600" />}
+                  <span>Placement Officer (T&P)</span>
+                  {user.role === 'PLACEMENT_OFFICER' && <Check className="w-3.5 h-3.5 text-cyan-700" />}
                 </button>
                 <button
                   onClick={() => handleQuickSwitch('HOSTEL_WARDEN')}
@@ -159,55 +160,51 @@ export default function Navigation({ activeTab, setActiveTab }) {
               </span>
             </div>
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded bg-[#1c398e] text-white font-bold text-xs flex items-center justify-center uppercase shadow-xs">
-              {user.name ? user.name.split(' ').map(n => n[0]).join('') : 'U'}
+              {user.name ? user.name[0] : 'U'}
             </div>
           </div>
 
-          {/* Logout */}
+          {/* Logout Button */}
           <button
             onClick={logout}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-all cursor-pointer"
-            title="Log Out"
+            className="p-1.5 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer"
+            title="Logout"
           >
             <LogOut className="w-4 h-4" />
           </button>
         </div>
       </header>
 
-      {/* Floating toast notifications */}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 max-w-sm w-full">
-        {inAppAlerts.map((alert) => (
-          <div
-            key={alert.id}
-            className={`p-4 rounded-md shadow-xl border flex items-start justify-between gap-3 animate-in slide-in-from-bottom-5 duration-300 ${
-              alert.type === 'danger'
-                ? 'bg-red-50 border-red-200 text-red-900 shadow-red-100'
-                : alert.type === 'warning'
-                ? 'bg-amber-50 border-amber-200 text-amber-900 shadow-amber-100'
-                : 'bg-white border-slate-200 text-slate-800 shadow-slate-200'
-            }`}
-          >
-            <div className="flex-1">
-              <p className="text-xs font-black uppercase tracking-wider mb-0.5">{alert.title}</p>
-              <p className="text-[11px] leading-relaxed text-slate-600 font-medium">{alert.message}</p>
-            </div>
-            <button
-              onClick={() => removeAlert(alert.id)}
-              className="p-0.5 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-600 shrink-0"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        ))}
-      </div>
+      {/* Floating Global SOS Modal */}
+      <SOSModal isOpen={isSosOpen} onClose={() => setIsSosOpen(false)} />
 
-      <SOSModal 
-        isOpen={isSosOpen} 
-        onClose={() => setIsSosOpen(false)} 
-        onSOSTriggered={() => {
-          if (activeTab === 'dashboard') window.location.reload();
-        }}
-      />
+      {/* In-app Toast Broadcasts */}
+      {inAppAlerts.length > 0 && (
+        <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+          {inAppAlerts.map((alert) => (
+            <div
+              key={alert.id}
+              className="pointer-events-auto p-3.5 rounded-md shadow-lg border border-red-500 bg-red-900 text-white flex items-start justify-between gap-3 animate-in slide-in-from-bottom-5 duration-300"
+            >
+              <div className="flex items-start gap-2.5">
+                <Shield className="w-5 h-5 text-red-400 shrink-0 mt-0.5 animate-pulse" />
+                <div>
+                  <h4 className="text-xs font-bold tracking-tight uppercase text-red-200">
+                    {alert.title || 'Emergency Notification'}
+                  </h4>
+                  <p className="text-xs text-slate-100 mt-0.5">{alert.message}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => removeAlert(alert.id)}
+                className="text-slate-300 hover:text-white p-1 rounded transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

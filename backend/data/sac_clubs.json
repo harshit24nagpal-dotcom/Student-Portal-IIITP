@@ -1,0 +1,166 @@
+{
+  "sacFacultyInCharge": {
+    "name": "Dr. Shubham Shukla",
+    "designation": "Student Activity Council (SAC) Faculty In-charge",
+    "role": "SAC_FACULTY_INCHARGE",
+    "responsibilities": "Overall coordination and final institutional approval for all club events and venue allocations",
+    "email": "shubham.shukla@iiitp.ac.in",
+    "office": "Room 214, Academic Block"
+  },
+  "categories": [
+    {
+      "id": "TECHNICAL",
+      "name": "Technical Clubs",
+      "facultyInCharge": {
+        "name": "Dr. Saurabh Kumar",
+        "title": "Faculty In-charge (Technical Clubs)",
+        "email": "saurabh.kumar@iiitp.ac.in"
+      },
+      "coInCharge": {
+        "name": "Dr. Mohammad Akhlaqur Rahman",
+        "title": "Co-Incharge (Technical Clubs)",
+        "email": "akhlaqur.rahman@iiitp.ac.in"
+      },
+      "clubs": [
+        {
+          "code": "ROFIES",
+          "name": "R.O.F.I.E.S.",
+          "focus": "Robotics & Embedded Systems",
+          "head": { "name": "Om Shivansh Jaiswal", "mobile": "6260758453" },
+          "coHead": { "name": "Khushal Agrawal", "mobile": "9937715866" }
+        },
+        {
+          "code": "LOCALHOST",
+          "name": "LocalHost",
+          "focus": "Full-Stack Web & App Development, Open Source",
+          "head": { "name": "Abdul Baasith", "mobile": "7019035321" },
+          "coHead": { "name": "Bhumi Dingana", "mobile": "9623773143" }
+        },
+        {
+          "code": "BIT_LEGION",
+          "name": "BiT Legion",
+          "focus": "Competitive Programming, Data Structures & Algorithms",
+          "head": { "name": "Pratham Bhardwaj", "mobile": "9588742961" },
+          "coHead": { "name": "Nabhya Parasrampuria", "mobile": "9870388893" }
+        },
+        {
+          "code": "QUANTUM",
+          "name": "Quantum",
+          "focus": "AI, Machine Learning, Deep Tech & Computing",
+          "head": { "name": "Jash Popat", "mobile": "9879298102" },
+          "coHead": { "name": "Krish Joshi", "mobile": "9227602424" }
+        },
+        {
+          "code": "QRIOCITY",
+          "name": "Qriocity",
+          "focus": "General Quiz, Tech Trivia, Knowledge & Debates",
+          "head": { "name": "Aadit Bajaj", "mobile": "7067048551" },
+          "coHead": { "name": "Amol Raj", "mobile": "8397995928" }
+        }
+      ]
+    },
+    {
+      "id": "CULTURAL",
+      "name": "Cultural Clubs",
+      "facultyInCharge": {
+        "name": "Dr. Dhawal Salwan",
+        "title": "Faculty In-charge (Cultural Clubs)",
+        "email": "dhawal.salwan@iiitp.ac.in"
+      },
+      "clubs": [
+        {
+          "code": "RANG",
+          "name": "Rang",
+          "focus": "Fine Arts, Painting, Sketching & Creative Installations",
+          "head": { "name": "Lakshita Banothe", "mobile": "7691914369" },
+          "coHead": { "name": "Nishit Kerketta", "mobile": "9302033256" }
+        },
+        {
+          "code": "ABHINAY",
+          "name": "Abhinay",
+          "focus": "Dramatics, Street Play, Acting & Stage Theatre",
+          "head": { "name": "Arjun Mukhraiya", "mobile": "8830309849" },
+          "coHead": { "name": "Ishika Kodwani", "mobile": "7499490412" }
+        },
+        {
+          "code": "SAAZ",
+          "name": "Saaz",
+          "focus": "Music Society, Vocal Bands & Instrumental Arts",
+          "head": { "name": "A Sanjhanaa", "mobile": "7010299169" },
+          "coHead": { "name": "Dev Krishan", "mobile": "7895949845" }
+        },
+        {
+          "code": "VANITY_CREW",
+          "name": "Vanity Crew",
+          "focus": "Western & Classical Dance Society, Choreography",
+          "head": { "name": "Shravya", "mobile": "7892257665" },
+          "coHead": { "name": "Arya Krishna", "mobile": "9567102501" }
+        },
+        {
+          "code": "ECLECTIC",
+          "name": "Eclectic",
+          "focus": "Literary Arts, Creative Writing, Poetry & Mun",
+          "head": { "name": "Urvara Lakshmy Prakash", "mobile": "6238057515" },
+          "coHead": { "name": "Yashraj Singh", "mobile": "9023612545" }
+        },
+        {
+          "code": "TEDX",
+          "name": "TEDx",
+          "focus": "TEDx IIIT Pune, Thought Leadership & Global Talks",
+          "head": { "name": "Meanas Chiwande", "mobile": "7981437949" },
+          "coHead": { "name": "Kunal Jangid", "mobile": "9373431833" }
+        }
+      ]
+    },
+    {
+      "id": "SPORTS",
+      "name": "Sports Club",
+      "facultyInCharge": {
+        "name": "Dr. Dipen Bepari",
+        "title": "Faculty In-charge (Sports Club)",
+        "email": "dipen.bepari@iiitp.ac.in"
+      },
+      "clubs": [
+        {
+          "code": "SPORTS_CLUB",
+          "name": "Sports Club",
+          "focus": "Athletics, Football, Cricket, Badminton, Table Tennis & Chess",
+          "head": { "name": "Saksham Dabas", "mobile": "9898425247" },
+          "coHead": { "name": "Adarsh Purupuruthan", "mobile": "7736329750" }
+        }
+      ]
+    },
+    {
+      "id": "SUPPORTING",
+      "name": "Supporting Clubs",
+      "facultyInCharge": {
+        "name": "Dr. Dhawal Salwan",
+        "title": "Faculty In-charge (Supporting Clubs with Cultural In-charge)",
+        "email": "dhawal.salwan@iiitp.ac.in"
+      },
+      "clubs": [
+        {
+          "code": "HORIZON",
+          "name": "Horizon",
+          "focus": "Media, Videography, Photography, PR & Campus Coverage",
+          "head": { "name": "Mohan Sri Krishna Alavanthar Budumuru", "mobile": "8008288479" },
+          "coHead": { "name": "Sanika Chormale", "mobile": "9869047451" }
+        },
+        {
+          "code": "BLUEPRINT",
+          "name": "Blueprint",
+          "focus": "Event Operations, Documentation, Security Logistics & Passes",
+          "head": { "name": "Revansh Singh", "mobile": "7505007620" },
+          "coHead": { "name": "Daksh Pachwaria", "mobile": "8239544960" }
+        },
+        {
+          "code": "ECELL",
+          "name": "E-Cell",
+          "focus": "Entrepreneurship Cell, Startup Incubator & Pitching Events",
+          "head": { "name": "Harshit Nagpal", "mobile": "6350531585" },
+          "coHead": { "name": "Anshika Dhuria", "mobile": "9950172088" }
+        }
+      ]
+    }
+  ]
+}

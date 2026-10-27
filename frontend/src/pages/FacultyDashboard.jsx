@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { API_URL, getFileUrl } from '../config/api';
+import InfrastructureReservationTab from '../components/InfrastructureReservationTab';
 import { 
   BookOpen, Users, Calendar, CheckCircle2, XCircle, 
   Save, Filter, AlertCircle, Sparkles, CheckSquare, XSquare, ShieldAlert,
   FileCheck, Download, Clock, AlertTriangle, User, RefreshCw, Send,
-  Layers, ChevronRight, Check, Award, BellRing, Megaphone, Info, Eye, X
+  Layers, ChevronRight, Check, Award, BellRing, Megaphone, Info, Eye, X, Building
 } from 'lucide-react';
 
 export default function FacultyDashboard() {
   const { user, token } = useAuth();
   
   // Differentiate Course Instructor vs Faculty Advisor
-  const isAdvisor = user?.role === 'FACULTY_ADVISOR' || user?.role === 'ADMIN';
+  // Merged Faculty Role: All faculty members have full instructor + advisor capabilities
+  const isAdvisor = true;
 
   // Initial tab based on role
   const [activeTab, setActiveTab] = useState(isAdvisor ? 'advisor_registration' : 'attendance');
@@ -403,7 +405,7 @@ export default function FacultyDashboard() {
                 ? 'bg-purple-50 text-purple-900 border-purple-200' 
                 : 'bg-blue-50 text-[#1c398e] border-blue-200'
             }`}>
-              {isAdvisor ? 'FACULTY ADVISOR • BATCH MENTOR (CSE)' : 'COURSE INSTRUCTOR • CSE DEPARTMENT'}
+              'FACULTY • TEACHING & ACADEMIC ADVISORY'
             </span>
             <span className="text-xxs text-slate-500 font-mono font-bold">
               FACULTY ID: {user?.userId || 'EMP102'}
@@ -411,7 +413,7 @@ export default function FacultyDashboard() {
           </div>
 
           <h1 className="text-2xl font-black text-slate-900 mt-1">
-            {isAdvisor ? 'Faculty Advisor Command Center' : 'Course Instructor Console'}
+            'Faculty Command & Advisory Center'
           </h1>
           <p className="text-xs text-slate-500 mt-0.5">
             {isAdvisor 
@@ -455,7 +457,7 @@ export default function FacultyDashboard() {
             }`}
           >
             <CheckSquare className="w-3.5 h-3.5" />
-            <span>{isAdvisor ? 'Teach Subject (HCI)' : 'Mark Lecture Attendance'}</span>
+            <span>Lecture Attendance Marking</span>
           </button>
 
           {/* Course Syllabus Progress (Primary for Course Instructor) */}
@@ -477,7 +479,17 @@ export default function FacultyDashboard() {
             }`}
           >
             <Megaphone className="w-3.5 h-3.5" />
-            <span>{isAdvisor ? 'Batch Circulars' : 'Class Announcements'}</span>
+            <span>Class Announcements & Circulars</span>
+          </button>
+          {/* Campus Facility Reservation */}
+          <button
+            onClick={() => setActiveTab('reservation')}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'reservation' ? 'bg-[#0c2340] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Building className="w-3.5 h-3.5" />
+            <span>Facility Reservation</span>
           </button>
         </div>
       </div>
@@ -984,6 +996,13 @@ export default function FacultyDashboard() {
           </div>
         </div>
       )}
-    </div>
+    
+      {/* =========================================================================
+          TAB 6: CAMPUS FACILITY RESERVATION (LH01-LH08, CR01-CR10)
+         ========================================================================= */}
+      {activeTab === 'reservation' && (
+        <InfrastructureReservationTab />
+      )}
+</div>
   );
 }

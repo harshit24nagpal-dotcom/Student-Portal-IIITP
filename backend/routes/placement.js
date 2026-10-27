@@ -1,9 +1,39 @@
 import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
 import { authenticateToken, authorizeRoles } from '../middleware/auth.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const REQUESTS_FILE = path.join(__dirname, '..', 'data', 'placement_requests.json');
+
+function getPlacementRequests() {
+  try {
+    if (fs.existsSync(REQUESTS_FILE)) {
+      return JSON.parse(fs.readFileSync(REQUESTS_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.error('Error reading placement requests:', err);
+  }
+  return [];
+}
+
+function savePlacementRequests(data) {
+  try {
+    fs.writeFileSync(REQUESTS_FILE, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error writing placement requests:', err);
+  }
+}
+
+// ============================================================================
+// 1. STUDENT PLACEMENT DRIVES (Student & TPO)
+// ============================================================================
 
 // Get placement drives with smart eligibility evaluation for logged-in student
 router.get('/drives', authenticateToken, async (req, res) => {
@@ -78,7 +108,6 @@ router.post('/apply/:driveId', authenticateToken, async (req, res) => {
     const student = await prisma.user.findUnique({ where: { id: req.user.id } });
     const studentCgpa = student?.cgpa ?? 8.45;
     const studentBacklogs = student?.activeBacklogs ?? 0;
-    const studentBranch = student?.department || 'CSE';
 
     // Verify eligibility
     if (studentCgpa < drive.minCgpa) {
@@ -137,8 +166,12 @@ router.get('/my-applications', authenticateToken, async (req, res) => {
   }
 });
 
+// ============================================================================
+// 2. PLACEMENT OFFICER & ADMIN CRM ENDPOINTS
+// ============================================================================
+
 // Admin / TPO: Get all student applications across drives
-router.get('/admin/all-applications', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
+router.get('/admin/all-applications', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR', 'PLACEMENT_OFFICER'), async (req, res) => {
   try {
     const { driveId, status } = req.query;
     const where = {};
@@ -176,7 +209,7 @@ router.get('/admin/all-applications', authenticateToken, authorizeRoles('ADMIN',
 });
 
 // Admin / TPO: Placement CRM Statistics
-router.get('/admin/stats', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
+router.get('/admin/stats', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR', 'PLACEMENT_OFFICER'), async (req, res) => {
   try {
     const totalDrives = await prisma.placementDrive.count();
     const activeDrives = await prisma.placementDrive.count({ where: { status: 'ACTIVE' } });
@@ -185,13 +218,21 @@ router.get('/admin/stats', authenticateToken, authorizeRoles('ADMIN', 'FACULTY',
     const interviewCount = await prisma.placementApplication.count({ where: { status: 'INTERVIEW_SCHEDULED' } });
     const offeredCount = await prisma.placementApplication.count({ where: { status: { in: ['OFFERED', 'SELECTED'] } } });
 
+    // Placement requests stats
+    const requests = getPlacementRequests();
+    const pendingRequests = requests.filter(r => r.status === 'PENDING').length;
+    const approvedRequests = requests.filter(r => r.status === 'APPROVED').length;
+
     res.json({
       totalDrives,
       activeDrives,
       totalApplications,
       shortlistedCount,
       interviewCount,
-      offeredCount
+      offeredCount,
+      totalRequests: requests.length,
+      pendingRequests,
+      approvedRequests
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch placement statistics' });
@@ -199,7 +240,7 @@ router.get('/admin/stats', authenticateToken, authorizeRoles('ADMIN', 'FACULTY',
 });
 
 // Create a new placement drive (TPO / Admin)
-router.post('/drives', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
+router.post('/drives', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR', 'PLACEMENT_OFFICER'), async (req, res) => {
   try {
     const { companyName, role, type, ctc, location, minCgpa, allowedBranches, maxBacklogs, deadline, description, selectionRounds } = req.body;
     if (!companyName || !role || !ctc) {
@@ -231,7 +272,7 @@ router.post('/drives', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FA
 });
 
 // Update application status & schedule interview (TPO / Admin)
-router.put('/applications/:id/status', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR'), async (req, res) => {
+router.put('/applications/:id/status', authenticateToken, authorizeRoles('ADMIN', 'FACULTY', 'FACULTY_ADVISOR', 'PLACEMENT_OFFICER'), async (req, res) => {
   try {
     const appId = parseInt(req.params.id);
     const { status, interviewSlot, interviewLink, remarks } = req.body;
@@ -267,14 +308,160 @@ router.put('/applications/:id/status', authenticateToken, authorizeRoles('ADMIN'
   }
 });
 
-// Delete a placement drive (Admin only)
-router.delete('/drives/:id', authenticateToken, authorizeRoles('ADMIN'), async (req, res) => {
+// Delete a placement drive (Admin / TPO)
+router.delete('/drives/:id', authenticateToken, authorizeRoles('ADMIN', 'PLACEMENT_OFFICER'), async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     await prisma.placementDrive.delete({ where: { id } });
     res.json({ message: 'Placement drive deleted successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete placement drive' });
+  }
+});
+
+// ============================================================================
+// 3. STUDENT PLACEMENT REQUESTS & NOC DESK (Student <-> Placement Officer)
+// ============================================================================
+
+// Get placement requests (Students get their own; Officers/Admin get all)
+router.get('/requests', authenticateToken, async (req, res) => {
+  try {
+    const requests = getPlacementRequests();
+    const isOfficerOrAdmin = ['ADMIN', 'PLACEMENT_OFFICER', 'FACULTY', 'FACULTY_ADVISOR'].includes(req.user.role);
+
+    if (isOfficerOrAdmin) {
+      res.json(requests);
+    } else {
+      const studentRequests = requests.filter(r => r.studentId === req.user.id || r.studentMis === req.user.userId);
+      res.json(studentRequests);
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch placement requests' });
+  }
+});
+
+// Student submits a placement request (NOC, Duty Leave, Resume Verification, PPO Intimation)
+router.post('/requests', authenticateToken, async (req, res) => {
+  try {
+    const { type, companyName, role, duration, stipend, location, details } = req.body;
+    if (!type || !companyName) {
+      return res.status(400).json({ error: 'Request type and Company Name are required.' });
+    }
+
+    const student = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, name: true, userId: true, email: true, department: true, cgpa: true, activeBacklogs: true }
+    });
+
+    const requests = getPlacementRequests();
+    const newReq = {
+      id: `REQ-${Date.now().toString().slice(-6)}`,
+      studentId: req.user.id,
+      studentName: student?.name || req.user.name || 'Student',
+      studentMis: student?.userId || req.user.userId || '112415079',
+      studentEmail: student?.email || req.user.email,
+      department: student?.department || 'CSE',
+      cgpa: student?.cgpa ?? 8.45,
+      activeBacklogs: student?.activeBacklogs ?? 0,
+      type: type || 'INTERNSHIP_NOC',
+      companyName: companyName.trim(),
+      role: (role || 'Engineering Intern').trim(),
+      duration: (duration || '6 Months').trim(),
+      stipend: (stipend || 'Competitive').trim(),
+      location: (location || 'Pune / Bengaluru').trim(),
+      details: (details || 'Submitted via student placement portal.').trim(),
+      status: 'PENDING',
+      submittedAt: new Date().toISOString(),
+      reviewedAt: null,
+      reviewedBy: null,
+      officerRemarks: null,
+      nocCertificateNumber: null
+    };
+
+    requests.unshift(newReq);
+    savePlacementRequests(requests);
+
+    res.status(201).json(newReq);
+  } catch (error) {
+    console.error('Submit Placement Request Error:', error);
+    res.status(500).json({ error: 'Failed to submit placement request' });
+  }
+});
+
+// Placement Officer / Admin reviews student request
+router.put('/requests/:id/review', authenticateToken, authorizeRoles('ADMIN', 'PLACEMENT_OFFICER'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, remarks } = req.body;
+
+    if (!['APPROVED', 'REJECTED', 'UNDER_REVIEW', 'ACTION_REQUIRED'].includes(status)) {
+      return res.status(400).json({ error: 'Invalid review status' });
+    }
+
+    const requests = getPlacementRequests();
+    const index = requests.findIndex(r => r.id === id);
+
+    if (index === -1) {
+      return res.status(404).json({ error: 'Placement request not found' });
+    }
+
+    const currentReq = requests[index];
+    const isApproved = status === 'APPROVED';
+
+    let nocCertificateNumber = currentReq.nocCertificateNumber;
+    if (isApproved && currentReq.type === 'INTERNSHIP_NOC' && !nocCertificateNumber) {
+      nocCertificateNumber = `IIITP/TPO/NOC/2026/${Math.floor(100 + Math.random() * 900)}`;
+    }
+
+    requests[index] = {
+      ...currentReq,
+      status,
+      officerRemarks: remarks || (isApproved ? 'Approved by Training & Placement Cell.' : 'Rejected per TPO eligibility guidelines.'),
+      reviewedAt: new Date().toISOString(),
+      reviewedBy: req.user.name || 'Training & Placement Officer',
+      nocCertificateNumber
+    };
+
+    savePlacementRequests(requests);
+
+    // Notify student
+    if (currentReq.studentId) {
+      await prisma.notification.create({
+        data: {
+          recipientId: currentReq.studentId,
+          title: `T&P Request Update: ${currentReq.type} (${currentReq.companyName})`,
+          message: `Your request (${currentReq.id}) has been ${status}. ${nocCertificateNumber ? `Issued NOC: ${nocCertificateNumber}.` : ''} Remarks: ${remarks || ''}`.trim(),
+          type: isApproved ? 'SUCCESS' : 'WARNING',
+          category: 'PLACEMENT'
+        }
+      }).catch(() => {});
+    }
+
+    res.json(requests[index]);
+  } catch (error) {
+    console.error('Review Request Error:', error);
+    res.status(500).json({ error: 'Failed to review request' });
+  }
+});
+
+// Student withdraws a request
+router.delete('/requests/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    let requests = getPlacementRequests();
+    const target = requests.find(r => r.id === id);
+
+    if (!target) return res.status(404).json({ error: 'Request not found' });
+    if (target.studentId !== req.user.id && !['ADMIN', 'PLACEMENT_OFFICER'].includes(req.user.role)) {
+      return res.status(403).json({ error: 'Unauthorized to delete this request' });
+    }
+
+    requests = requests.filter(r => r.id !== id);
+    savePlacementRequests(requests);
+
+    res.json({ message: 'Request removed successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to remove request' });
   }
 });
 

@@ -31,19 +31,19 @@ export default function Login() {
   const demoAccounts = [
     {
       role: 'STUDENT',
-      title: 'Continuing Student',
+      title: 'Continuing Student • Head of E-Cell',
       name: 'Harshit Nagpal',
       mis: '112415079',
-      dept: 'B.Tech CSE (3rd Sem)',
+      dept: 'B.Tech CSE (3rd Sem) • Authorized Club Head',
       identifier: '112415079',
       password: '112415079',
-      badge: 'Student (Sem 3)',
+      badge: 'Student & Club Head',
       icon: GraduationCap,
       color: 'blue'
     },
     {
       role: 'STUDENT',
-      title: 'Graduating Finalist',
+      title: 'Graduating Finalist (8th Sem)',
       name: 'Aarav Verma',
       mis: '112001001',
       dept: 'B.Tech CSE (8th Sem / Final)',
@@ -55,27 +55,27 @@ export default function Login() {
     },
     {
       role: 'FACULTY',
-      title: 'Course Instructor',
-      name: 'Ms. Anagha Khiste',
-      mis: 'EMP101',
-      dept: 'CSE Course Instructor (LNO)',
-      identifier: 'anagha.khiste@iiitp.ac.in',
-      password: 'faculty123',
-      badge: 'Instructor',
-      icon: User,
-      color: 'cyan'
-    },
-    {
-      role: 'FACULTY_ADVISOR',
-      title: 'Academic Advisor',
+      title: 'Faculty (Teaching & Academic Advisory)',
       name: 'Dr. Shrikant Salve',
       mis: 'EMP102',
-      dept: 'CSE Faculty Advisor',
+      dept: 'CSE • Subject Instructor & Academic Advisor',
       identifier: 'advisor.cse@iiitp.ac.in',
       password: 'advisor123',
-      badge: 'Advisor',
-      icon: Briefcase,
+      badge: 'Faculty (All-in-One)',
+      icon: User,
       color: 'emerald'
+    },
+    {
+      role: 'PLACEMENT_OFFICER',
+      title: 'Training & Placement Officer',
+      name: 'Dr. Bhupendra Singh',
+      mis: 'EMP105',
+      dept: 'Corporate Relations & T&P Cell',
+      identifier: 'tpo@iiitp.ac.in',
+      password: 'tpo123',
+      badge: 'Placement Officer',
+      icon: Briefcase,
+      color: 'cyan'
     },
     {
       role: 'HOSTEL_WARDEN',
