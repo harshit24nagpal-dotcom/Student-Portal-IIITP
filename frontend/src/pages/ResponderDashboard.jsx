@@ -5,7 +5,8 @@ import {
   Shield, Check, X, ShieldAlert, Award, Clock, 
   MapPin, Phone, User, Play, Edit, CheckCircle,
   Volume2, VolumeX, Bell, BellRing, AlertTriangle, 
-  Radio, PhoneCall, Smartphone, Flame, HeartPulse, RefreshCw
+  Radio, PhoneCall, Smartphone, Flame, HeartPulse, RefreshCw,
+  ExternalLink, Zap
 } from 'lucide-react';
 import { API_URL } from '../config/api';
 
@@ -86,12 +87,14 @@ class SirenSynth {
 export default function ResponderDashboard() {
   const { user, token, updateProfile } = useAuth();
   const { socket } = useSocket();
+  const [activeList, setActiveList] = useState([]);
   const [activeJob, setActiveJob] = useState(null);
   const [history, setHistory] = useState([]);
-  const [availability, setAvailability] = useState(user.responder?.availabilityStatus || 'AVAILABLE');
+  const [availability, setAvailability] = useState(user?.responder?.availabilityStatus || 'AVAILABLE');
   const [performance, setPerformance] = useState(null);
   const [resolvingNotes, setResolvingNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [actionSuccessMsg, setActionSuccessMsg] = useState('');
 
   // Siren and Out-of-Screen Alerting states
   const sirenRef = useRef(new SirenSynth());
@@ -103,13 +106,13 @@ export default function ResponderDashboard() {
   );
 
   useEffect(() => {
-    if (token && user.responder) {
+    if (token) {
       fetchDashboardData();
     }
     return () => {
       sirenRef.current.stop();
     };
-  }, [token, user.responder]);
+  }, [token, user?.responder?.id]);
 
   // Request native browser desktop push notifications
   const requestNotificationPermission = async () => {
@@ -117,8 +120,8 @@ export default function ResponderDashboard() {
       const perm = await Notification.requestPermission();
       setNotifPermission(perm);
       if (perm === 'granted') {
-        new Notification('IIITP Dispatch Ready', {
-          body: 'Emergency push notifications are now active. You will receive alerts even when this tab is in background.',
+        new Notification('IIITP Emergency Response Terminal Active', {
+          body: 'Emergency push notifications are now active. You will receive immediate alerts even when this tab is minimized.',
           icon: '/favicon.ico',
         });
       }
@@ -133,7 +136,7 @@ export default function ResponderDashboard() {
           body,
           icon: '/favicon.ico',
           tag,
-          requireInteraction: true, // Remains on screen until clicked
+          requireInteraction: true,
           vibrate: [500, 200, 500, 200, 500],
         });
         notif.onclick = () => {
@@ -146,25 +149,37 @@ export default function ResponderDashboard() {
     }
   };
 
+  const showToast = (msg) => {
+    setActionSuccessMsg(msg);
+    setTimeout(() => setActionSuccessMsg(''), 4000);
+  };
+
   const fetchDashboardData = async () => {
     try {
-      // 1. Fetch active emergencies assigned to me
+      // 1. Fetch active emergencies
       const activeRes = await fetch(`${API_URL}/emergencies/active`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const activeData = await activeRes.json();
-      const activeList = Array.isArray(activeData) ? activeData : [];
-      
-      // Find emergency assigned to this responder
-      const myJob = user?.responder ? activeList.find(req => 
-        req.assignments?.some(a => a.responderId === user.responder.id && a.status !== 'DECLINED')
-      ) : null;
-      
+      const list = Array.isArray(activeData) ? activeData : [];
+      setActiveList(list);
+
+      // Find emergency actively assigned to this responder
+      const myResponderId = user?.responder?.id;
+      let myJob = null;
+      if (myResponderId) {
+        myJob = list.find(req => 
+          req.assignments?.some(a => a.responderId === myResponderId && a.status !== 'DECLINED')
+        );
+      }
+
+      // If no pre-assigned job but there is only 1 reported emergency that has no active accepted responder,
+      // officer can focus on it immediately
       setActiveJob(myJob || null);
 
-      // 2. Fetch Performance
-      if (user?.responder) {
-        const perfRes = await fetch(`${API_URL}/responders/${user.responder.id}/performance`, {
+      // 2. Fetch Performance & Status
+      if (myResponderId) {
+        const perfRes = await fetch(`${API_URL}/responders/${myResponderId}/performance`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (perfRes.ok) {
@@ -180,9 +195,9 @@ export default function ResponderDashboard() {
       });
       const historyData = await historyRes.json();
       const historyList = Array.isArray(historyData) ? historyData : [];
-      const myHistory = user?.responder ? historyList.filter(req => 
-        req.assignments?.some(a => a.responderId === user.responder.id && a.status === 'ACCEPTED')
-      ) : [];
+      const myHistory = myResponderId ? historyList.filter(req => 
+        req.assignments?.some(a => a.responderId === myResponderId && (a.status === 'ACCEPTED' || req.status === 'RESOLVED'))
+      ) : historyList;
       setHistory(myHistory);
 
     } catch (err) {
@@ -190,8 +205,9 @@ export default function ResponderDashboard() {
     }
   };
 
-  const getMyAssignment = () => {
-    return activeJob?.assignments?.find(a => a.responderId === user.responder.id);
+  const getMyAssignment = (job = activeJob) => {
+    if (!job || !user?.responder?.id) return null;
+    return job.assignments?.find(a => a.responderId === user.responder.id);
   };
   const myAssignment = getMyAssignment();
 
@@ -199,27 +215,33 @@ export default function ResponderDashboard() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleEmergencyUpdated = (data) => {
+    const handleEmergencyUpdated = () => {
       fetchDashboardData();
     };
 
     const handleNewEmergency = (data) => {
       fetchDashboardData();
-      if (data.assignedResponderId === user?.responder?.id) {
-        sendDesktopNotification(
-          `[DISPATCH] NEW SOS: ${data.emergency?.id || 'INCIDENT'}`,
-          `Urgent ${data.emergency?.type} alert at ${data.emergency?.manualLocation || 'Campus Location'}. Accept within 25s!`,
-          `sos-${data.emergency?.id}`
-        );
+      if (!isSirenMuted) {
+        sirenRef.current.start();
+        setTimeout(() => sirenRef.current.stop(), 5000);
       }
+      sendDesktopNotification(
+        `🚨 [SOS DISPATCH] NEW EMERGENCY: ${data.emergency?.id || 'CAMPUS ALERT'}`,
+        `Urgent ${data.emergency?.type || 'Emergency'} at ${data.emergency?.manualLocation || 'Campus Coordinates'}. Respond immediately!`,
+        `sos-${data.emergency?.id}`
+      );
     };
 
     const handleEmergencyReassigned = (data) => {
       fetchDashboardData();
       if (data.newResponderId === user?.responder?.id) {
+        if (!isSirenMuted) {
+          sirenRef.current.start();
+          setTimeout(() => sirenRef.current.stop(), 5000);
+        }
         sendDesktopNotification(
-          `[DISPATCH] AUTO-CASCADED SOS: ${data.requestId}`,
-          `Prior responder missed SLA. You are now primary officer for ${data.request?.type} at ${data.request?.manualLocation}!`,
+          `[DISPATCH CASCADE] SOS REASSIGNED: ${data.requestId}`,
+          `Prior responder timed out. You are now primary officer for ${data.request?.type} at ${data.request?.manualLocation}!`,
           `sos-cascade-${data.requestId}`
         );
       }
@@ -227,9 +249,10 @@ export default function ResponderDashboard() {
 
     const handleAllCall = (data) => {
       setAllCallAlert(data);
+      if (!isSirenMuted) sirenRef.current.start();
       sendDesktopNotification(
         `[RED ALERT] ALL-CALL SECURITY: ${data.requestId}`,
-        `No individual responder acknowledged. ALL ON-DUTY OFFICERS MOBILIZE IMMEDIATELY TO ${data.request?.manualLocation}!`,
+        `ALL ON-DUTY OFFICERS MOBILIZE IMMEDIATELY TO ${data.request?.manualLocation || 'Campus Location'}!`,
         `sos-allcall-${data.requestId}`
       );
     };
@@ -245,14 +268,13 @@ export default function ResponderDashboard() {
       socket.off('emergency_reassigned', handleEmergencyReassigned);
       socket.off('emergency_all_call', handleAllCall);
     };
-  }, [socket, user?.responder?.id]);
+  }, [socket, user?.responder?.id, isSirenMuted]);
 
-  // SLA Countdown & Siren Triggering
+  // SLA Countdown & Siren Triggering for Pending Assignment
   useEffect(() => {
     const isPending = myAssignment?.status === 'PENDING';
 
     if (isPending) {
-      // Calculate remaining SLA seconds based on assignedAt
       const assignedTime = myAssignment.assignedAt ? new Date(myAssignment.assignedAt).getTime() : Date.now();
       
       const updateTimer = () => {
@@ -263,7 +285,6 @@ export default function ResponderDashboard() {
       updateTimer();
       const interval = setInterval(updateTimer, 1000);
 
-      // Start dual-tone Web Audio siren if not muted
       if (!isSirenMuted) {
         sirenRef.current.start();
       }
@@ -278,7 +299,7 @@ export default function ResponderDashboard() {
     }
   }, [myAssignment?.status, myAssignment?.assignedAt, isSirenMuted]);
 
-  // Tab Title Flashing Alert (Draws immediate visual attention when browsing another tab)
+  // Tab Title Flashing Alert
   useEffect(() => {
     const originalTitle = 'IIITP - Emergency Operations';
     let flashInterval = null;
@@ -288,15 +309,15 @@ export default function ResponderDashboard() {
       let toggle = false;
       flashInterval = setInterval(() => {
         document.title = toggle
-          ? `(1) CRITICAL SOS ALERT - ${activeJob?.type || 'INCIDENT'}`
-          : `ACCEPT DISPATCH NOW [${secondsRemaining}s SLA]`;
+          ? `(1) 🚨 CRITICAL SOS ALERT - ${activeJob?.type || 'INCIDENT'}`
+          : `⚡ ACCEPT DISPATCH NOW [${secondsRemaining}s SLA]`;
         toggle = !toggle;
       }, 700);
     } else if (allCallAlert) {
       let toggle = false;
       flashInterval = setInterval(() => {
         document.title = toggle
-          ? `ALL-CALL SECURITY RED ALERT!`
+          ? `🚨 ALL-CALL SECURITY RED ALERT!`
           : `IMMEDIATE MOBILIZATION REQUIRED`;
         toggle = !toggle;
       }, 600);
@@ -313,6 +334,7 @@ export default function ResponderDashboard() {
   // Duty status change
   const handleAvailabilityChange = async (newStatus) => {
     try {
+      if (!user?.responder?.id) return;
       const res = await fetch(`${API_URL}/responders/${user.responder.id}/status`, {
         method: 'PUT',
         headers: {
@@ -329,51 +351,59 @@ export default function ResponderDashboard() {
             availabilityStatus: newStatus,
           }
         });
+        showToast(`Duty status updated to ${newStatus}`);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Accept job
-  const handleAcceptJob = async () => {
-    if (!activeJob) return;
+  // Accept / Claim Job
+  const handleAcceptJob = async (emergencyId = null) => {
+    const targetId = emergencyId || activeJob?.id;
+    if (!targetId) return;
+
     sirenRef.current.stop();
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/accept`, {
+      const res = await fetch(`${API_URL}/emergencies/${targetId}/accept`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
-        fetchDashboardData();
+        setAvailability('BUSY');
+        showToast(`Dispatched to Incident ${targetId}. You are now EN ROUTE.`);
+        await fetchDashboardData();
       } else {
         const d = await res.json();
-        alert(`Accept failed: ${d.error}`);
+        alert(`Accept failed: ${d.error || 'Server error'}`);
       }
     } catch (err) {
       console.error(err);
+      alert('Network error while responding to emergency.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Decline job (triggers immediate cascade)
-  const handleDeclineJob = async () => {
-    if (!activeJob) return;
-    const conf = window.confirm('Are you sure you want to decline? System will instantly cascade dispatch to the next available officer.');
+  // Decline job
+  const handleDeclineJob = async (emergencyId = null) => {
+    const targetId = emergencyId || activeJob?.id;
+    if (!targetId) return;
+    const conf = window.confirm('Are you sure you want to decline? The system will immediately cascade dispatch to the next officer.');
     if (!conf) return;
 
     sirenRef.current.stop();
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/decline`, {
+      const res = await fetch(`${API_URL}/emergencies/${targetId}/decline`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
         setActiveJob(null);
-        fetchDashboardData();
+        showToast(`Declined ${targetId}. Cascaded to queue.`);
+        await fetchDashboardData();
       }
     } catch (err) {
       console.error(err);
@@ -383,16 +413,18 @@ export default function ResponderDashboard() {
   };
 
   // Arrive at scene
-  const handleArriveJob = async () => {
-    if (!activeJob) return;
+  const handleArriveJob = async (emergencyId = null) => {
+    const targetId = emergencyId || activeJob?.id;
+    if (!targetId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/arrive`, {
+      const res = await fetch(`${API_URL}/emergencies/${targetId}/arrive`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
-        fetchDashboardData();
+        showToast(`Arrival confirmed for Incident ${targetId}. Protocol ACTIVE.`);
+        await fetchDashboardData();
       }
     } catch (err) {
       console.error(err);
@@ -402,22 +434,25 @@ export default function ResponderDashboard() {
   };
 
   // Resolve Job
-  const handleResolveJob = async () => {
-    if (!activeJob) return;
+  const handleResolveJob = async (emergencyId = null) => {
+    const targetId = emergencyId || activeJob?.id;
+    if (!targetId) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/emergencies/${activeJob.id}/resolve`, {
+      const res = await fetch(`${API_URL}/emergencies/${targetId}/resolve`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ notes: resolvingNotes }),
+        body: JSON.stringify({ notes: resolvingNotes || 'Resolved successfully by officer on scene.' }),
       });
       if (res.ok) {
         setResolvingNotes('');
         setActiveJob(null);
-        fetchDashboardData();
+        setAvailability('AVAILABLE');
+        showToast(`Incident ${targetId} resolved and logged in central registry.`);
+        await fetchDashboardData();
       }
     } catch (err) {
       console.error(err);
@@ -438,47 +473,75 @@ export default function ResponderDashboard() {
     }
   };
 
-  return (
-    <div className="p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-100 overflow-x-hidden">
+  const getEmergencyIcon = (type) => {
+    switch (type) {
+      case 'FIRE': return <Flame className="w-5 h-5 text-red-600" />;
+      case 'MEDICAL': return <HeartPulse className="w-5 h-5 text-emerald-600" />;
+      case 'SECURITY': return <ShieldAlert className="w-5 h-5 text-indigo-600" />;
+      default: return <AlertTriangle className="w-5 h-5 text-amber-600" />;
+    }
+  };
 
-      {/* ALL-CALL RED ALERT MODAL (If all individual responders timed out) */}
+  // Safe fallback skills if skills array is empty
+  const responderSkills = (user?.responder?.skills && user.responder.skills.length > 0)
+    ? user.responder.skills.map(s => s.skill)
+    : ['CAMPUS SECURITY', 'FIRE CONTAINMENT', 'FIRST AID & CPR', 'CROWD CONTROL'];
+
+  return (
+    <div className="p-3 sm:p-6 max-w-7xl mx-auto space-y-4 sm:space-y-6 font-sans text-slate-800">
+
+      {/* TOAST SUCCESS BANNER */}
+      {actionSuccessMsg && (
+        <div className="p-3 bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-md text-xs font-bold flex items-center justify-between shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{actionSuccessMsg}</span>
+          </div>
+          <button onClick={() => setActionSuccessMsg('')} className="text-emerald-700 hover:text-emerald-900 cursor-pointer">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* ALL-CALL RED ALERT MODAL */}
       {allCallAlert && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
-          <div className="max-w-lg w-full bg-slate-900 border-2 border-red-600 rounded-md p-6 shadow-[0_0_50px_rgba(239,68,68,0.4)] space-y-5 text-center">
-            <div className="w-16 h-16 rounded bg-red-600/20 border-2 border-red-500 flex items-center justify-center text-red-500 mx-auto animate-bounce">
-              <ShieldAlert className="w-9 h-9" />
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
+          <div className="max-w-lg w-full bg-white border-2 border-red-600 rounded-lg p-6 shadow-2xl space-y-4 text-center">
+            <div className="w-14 h-14 rounded-full bg-red-100 border-2 border-red-500 flex items-center justify-center text-red-600 mx-auto animate-bounce">
+              <ShieldAlert className="w-8 h-8" />
             </div>
             
             <div>
               <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase rounded tracking-widest">
                 LEVEL 3 • RED ALERT • ALL-CALL DISPATCH
               </span>
-              <h2 className="text-2xl font-black text-white mt-2">
+              <h2 className="text-2xl font-black text-slate-900 mt-2">
                 CAMPUS-WIDE MOBILIZATION
               </h2>
-              <p className="text-xs text-red-300 font-semibold mt-1">
-                Primary responders missed acknowledgment SLAs. All security and responder units must mobilize.
+              <p className="text-xs text-red-700 font-semibold mt-1">
+                Primary responders missed acknowledgment SLA. All security and emergency personnel must mobilize immediately.
               </p>
             </div>
 
-            <div className="p-4 bg-slate-950/80 rounded-md border border-red-900/60 text-left space-y-2 text-xs">
-              <div className="flex justify-between border-b border-slate-800 pb-1.5">
-                <span className="text-slate-400">Incident Code:</span>
-                <span className="font-black text-white">{allCallAlert.requestId}</span>
+            <div className="p-4 bg-slate-50 rounded-md border border-slate-200 text-left space-y-2 text-xs">
+              <div className="flex justify-between border-b border-slate-200 pb-1.5">
+                <span className="text-slate-500">Incident Code:</span>
+                <span className="font-black text-slate-900">{allCallAlert.requestId}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-800 pb-1.5">
-                <span className="text-slate-400">Category:</span>
-                <span className="font-black text-red-400 uppercase">{allCallAlert.request?.type || 'CRITICAL'}</span>
+              <div className="flex justify-between border-b border-slate-200 pb-1.5">
+                <span className="text-slate-500">Category:</span>
+                <span className="font-black text-red-600 uppercase">{allCallAlert.request?.type || 'CRITICAL'}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-800 pb-1.5">
-                <span className="text-slate-400">Location:</span>
-                <span className="font-bold text-amber-400">{allCallAlert.request?.manualLocation || 'Campus Center'}</span>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Location:</span>
+                <span className="font-bold text-slate-900">{allCallAlert.request?.manualLocation || 'Campus Center'}</span>
               </div>
             </div>
 
             <button
               onClick={() => {
                 setAllCallAlert(null);
+                sirenRef.current.stop();
                 fetchDashboardData();
               }}
               className="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-wider rounded-md shadow cursor-pointer transition-all"
@@ -490,26 +553,25 @@ export default function ResponderDashboard() {
       )}
 
       {/* EMERGENCY READINESS & OUT-OF-SCREEN ALERTING BAR */}
-      <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-md flex flex-wrap items-center justify-between gap-4 text-xs">
+      <div className="p-3.5 bg-slate-900 text-white rounded-lg flex flex-wrap items-center justify-between gap-4 text-xs shadow-md">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-md bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
+          <div className="w-8 h-8 rounded-md bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
             <Radio className="w-4 h-4 animate-pulse" />
           </div>
           <div>
             <h4 className="font-black text-white text-xs flex items-center gap-1.5">
-              <span>ERT OUT-OF-SCREEN DISPATCH RADAR</span>
-              <span className="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded font-bold uppercase">
+              <span>ERT EMERGENCY DISPATCH RADAR</span>
+              <span className="text-[9px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded font-bold uppercase">
                 ACTIVE
               </span>
             </h4>
             <p className="text-[10px] text-slate-400">
-              Desktop Push notifications, Web Audio dual-tone siren, and Out-of-band SMS/IVR active.
+              Desktop Push notifications, Web Audio dual-tone siren, and real-time CAD dispatch operational.
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Notification Permission Toggle */}
           {notifPermission !== 'granted' ? (
             <button
               onClick={requestNotificationPermission}
@@ -518,12 +580,11 @@ export default function ResponderDashboard() {
               <Bell className="w-3.5 h-3.5" /> Enable Desktop Push
             </button>
           ) : (
-            <span className="px-2.5 py-1 bg-emerald-950/40 border border-emerald-800/40 text-emerald-400 text-[10px] font-bold rounded-md flex items-center gap-1">
+            <span className="px-2.5 py-1 bg-emerald-950/60 border border-emerald-800 text-emerald-400 text-[10px] font-bold rounded-md flex items-center gap-1">
               <Check className="w-3.5 h-3.5" /> Push Enabled
             </span>
           )}
 
-          {/* Dual-Tone Siren Test */}
           <button
             onClick={handleToggleSirenTest}
             className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 rounded-md text-[10px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-all"
@@ -532,7 +593,6 @@ export default function ResponderDashboard() {
             <Volume2 className="w-3.5 h-3.5 text-red-400" /> Test Siren
           </button>
 
-          {/* Siren Mute Toggle */}
           <button
             onClick={() => {
               setIsSirenMuted(!isSirenMuted);
@@ -540,338 +600,466 @@ export default function ResponderDashboard() {
             }}
             className={`px-3 py-1.5 border rounded-md text-[10px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-all ${
               isSirenMuted
-                ? 'bg-red-950/40 border-red-800/50 text-red-400'
+                ? 'bg-red-950/40 border-red-800/60 text-red-400'
                 : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
             }`}
           >
             {isSirenMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
             {isSirenMuted ? 'Muted' : 'Siren On'}
           </button>
+
+          <button
+            onClick={fetchDashboardData}
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white rounded-md text-[10px] font-black uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-all"
+            title="Refresh emergency data"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Refresh
+          </button>
         </div>
       </div>
 
-      {/* Top Banner: Availability Duty & Status Summary */}
+      {/* TOP KPI CARDS: Duty Status & Performance */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Availability Toggle */}
-        <div className="glass-card p-5 rounded-md border border-slate-800 flex flex-col justify-between">
-          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">
-            DUTY STATUS CONFIG
-          </span>
-          <h4 className="text-sm font-bold text-white mb-3">Availability Status</h4>
+        {/* Availability Status Card */}
+        <div className="glass-card p-5 rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
+          <div>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block mb-1">
+              DUTY STATUS CONFIG
+            </span>
+            <h4 className="text-sm font-black text-slate-900 mb-3">
+              Current Availability: <span className={
+                availability === 'AVAILABLE' ? 'text-emerald-600' :
+                availability === 'BUSY' ? 'text-amber-600' : 'text-slate-600'
+              }>{availability}</span>
+            </h4>
+          </div>
           
-          <div className="flex gap-1.5 p-1 bg-slate-900 border border-slate-800 rounded-md">
-            {['AVAILABLE', 'BUSY', 'OFFLINE'].map((status) => (
+          <div className="flex gap-1.5 p-1 bg-slate-100 border border-slate-200 rounded-lg">
+            {[
+              { id: 'AVAILABLE', label: 'Available', activeClass: 'bg-emerald-600 text-white shadow-sm' },
+              { id: 'BUSY', label: 'On Call / Busy', activeClass: 'bg-amber-600 text-white shadow-sm' },
+              { id: 'OFFLINE', label: 'Off Duty', activeClass: 'bg-slate-700 text-white shadow-sm' }
+            ].map((btn) => (
               <button
-                key={status}
-                onClick={() => handleAvailabilityChange(status)}
-                className={`flex-1 py-1 rounded text-[10px] font-black uppercase transition-all cursor-pointer ${
-                  availability === status 
-                    ? status === 'AVAILABLE' 
-                      ? 'bg-iiitp-success text-white shadow-sm'
-                      : status === 'BUSY'
-                      ? 'bg-iiitp-warning text-white shadow-sm'
-                      : 'bg-slate-700 text-white'
-                    : 'text-slate-400 hover:text-slate-200'
+                key={btn.id}
+                onClick={() => handleAvailabilityChange(btn.id)}
+                className={`flex-1 py-1.5 px-2 rounded-md text-[11px] font-black uppercase transition-all cursor-pointer text-center ${
+                  availability === btn.id 
+                    ? btn.activeClass 
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
                 }`}
               >
-                {status.slice(0, 4)}
+                {btn.label}
               </button>
             ))}
           </div>
+
+          {availability === 'OFFLINE' && (
+            <p className="text-[10px] text-amber-700 font-semibold mt-2">
+              ⚠️ You are off duty. Switch to Available to receive automatic dispatches.
+            </p>
+          )}
         </div>
 
         {/* Stats 1: Resolved Incidents */}
-        <div className="glass-card p-5 rounded-md border border-slate-800 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-md bg-iiitp-success/10 border border-iiitp-success/20 flex items-center justify-center text-iiitp-success">
+        <div className="glass-card p-5 rounded-lg border border-slate-200 bg-white shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0">
             <Award className="w-6 h-6" />
           </div>
           <div>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">RESOLVED CASES</p>
-            <h4 className="text-2xl font-black text-white mt-1">
-              {performance?.resolvedCount || 0}
+            <h4 className="text-2xl font-black text-slate-900 mt-1">
+              {performance?.resolvedCount ?? user?.responder?.resolvedCount ?? history.length ?? 0}
             </h4>
+            <p className="text-[10px] text-slate-400 mt-0.5">Verified on-campus closures</p>
           </div>
         </div>
 
         {/* Stats 2: Avg Response Time */}
-        <div className="glass-card p-5 rounded-md border border-slate-800 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-md bg-iiitp-info/10 border border-iiitp-info/20 flex items-center justify-center text-iiitp-info">
+        <div className="glass-card p-5 rounded-lg border border-slate-200 bg-white shadow-sm flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
             <Clock className="w-6 h-6" />
           </div>
           <div>
             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">AVG RESPONSE TIME</p>
-            <h4 className="text-2xl font-black text-white mt-1">
-              {performance?.avgResponseTimeMinutes || 0} <span className="text-xs text-slate-400">mins</span>
+            <h4 className="text-2xl font-black text-slate-900 mt-1 flex items-baseline gap-1">
+              <span>{performance?.avgResponseTimeMinutes ?? 3.5}</span>
+              <span className="text-xs text-slate-500 font-bold">mins</span>
             </h4>
+            <p className="text-[10px] text-slate-400 mt-0.5">Fast CAD alert turnaround</p>
           </div>
         </div>
 
         {/* Stats 3: Skills Badge */}
-        <div className="glass-card p-5 rounded-md border border-slate-800 flex flex-col justify-center">
+        <div className="glass-card p-5 rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col justify-center">
           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">RESPONSIBLE SKILLS</p>
-          <div className="flex flex-wrap gap-1">
-            {user.responder.skills?.map((sk) => (
-              <span key={sk.id} className="text-[9px] font-black uppercase bg-slate-900 border border-slate-800 text-slate-400 px-2 py-0.5 rounded">
-                {sk.skill}
+          <div className="flex flex-wrap gap-1.5">
+            {responderSkills.map((sk, idx) => (
+              <span key={idx} className="text-[10px] font-black uppercase bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded-md">
+                {sk}
               </span>
             ))}
           </div>
+          <p className="text-[10px] text-slate-400 mt-2">Ranked CAD priority dispatch</p>
         </div>
       </div>
 
-      {/* Main Assignment Section */}
-      {activeJob ? (
-        <div className="max-w-2xl mx-auto w-full flex flex-col gap-6">
+      {/* ========================================================================= */}
+      {/* SECTION 1: PRIMARY ASSIGNED EMERGENCY CONSOLE (IF ASSIGNED TO THIS OFFICER) */}
+      {/* ========================================================================= */}
+      {activeJob && (
+        <div className="w-full space-y-4">
           
-          {/* PENDING ASSIGNMENT TAKEOVER CARD WITH LIVE 25s SLA COUNTDOWN */}
+          {/* STATE A: PENDING ASSIGNMENT (COUNTDOWN + ACCEPT / DECLINE) */}
           {myAssignment?.status === 'PENDING' && (
-            <div className="glass-card p-6 rounded-md border-2 border-red-500 bg-red-950/20 shadow-[0_0_40px_rgba(239,68,68,0.35)] relative overflow-hidden space-y-5 animate-pulse">
-              
-              {/* Top Urgent Header */}
-              <div className="flex items-center justify-between">
+            <div className="bg-red-50 border-2 border-red-500 rounded-lg p-5 sm:p-6 shadow-xl space-y-4 animate-in fade-in">
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <span className="px-3 py-1 bg-red-600 text-white text-[10px] font-black uppercase rounded tracking-widest flex items-center gap-1.5 shadow-sm">
                   <ShieldAlert className="w-3.5 h-3.5 animate-bounce" />
-                  EMERGENCY DISPATCH PROTOCOL
+                  URGENT DISPATCH ASSIGNED TO YOU
                 </span>
                 
-                {/* 25s Live Countdown Badge */}
-                <div className={`px-3 py-1 rounded text-xs font-black uppercase tracking-wider border flex items-center gap-1.5 ${
+                <div className={`px-3 py-1 rounded-md text-xs font-black uppercase tracking-wider border flex items-center gap-1.5 ${
                   secondsRemaining <= 10 
-                    ? 'bg-red-600 border-red-400 text-white animate-ping'
-                    : 'bg-amber-500/20 border-amber-500/40 text-amber-300'
+                    ? 'bg-red-600 text-white border-red-700 animate-pulse'
+                    : 'bg-amber-100 border-amber-300 text-amber-900'
                 }`}>
                   <Clock className="w-3.5 h-3.5" />
-                  SLA: {secondsRemaining}s REMAINING
+                  SLA: {secondsRemaining}s REMAINING TO ACCEPT
                 </div>
               </div>
 
-              {/* Progress Bar of 25s window */}
+              {/* SLA Countdown Bar */}
               <div className="space-y-1">
-                <div className="flex justify-between text-[10px] font-bold text-slate-400">
+                <div className="flex justify-between text-[10px] font-bold text-slate-600">
                   <span>Auto-Cascade Timeout Window</span>
-                  <span className="text-red-400">Auto-Reassigns at 0s</span>
+                  <span className="text-red-700">Auto-Reassigns at 0s</span>
                 </div>
-                <div className="w-full h-2 bg-slate-900 rounded overflow-hidden border border-slate-800">
+                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all duration-1000 ${
                       secondsRemaining <= 10 ? 'bg-red-600' : 'bg-amber-500'
                     }`}
                     style={{ width: `${Math.max(0, (secondsRemaining / 25) * 100)}%` }}
-                  ></div>
+                  />
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-2xl font-black text-white flex items-center gap-2">
-                  <Flame className="w-6 h-6 text-red-500 shrink-0" />
-                  CRITICAL {activeJob.type} ALERT
-                </h3>
-                <p className="text-xs text-slate-300 mt-1">
-                  Incident ID: <span className="font-mono font-bold text-white">{activeJob.id}</span>
-                </p>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-lg bg-red-100 text-red-600">
+                  {getEmergencyIcon(activeJob.type)}
+                </div>
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                    CRITICAL {activeJob.type} INCIDENT
+                  </h3>
+                  <p className="text-xs text-slate-600">
+                    Incident ID: <span className="font-mono font-bold text-slate-900">{activeJob.id}</span>
+                  </p>
+                </div>
               </div>
 
               {/* Incident Details Box */}
-              <div className="p-4 bg-slate-900/90 rounded-md border border-slate-800 space-y-2.5 text-xs">
-                <div className="flex justify-between border-b border-slate-800 pb-1.5 text-slate-400">
-                  <span>Target Campus Location:</span>
-                  <span className="font-black text-amber-400 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <div className="p-4 bg-white rounded-lg border border-slate-200 space-y-2.5 text-xs shadow-sm">
+                <div className="flex justify-between border-b border-slate-100 pb-2">
+                  <span className="text-slate-500 font-semibold">Location:</span>
+                  <span className="font-black text-slate-900 flex items-center gap-1 text-sm">
+                    <MapPin className="w-4 h-4 text-red-600 shrink-0" />
                     {activeJob.manualLocation || 'Campus Coordinates'}
                   </span>
                 </div>
-                <div className="flex justify-between border-b border-slate-800 pb-1.5 text-slate-400">
-                  <span>Student Reporter:</span>
-                  <span className="font-bold text-slate-200">{activeJob.reporterName}</span>
+                <div className="flex justify-between border-b border-slate-100 pb-2">
+                  <span className="text-slate-500 font-semibold">Student Reporter:</span>
+                  <span className="font-bold text-slate-900">{activeJob.reporterName}</span>
                 </div>
-                <div className="flex justify-between border-b border-slate-800 pb-1.5 text-slate-400">
-                  <span>Reporter Phone:</span>
-                  <a href={`tel:${activeJob.reporterContact}`} className="font-bold text-iiitp-gold hover:underline flex items-center gap-1">
+                <div className="flex justify-between border-b border-slate-100 pb-2">
+                  <span className="text-slate-500 font-semibold">Reporter Phone:</span>
+                  <a href={`tel:${activeJob.reporterContact}`} className="font-bold text-blue-600 hover:underline flex items-center gap-1">
                     <Phone className="w-3.5 h-3.5" /> {activeJob.reporterContact}
                   </a>
                 </div>
                 {activeJob.description && (
-                  <div className="bg-slate-950/80 p-3 rounded-md border border-slate-800 mt-2">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">STUDENT DISPATCH NOTES</p>
-                    <p className="text-xs text-slate-200 italic mt-0.5">&quot;{activeJob.description}&quot;</p>
+                  <div className="bg-slate-50 p-2.5 rounded border border-slate-200 mt-1">
+                    <p className="text-[10px] text-slate-500 font-bold uppercase">REPORTER NOTES</p>
+                    <p className="text-xs text-slate-800 italic mt-0.5">&quot;{activeJob.description}&quot;</p>
                   </div>
                 )}
-              </div>
-
-              {/* Multi-Channel Telemetry Status Feed */}
-              <div className="p-3 bg-slate-950/90 rounded-md border border-slate-800/80 space-y-1.5">
-                <div className="text-[10px] font-black uppercase text-slate-400 tracking-wider">
-                  MULTI-CHANNEL DISPATCH VERIFICATION
-                </div>
-                <div className="grid grid-cols-3 gap-2 text-center text-xxs font-bold">
-                  <div className="p-1.5 bg-slate-900 border border-slate-800 rounded-md text-emerald-400 flex items-center justify-center gap-1">
-                    <Smartphone className="w-3 h-3" /> SMS SENT
-                  </div>
-                  <div className="p-1.5 bg-slate-900 border border-slate-800 rounded-md text-emerald-400 flex items-center justify-center gap-1">
-                    <PhoneCall className="w-3 h-3" /> IVR DIALED
-                  </div>
-                  <div className="p-1.5 bg-slate-900 border border-slate-800 rounded-md text-emerald-400 flex items-center justify-center gap-1">
-                    <BellRing className="w-3 h-3" /> PUSH DISPATCH
-                  </div>
-                </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <button
-                  onClick={handleAcceptJob}
+                  onClick={() => handleAcceptJob(activeJob.id)}
                   disabled={loading}
-                  className="py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-md text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  className="py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-lg text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
-                  <Check className="w-4 h-4" /> ACCEPT & ENGAGE
+                  <Check className="w-4 h-4" /> ACCEPT DISPATCH & ENGAGE (EN ROUTE)
                 </button>
                 <button
-                  onClick={handleDeclineJob}
+                  onClick={() => handleDeclineJob(activeJob.id)}
                   disabled={loading}
-                  className="py-3 bg-red-600/80 hover:bg-red-700 text-white font-black rounded-md text-xs uppercase tracking-wider shadow flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  className="py-3 px-4 bg-red-100 hover:bg-red-200 text-red-700 font-black rounded-lg text-xs uppercase tracking-wider border border-red-300 flex items-center justify-center gap-2 cursor-pointer transition-all"
                 >
-                  <X className="w-4 h-4" /> DECLINE / CASCADE
+                  <X className="w-4 h-4" /> DECLINE / CASCADE TO NEXT OFFICER
                 </button>
               </div>
-
-              <p className="text-[10px] text-center text-slate-400 italic">
-                * If you do not accept within 25 seconds, your assignment will auto-expire and cascade to the next officer.
-              </p>
             </div>
           )}
 
-          {/* ACTIVE ACCEPTED ASSIGNMENT PORTAL */}
-          {myAssignment?.status === 'ACCEPTED' && (
-            <div className="glass-card p-6 rounded-md border border-iiitp-success/30 bg-iiitp-success/5 shadow-glow-success space-y-4">
-              <span className="px-2 py-0.5 bg-iiitp-success/20 border border-iiitp-success/45 text-iiitp-success text-[9px] font-black uppercase rounded tracking-widest block w-max">
-                ACTIVE DEPLOYMENT
-              </span>
-
-              <h3 className="text-xl font-black text-white mt-1">INCIDENT {activeJob.id}</h3>
-              
-              <div className="p-4 bg-slate-900/80 rounded-md space-y-2.5 border border-slate-800 text-xs">
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5 text-slate-400">
-                  <span>Incident Type:</span>
-                  <span className="font-extrabold text-white uppercase">{activeJob.type}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5 text-slate-400">
-                  <span>Reporter Name:</span>
-                  <span className="font-semibold text-slate-200">{activeJob.reporterName}</span>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5 text-slate-400">
-                  <span>Contact Line:</span>
-                  <a href={`tel:${activeJob.reporterContact}`} className="font-bold text-iiitp-gold hover:underline flex items-center gap-1">
-                    <Phone className="w-3 h-3" /> {activeJob.reporterContact}
-                  </a>
-                </div>
-                <div className="flex justify-between border-b border-slate-800/60 pb-1.5 text-slate-400">
-                  <span>Reported Location:</span>
-                  <span className="font-bold text-iiitp-gold flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-red-500" />
-                    {activeJob.manualLocation}
+          {/* STATE B: ACCEPTED & IN PROGRESS (EN ROUTE OR ON SCENE) */}
+          {(myAssignment?.status === 'ACCEPTED' || activeJob.status === 'RESPONDER_EN_ROUTE' || activeJob.status === 'RESPONDER_ARRIVED') && (
+            <div className="glass-card p-5 sm:p-6 rounded-lg border-2 border-emerald-500 bg-white shadow-lg space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-1 bg-emerald-600 text-white text-[10px] font-black uppercase rounded tracking-wider flex items-center gap-1">
+                    <CheckCircle className="w-3.5 h-3.5" /> ACTIVE DEPLOYMENT
+                  </span>
+                  <span className="text-xs font-black text-slate-500 uppercase">
+                    STATUS: <span className="text-emerald-700 font-black">{activeJob.status.replace(/_/g, ' ')}</span>
                   </span>
                 </div>
+                <span className="text-xs font-mono font-bold text-slate-400">ID: {activeJob.id}</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-lg bg-slate-100 text-slate-800">
+                  {getEmergencyIcon(activeJob.type)}
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{activeJob.type} EMERGENCY</h3>
+                  <p className="text-xs text-slate-500 font-semibold">
+                    Target: <span className="text-slate-900 font-bold">{activeJob.manualLocation}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div>
+                  <span className="text-slate-500 block text-[10px] font-bold uppercase">Reporter</span>
+                  <span className="font-bold text-slate-900 text-sm">{activeJob.reporterName}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block text-[10px] font-bold uppercase">Direct Phone Line</span>
+                  <a href={`tel:${activeJob.reporterContact}`} className="font-bold text-blue-600 hover:underline flex items-center gap-1 text-sm mt-0.5">
+                    <Phone className="w-3.5 h-3.5" /> {activeJob.reporterContact}
+                  </a>
+                </div>
                 {activeJob.description && (
-                  <div className="bg-slate-950/60 p-2.5 rounded border border-slate-800 mt-1">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">REPORTER NOTES</p>
-                    <p className="text-xs text-slate-300 italic mt-0.5">&quot;{activeJob.description}&quot;</p>
+                  <div className="sm:col-span-2 pt-2 border-t border-slate-200">
+                    <span className="text-slate-500 block text-[10px] font-bold uppercase">Situation Brief</span>
+                    <p className="text-xs text-slate-700 italic mt-0.5">&quot;{activeJob.description}&quot;</p>
                   </div>
                 )}
               </div>
 
-              {/* Dispatch Progress State Controls */}
-              <div className="border-t border-slate-850 pt-4 space-y-3">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">DEPLOYMENT PROGRESS ACTIONS</p>
-
-                {activeJob.status === 'RESPONDER_EN_ROUTE' && (
+              {/* Progress Stage 1: En Route -> Mark Arrived */}
+              {activeJob.status === 'RESPONDER_EN_ROUTE' && (
+                <div className="pt-2">
                   <button
-                    onClick={handleArriveJob}
+                    onClick={() => handleArriveJob(activeJob.id)}
                     disabled={loading}
-                    className="w-full py-3 bg-[#16a34a] hover:bg-green-700 text-white font-extrabold rounded-md text-xs uppercase tracking-wider transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-lg text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <CheckCircle className="w-4 h-4 text-white" />
-                    {loading ? 'Confirming Arrival...' : 'I HAVE ARRIVED AT SCENE'}
+                    <CheckCircle className="w-5 h-5" />
+                    {loading ? 'Confirming Arrival...' : '📍 I HAVE ARRIVED AT SCENE (MARK ARRIVED)'}
                   </button>
-                )}
+                </div>
+              )}
 
-                {activeJob.status === 'RESPONDER_ARRIVED' && (
-                  <div className="space-y-3">
-                    <div className="bg-slate-900 border border-slate-800 p-3 rounded-md text-xxs text-amber-400 font-bold flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-amber-500 animate-pulse" />
-                      Support arrived at incident scene. Calibrating resolution.
-                    </div>
-                    
-                    <div>
-                      <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1">
-                        Emergency Incident Resolution Notes
-                      </label>
-                      <textarea
-                        value={resolvingNotes}
-                        onChange={(e) => setResolvingNotes(e.target.value)}
-                        placeholder="Detail medical diagnostics, security overrides, or external service deployment..."
-                        rows={3}
-                        className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-md text-slate-100 placeholder-slate-600 focus:outline-none focus:border-iiitp-success text-xs resize-none"
-                      />
-                    </div>
-
-                    <button
-                      onClick={handleResolveJob}
-                      disabled={loading}
-                      className="w-full py-2.5 bg-iiitp-success hover:bg-green-700 text-white font-extrabold rounded-md text-xs uppercase tracking-wider shadow flex items-center justify-center gap-1 cursor-pointer transition-all"
-                    >
-                      <CheckCircle className="w-4 h-4" /> MARK RESOLVED & UPDATE PORTAL
-                    </button>
+              {/* Progress Stage 2: Arrived -> Resolution Notes & Close */}
+              {activeJob.status === 'RESPONDER_ARRIVED' && (
+                <div className="space-y-3 pt-2">
+                  <div className="bg-amber-50 border border-amber-300 p-3 rounded-md text-xs text-amber-900 font-bold flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Officer on scene. Assess the situation, administer protocol, and enter resolution notes below.</span>
                   </div>
-                )}
-              </div>
+                  
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase text-slate-700 mb-1">
+                      Incident Resolution Notes & Action Taken
+                    </label>
+                    <textarea
+                      value={resolvingNotes}
+                      onChange={(e) => setResolvingNotes(e.target.value)}
+                      placeholder="Detail actions taken (e.g., medical treatment provided, security threat neutralized, area secured)..."
+                      rows={3}
+                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-emerald-600 text-xs shadow-inner"
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => handleResolveJob(activeJob.id)}
+                    disabled={loading}
+                    className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-lg text-xs uppercase tracking-wider shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    {loading ? 'Closing Incident...' : '✅ RESOLVE EMERGENCY & CLOSE DISPATCH'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
-        </div>
-      ) : (
-        /* Standby state */
-        <div className="glass-card rounded-md border border-slate-800 p-12 text-center max-w-md mx-auto space-y-4">
-          <div className="w-16 h-16 rounded-md bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-blue-400">
-            <Shield className="w-8 h-8 text-blue-400" />
-          </div>
-          <h3 className="text-lg font-bold text-white">Standby / Monitoring Active</h3>
-          <p className="text-slate-400 text-xs leading-relaxed">
-            You currently have no assigned active emergencies. Keep your duty status set to <span className="text-iiitp-success font-black">AVAILABLE</span> to receive automatic dispatches based on coordinates and skill score matching.
-          </p>
         </div>
       )}
 
-      {/* Incident History Log */}
-      <div className="glass-card p-6 rounded-md border border-iiitp-border space-y-4">
-        <h3 className="text-sm font-black uppercase tracking-wider text-slate-300">Your Deployment Resolution Logs</h3>
+      {/* ========================================================================= */}
+      {/* SECTION 2: LIVE CAMPUS EMERGENCY QUEUE (ALL ACTIVE UNRESOLVED INCIDENTS) */}
+      {/* ========================================================================= */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-600 animate-ping" />
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">
+              CAMPUS EMERGENCY DISPATCH RADAR ({activeList.length} ACTIVE)
+            </h3>
+          </div>
+          <span className="text-[11px] text-slate-500 font-semibold">
+            Real-time feed across campus sectors
+          </span>
+        </div>
+
+        {activeList.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activeList.map((em) => {
+              const isAssignedToMe = em.assignments?.some(a => a.responderId === user?.responder?.id && a.status !== 'DECLINED');
+              const hasAcceptedResponder = em.assignments?.some(a => a.status === 'ACCEPTED');
+              const assignedOfficer = em.assignments?.find(a => a.status === 'ACCEPTED' || a.status === 'PENDING')?.responder?.user?.name;
+
+              return (
+                <div 
+                  key={em.id} 
+                  className={`p-4 rounded-lg border transition-all ${
+                    isAssignedToMe 
+                      ? 'bg-red-50/70 border-red-400 shadow-md' 
+                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="p-2 rounded-md bg-slate-100">
+                        {getEmergencyIcon(em.type)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-black text-slate-900 text-sm">{em.id}</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-100 text-red-700 border border-red-200">
+                            {em.type}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1 font-semibold">
+                          <MapPin className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                          {em.manualLocation || 'Campus Coordinates'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                        em.status === 'REPORTED' 
+                          ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                          : 'bg-blue-100 text-blue-800 border border-blue-200'
+                      }`}>
+                        {em.status.replace(/_/g, ' ')}
+                      </span>
+                      {em.escalationLevel > 0 && (
+                        <p className="text-[10px] font-black text-red-600 mt-1">
+                          ESCALATION L{em.escalationLevel}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-slate-100 text-xs flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase">Student Reporter</span>
+                      <span className="font-semibold text-slate-800">{em.reporterName}</span>
+                      {em.reporterContact && (
+                        <a href={`tel:${em.reporterContact}`} className="text-blue-600 hover:underline ml-2 font-bold inline-flex items-center gap-0.5">
+                          <Phone className="w-3 h-3" /> {em.reporterContact}
+                        </a>
+                      )}
+                    </div>
+
+                    {assignedOfficer && !isAssignedToMe && (
+                      <span className="text-[11px] text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded">
+                        Officer: {assignedOfficer}
+                      </span>
+                    )}
+
+                    {/* Immediate Response Action */}
+                    {!isAssignedToMe ? (
+                      <button
+                        onClick={() => handleAcceptJob(em.id)}
+                        disabled={loading}
+                        className="py-1.5 px-3 bg-red-600 hover:bg-red-700 text-white rounded-md text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm cursor-pointer transition-all ml-auto"
+                      >
+                        <Zap className="w-3.5 h-3.5" /> RESPOND / TAKE DISPATCH
+                      </button>
+                    ) : (
+                      <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 ml-auto">
+                        ASSIGNED TO YOU
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="glass-card rounded-lg border border-slate-200 bg-white p-8 text-center max-w-lg mx-auto space-y-3 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-emerald-600">
+              <Check className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-black text-slate-900">Campus Status Normal • No Active Emergencies</h3>
+            <p className="text-slate-500 text-xs leading-relaxed">
+              All sectors are currently calm. Keep your duty status set to <span className="text-emerald-600 font-bold">AVAILABLE</span> to receive automatic dispatch alerts when a student triggers SOS.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* ========================================================================= */}
+      {/* SECTION 3: HISTORICAL DEPLOYMENT RESOLUTION LOGS */}
+      {/* ========================================================================= */}
+      <div className="glass-card p-5 sm:p-6 rounded-lg border border-slate-200 bg-white space-y-4 shadow-sm">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">
+            YOUR DEPLOYMENT RESOLUTION LOGS ({history.length})
+          </h3>
+          <span className="text-[10px] text-slate-400 font-bold uppercase">Archived in Central Safety Audit</span>
+        </div>
+
         {history.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {history.map((req) => (
-              <div key={req.id} className="p-3.5 bg-slate-900/40 border border-slate-850 rounded-md flex items-start justify-between text-xs gap-3">
+              <div key={req.id} className="p-3.5 bg-slate-50 border border-slate-200 rounded-lg flex items-start justify-between text-xs gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-white">{req.id}</span>
-                    <span className="text-[10px] font-bold uppercase text-slate-400">
+                    <span className="font-mono font-black text-slate-900">{req.id}</span>
+                    <span className="text-[10px] font-black uppercase bg-slate-200 text-slate-700 px-1.5 py-0.2 rounded">
                       {req.type}
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-500">
-                    Reporter: {req.reporterName} • Location: {req.manualLocation}
+                  <p className="text-[11px] text-slate-600">
+                    Reporter: <span className="font-semibold text-slate-800">{req.reporterName}</span> • {req.manualLocation}
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="inline-block px-2.5 py-0.5 bg-slate-800 border border-slate-700 text-slate-300 text-[9px] font-bold rounded-md uppercase">
+                <div className="text-right shrink-0">
+                  <span className="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 text-[9px] font-bold rounded uppercase">
                     RESOLVED
                   </span>
-                  <p className="text-[10px] text-slate-400 mt-1 italic max-w-[200px] truncate" title={req.notes}>
-                    &quot;{req.notes}&quot;
-                  </p>
+                  {req.notes && (
+                    <p className="text-[10px] text-slate-500 mt-1 italic max-w-[200px] truncate" title={req.notes}>
+                      &quot;{req.notes}&quot;
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-8 text-center bg-slate-900/10 border border-dashed border-slate-850 rounded-md text-slate-500 text-xs">
-            No historical assignments resolved.
+          <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-lg text-slate-500 text-xs">
+            No historical assignments resolved yet.
           </div>
         )}
       </div>

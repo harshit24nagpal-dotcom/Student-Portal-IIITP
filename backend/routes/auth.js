@@ -29,6 +29,8 @@ router.get('/me', authenticateToken, async (req, res) => {
             rating: true,
             latitude: true,
             longitude: true,
+            resolvedCount: true,
+            skills: true,
           },
         },
       },
@@ -148,7 +150,11 @@ router.post('/login', async (req, res) => {
           { email: `${lowerId}@ece.iiitp.ac.in` }
         ]
       },
-      include: { responder: true },
+      include: {
+        responder: {
+          include: { skills: true }
+        }
+      },
     });
 
     if (!user) {
@@ -225,12 +231,20 @@ router.post('/quick-login', async (req, res) => {
       // Find the first responder's user details
       user = await prisma.user.findFirst({
         where: { role: 'RESPONDER' },
-        include: { responder: true },
+        include: {
+        responder: {
+          include: { skills: true }
+        }
+      },
       });
     } else {
       user = await prisma.user.findFirst({
         where: { role },
-        include: { responder: true },
+        include: {
+        responder: {
+          include: { skills: true }
+        }
+      },
       });
     }
 

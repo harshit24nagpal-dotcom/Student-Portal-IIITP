@@ -361,24 +361,52 @@ router.post('/:id/accept', authenticateToken, async (req, res) => {
       return res.status(400).json({ error: 'User is not a responder' });
     }
 
-    // Update Assignment
-    const assignment = await prisma.emergencyAssignment.findFirst({
-      where: { requestId, responderId: user.responder.id, status: 'PENDING' },
+    // Verify emergency exists and is not resolved
+    const emergency = await prisma.emergencyRequest.findUnique({
+      where: { id: requestId },
     });
 
-    if (!assignment) {
-      return res.status(404).json({ error: 'No pending assignment found' });
+    if (!emergency) {
+      return res.status(404).json({ error: 'Emergency not found' });
     }
 
-    await prisma.emergencyAssignment.update({
-      where: { id: assignment.id },
-      data: {
-        status: 'ACCEPTED',
-        respondedAt: new Date(),
-      },
+    if (emergency.status === 'RESOLVED') {
+      return res.status(400).json({ error: 'Emergency is already resolved' });
+    }
+
+    // Find if there is an existing assignment for this responder
+    let assignment = await prisma.emergencyAssignment.findFirst({
+      where: { requestId, responderId: user.responder.id },
+      orderBy: { createdAt: 'desc' },
     });
 
-    // Update Request
+    if (assignment) {
+      assignment = await prisma.emergencyAssignment.update({
+        where: { id: assignment.id },
+        data: {
+          status: 'ACCEPTED',
+          respondedAt: new Date(),
+        },
+      });
+    } else {
+      // Cancel/decline any other stale pending assignments
+      await prisma.emergencyAssignment.updateMany({
+        where: { requestId, status: 'PENDING' },
+        data: { status: 'DECLINED' },
+      });
+
+      // Create new assignment as ACCEPTED
+      assignment = await prisma.emergencyAssignment.create({
+        data: {
+          requestId,
+          responderId: user.responder.id,
+          status: 'ACCEPTED',
+          respondedAt: new Date(),
+        },
+      });
+    }
+
+    // Update Request to RESPONDER_EN_ROUTE
     const updatedRequest = await prisma.emergencyRequest.update({
       where: { id: requestId },
       data: { status: 'RESPONDER_EN_ROUTE' },
@@ -399,7 +427,7 @@ router.post('/:id/accept', authenticateToken, async (req, res) => {
         requestId,
         status: 'RESPONDER_EN_ROUTE',
         changedById: req.user.id,
-        note: `Responder accepted assignment and is en route.`,
+        note: `Officer ${user.name} accepted dispatch and is en route.`,
       },
     });
 
@@ -410,10 +438,13 @@ router.post('/:id/accept', authenticateToken, async (req, res) => {
         requestId,
         status: 'RESPONDER_EN_ROUTE',
         request: updatedRequest,
+        assignment,
+        responderName: user.name,
+        responderId: user.responder.id,
       });
     }
 
-    res.json({ success: true, request: updatedRequest });
+    res.json({ success: true, request: updatedRequest, assignment });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -549,14 +580,26 @@ router.post('/:id/resolve', authenticateToken, async (req, res) => {
     });
 
     // Update responder stats if applicable
-    if (activeAssignment) {
-      const assignedAt = new Date(activeAssignment.assignedAt);
-      const elapsedSeconds = Math.floor((now.getTime() - assignedAt.getTime()) / 1000);
+    let responderToUpdateId = activeAssignment?.responderId;
+    if (!responderToUpdateId) {
+      const userRecord = await prisma.user.findUnique({
+        where: { id: req.user.id },
+        include: { responder: true },
+      });
+      if (userRecord?.responder) {
+        responderToUpdateId = userRecord.responder.id;
+      }
+    }
+
+    if (responderToUpdateId) {
+      const resp = await prisma.responder.findUnique({ where: { id: responderToUpdateId } });
+      const assignedAt = activeAssignment?.assignedAt ? new Date(activeAssignment.assignedAt) : new Date(updatedRequest.createdAt);
+      const elapsedSeconds = Math.max(1, Math.floor((now.getTime() - assignedAt.getTime()) / 1000));
 
       await prisma.responder.update({
-        where: { id: activeAssignment.responderId },
+        where: { id: responderToUpdateId },
         data: {
-          currentWorkload: { decrement: 1 },
+          currentWorkload: Math.max(0, (resp?.currentWorkload || 1) - 1),
           availabilityStatus: 'AVAILABLE',
           resolvedCount: { increment: 1 },
           responseTimeSum: { increment: elapsedSeconds },
